@@ -84,6 +84,7 @@ function createXHRStream(url, method, body, onEvent, onComplete, onError) {
   xhr.setRequestHeader('Content-Type', 'application/json');
   
   let lastIndex = 0;
+  let capturedThreadId = null;
   
   xhr.onprogress = () => {
     // Get new data since last progress event
@@ -108,6 +109,12 @@ function createXHRStream(url, method, body, onEvent, onComplete, onError) {
             const data = JSON.parse(dataStr);
             console.log('[XHR-SSE] ✅ Parsed:', data);
             
+            // CAPTURE thread_id from events
+            if (data.thread_id && !capturedThreadId) {
+              capturedThreadId = data.thread_id;
+              console.log('[XHR-SSE] 🎯 Captured thread_id:', capturedThreadId);
+            }
+            
             // Extract event type from data (it's inside the JSON now)
             const eventType = data.type || 'message';
             
@@ -129,7 +136,10 @@ function createXHRStream(url, method, body, onEvent, onComplete, onError) {
   
   xhr.onload = () => {
     console.log('[XHR-SSE] 🏁 Complete!');
-    onComplete({ status: 'completed' });
+    onComplete({ 
+      status: 'completed',
+      thread_id: capturedThreadId
+    });
   };
   
   xhr.onerror = () => {

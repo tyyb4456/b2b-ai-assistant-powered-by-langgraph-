@@ -88,3 +88,86 @@
 2025-11-22 06:39:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 675
 2025-11-22 06:39:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:270 - [SSE] Supplier response analyzed
 
+2025-11-22 07:14:07 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-11-22 07:14:52 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-11-22 07:14:58 | INFO     | main:lifespan:41 - ----------------------------------------
+2025-11-22 07:14:58 | INFO     | main:lifespan:42 - Starting B2B Textile Procurement API
+2025-11-22 07:14:58 | INFO     | main:lifespan:43 - Version: 1.0.0
+2025-11-22 07:14:58 | INFO     | main:lifespan:44 - Debug mode: False
+2025-11-22 07:14:58 | INFO     | main:lifespan:45 - ----------------------------------------
+2025-11-22 07:14:58 | SUCCESS  | main:lifespan:49 - LangGraph initialized
+2025-11-22 07:14:59 | INFO     | main:log_requests:100 - GET /
+2025-11-22 07:14:59 | INFO     | main:log_requests:102 - GET / - Status: 200
+2025-11-22 07:15:00 | INFO     | main:log_requests:100 - GET /favicon.ico
+2025-11-22 07:15:00 | INFO     | main:log_requests:102 - GET /favicon.ico - Status: 404
+2025-11-22 07:15:25 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations
+2025-11-22 07:15:25 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations - Status: 200
+2025-11-22 07:15:25 | INFO     | main:log_requests:100 - GET /api/v1/conversations
+2025-11-22 07:15:25 | INFO     | app.services.graph_manager:_ensure_initialized:42 - Initializing checkpoint database: B2B-textile-assistant.db
+2025-11-22 07:15:25 | SUCCESS  | app.services.graph_manager:_ensure_initialized:64 - LangGraph initialized successfully
+2025-11-22 07:15:25 | INFO     | app.services.conversation_service:list_conversations:865 - Found 0 conversations
+2025-11-22 07:15:25 | INFO     | main:log_requests:102 - GET /api/v1/conversations - Status: 200
+2025-11-22 07:15:56 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/stream
+2025-11-22 07:15:56 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/stream - Status: 200
+2025-11-22 07:15:56 | INFO     | main:log_requests:100 - POST /api/v1/conversations/stream
+2025-11-22 07:15:56 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:928 - Starting streaming conversation for user: demo_user
+2025-11-22 07:15:56 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 161
+2025-11-22 07:15:56 | INFO     | main:log_requests:102 - POST /api/v1/conversations/stream - Status: 200
+2025-11-22 07:15:56 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:86 - [SSE] Starting stream for thread: demo_user_82556da1-5de7-427b-90da-85f7a5952942
+2025-11-22 07:15:56 | INFO     | app.services.graph_manager:execute_workflow:89 - Starting workflow execution for thread: demo_user_82556da1-5de7-427b-90da-85f7a5952942
+2025-11-22 07:15:56 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:133 - [SSE] Processing node: receive_user_input
+2025-11-22 07:15:56 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Sending node_progress event, size: 150
+2025-11-22 07:15:56 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 192
+2025-11-22 07:15:56 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 180
+2025-11-22 07:15:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:133 - [SSE] Processing node: classify_intent
+2025-11-22 07:15:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Sending node_progress event, size: 140
+2025-11-22 07:15:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 183
+2025-11-22 07:15:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:199 - [SSE] Intent classified: get_quote
+2025-11-22 07:16:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:133 - [SSE] Processing node: extract_parameters
+2025-11-22 07:16:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Sending node_progress event, size: 122
+2025-11-22 07:16:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 245
+2025-11-22 07:16:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:210 - [SSE] Parameters extracted
+2025-11-22 07:46:59 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-11-22 07:47:34 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-11-22 07:48:58 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-11-22 07:50:08 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-11-22 07:53:48 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-11-22 07:54:28 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-11-22 07:54:34 | INFO     | main:lifespan:41 - ----------------------------------------
+2025-11-22 07:54:34 | INFO     | main:lifespan:42 - Starting B2B Textile Procurement API
+2025-11-22 07:54:34 | INFO     | main:lifespan:43 - Version: 1.0.0
+2025-11-22 07:54:34 | INFO     | main:lifespan:44 - Debug mode: False
+2025-11-22 07:54:34 | INFO     | main:lifespan:45 - ----------------------------------------
+2025-11-22 07:54:34 | SUCCESS  | main:lifespan:49 - LangGraph initialized
+2025-11-22 07:57:15 | INFO     | main:log_requests:100 - GET /
+2025-11-22 07:57:15 | INFO     | main:log_requests:102 - GET / - Status: 200
+2025-11-22 07:57:15 | INFO     | main:log_requests:100 - GET /favicon.ico
+2025-11-22 07:57:15 | INFO     | main:log_requests:102 - GET /favicon.ico - Status: 404
+2025-11-22 07:57:20 | INFO     | main:log_requests:100 - GET /docs
+2025-11-22 07:57:20 | INFO     | main:log_requests:102 - GET /docs - Status: 200
+2025-11-22 07:57:21 | INFO     | main:log_requests:100 - GET /openapi.json
+2025-11-22 07:57:21 | INFO     | main:log_requests:102 - GET /openapi.json - Status: 200
+2025-11-22 07:57:31 | INFO     | main:log_requests:100 - POST /api/v1/conversations/stream
+2025-11-22 07:57:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:928 - Starting streaming conversation for user: demo_user
+2025-11-22 07:57:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 161
+2025-11-22 07:57:31 | INFO     | main:log_requests:102 - POST /api/v1/conversations/stream - Status: 200
+2025-11-22 07:57:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:86 - [SSE] Starting stream for thread: demo_user_e8bf075d-c8ea-4a52-983c-ef8defda58bc
+2025-11-22 07:57:31 | INFO     | app.services.graph_manager:_ensure_initialized:42 - Initializing checkpoint database: B2B-textile-assistant.db
+2025-11-22 07:57:31 | SUCCESS  | app.services.graph_manager:_ensure_initialized:64 - LangGraph initialized successfully
+2025-11-22 07:57:31 | INFO     | app.services.graph_manager:execute_workflow:89 - Starting workflow execution for thread: demo_user_e8bf075d-c8ea-4a52-983c-ef8defda58bc
+2025-11-22 07:57:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:133 - [SSE] Processing node: receive_user_input
+2025-11-22 07:57:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Sending node_progress event, size: 150
+2025-11-22 07:57:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 192
+2025-11-22 07:57:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 180
+2025-11-22 07:57:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:133 - [SSE] Processing node: classify_intent
+2025-11-22 07:57:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Sending node_progress event, size: 140
+2025-11-22 07:57:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 183
+2025-11-22 07:57:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:199 - [SSE] Intent classified: get_quote
+2025-11-22 07:57:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:133 - [SSE] Processing node: extract_parameters
+2025-11-22 07:57:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Sending node_progress event, size: 122
+2025-11-22 07:57:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 310
+2025-11-22 07:57:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:210 - [SSE] Parameters extracted
+2025-11-22 07:57:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:133 - [SSE] Processing node: search_suppliers_direct_sql
+2025-11-22 07:57:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Sending node_progress event, size: 131
+2025-11-22 07:57:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:192 - [SSE] Sending message event, size: 196
+2025-11-22 07:57:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:227 - [SSE] Found 6 suppliers

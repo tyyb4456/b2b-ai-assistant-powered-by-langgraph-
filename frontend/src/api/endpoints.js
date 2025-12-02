@@ -40,6 +40,10 @@ export const getSuppliers = (threadId) => {
   return apiClient.get(`/conversations/${threadId}/suppliers`);
 };
 
+export const selectSupplier = (threadId, supplierData) => {
+  return apiClient.post(`/conversations/${threadId}/select-supplier`, supplierData);
+};
+
 export const getConversationMessages = (threadId) => {
   return apiClient.get(`/conversations/${threadId}/messages`);
 };

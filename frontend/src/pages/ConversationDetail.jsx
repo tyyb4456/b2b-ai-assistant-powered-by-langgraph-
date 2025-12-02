@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useConversationComprehensive, useConversationMessages, useConversationStatus } from '../api/hooks';
+import { useConversationComprehensive, useConversationMessages, useConversationStatus, useSelectSupplier } from '../api/hooks';
 import * as api from '../api/endpoints';
 import StreamingConversation from '../components/features/StreamingConversation';
 import Card, { CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/Card';
@@ -42,6 +42,10 @@ export default function ConversationDetail() {
   const [continueInput, setContinueInput] = useState('');
   const [resumeInput, setResumeInput] = useState('');
   const [activeTab, setActiveTab] = useState('overview'); // overview | messages | continue | resume
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  
+  // Supplier selection
+  const selectSupplierMutation = useSelectSupplier() || { mutate: () => {}, isPending: false };
 
   // 🔥 FIXED: Streaming setup with proper thread_id handling
   const streaming = StreamingConversation({
@@ -222,8 +226,15 @@ export default function ConversationDetail() {
       {/* Tab Content */}
       <div className="space-y-6">
         {activeTab === 'overview' && !streaming.streamState.isStreaming && (
-          <OverviewTab conversation={conversation} />
+          <OverviewTab 
+            conversation={conversation} 
+            selectedSupplier={selectedSupplier}
+            setSelectedSupplier={setSelectedSupplier}
+            selectSupplierMutation={selectSupplierMutation}
+            threadId={threadId}
+          />
         )}
+
 
         {activeTab === 'messages' && !streaming.streamState.isStreaming && (
           <MessagesTab messages={messagesData?.messages || []} />
@@ -290,7 +301,7 @@ export default function ConversationDetail() {
 // TAB COMPONENTS
 // ============================================
 
-function OverviewTab({ conversation }) {
+function OverviewTab({ conversation, selectedSupplier, setSelectedSupplier, selectSupplierMutation, threadId }) {
   return (
     <div className="space-y-6">
       {/* BASIC INFORMATION */}
@@ -399,14 +410,32 @@ function OverviewTab({ conversation }) {
               {conversation.supplier_search.top_recommendations?.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-neutral-700">Top Recommendations:</p>
-                  {conversation.supplier_search.top_recommendations.slice(0, 3).map((supplier, idx) => (
-                    <div key={idx} className="p-2 bg-neutral-50 rounded border border-neutral-200">
-                      <p className="text-sm font-semibold text-neutral-900">{supplier.name}</p>
-                      <div className="text-xs text-neutral-600 space-y-1 mt-1">
-                        <p>📍 {supplier.location}</p>
-                        {supplier.price_per_unit && <p>💰 ${supplier.price_per_unit}/unit</p>}
-                        {supplier.lead_time_days && <p>⏱️ {supplier.lead_time_days} days</p>}
-                        <p>⭐ Score: {supplier.overall_score.toFixed(1)}/100</p>
+                  {conversation.supplier_search.top_recommendations.map((supplier, idx) => (
+                    <div key={idx} className={`p-3 rounded border transition ${selectedSupplier?.supplier_id === supplier.supplier_id ? 'bg-primary-100 border-primary-400' : 'bg-neutral-50 border-neutral-200 hover:border-primary-300'}`}>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-neutral-900">{supplier.name}</p>
+                          <div className="text-xs text-neutral-600 space-y-1 mt-1">
+                            <p>📍 {supplier.location}</p>
+                            {supplier.price_per_unit && <p>💰 ${supplier.price_per_unit}/unit</p>}
+                            {supplier.lead_time_days && <p>⏱️ {supplier.lead_time_days} days</p>}
+                            <p>⭐ Score: {supplier.overall_score.toFixed(1)}/100</p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedSupplier(supplier);
+                            selectSupplierMutation.mutate({
+                              threadId,
+                              supplierData: supplier
+                            });
+                          }}
+                          disabled={selectSupplierMutation.isPending}
+                          className={selectedSupplier?.supplier_id === supplier.supplier_id ? 'bg-primary-600 text-white' : ''}
+                        >
+                          {selectSupplierMutation.isPending && selectedSupplier?.supplier_id === supplier.supplier_id ? 'Selecting...' : selectedSupplier?.supplier_id === supplier.supplier_id ? '✓ Selected' : 'Select'}
+                        </Button>
                       </div>
                     </div>
                   ))}

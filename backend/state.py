@@ -53,8 +53,8 @@ class AgentState(TypedDict):
 
     # supplier sourcing fields
     supplier_search_result : SupplierSearchResult
-    top_suppliers: Optional[List[Dict[str, Any]]]  
-
+    top_suppliers: Optional[List[Dict[str, Any]]]
+    selected_supplier: Optional[Dict[str, Any]]  # User-selected supplier for negotiation
 
     # quote generation fields
     generated_quote : GeneratedQuote

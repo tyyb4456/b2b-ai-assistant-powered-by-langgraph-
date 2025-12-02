@@ -231,3 +231,26 @@ export function useResumeConversation() {
     },
   });
 }
+
+
+/**
+ * Hook to select a supplier for negotiation
+ */
+export function useSelectSupplier() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ threadId, supplierData }) => 
+      api.selectSupplier(threadId, supplierData),
+    onSuccess: (response, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.conversationComprehensive(variables.threadId) 
+      });
+      
+      toast.success(`${variables.supplierData.name} selected for negotiation!`);
+      return response.data;
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Failed to select supplier');
+    },
+  });
+}

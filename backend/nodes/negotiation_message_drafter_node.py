@@ -9,7 +9,7 @@ import uuid
 
 
 load_dotenv()
-
+from loguru import logger
 
 
 
@@ -49,8 +49,22 @@ def analyze_negotiation_history(state: AgentState):
     
     # Build comprehensive Supplier Profile for cultural context
     active_supplier = {}
-    if supplier_data and len(supplier_data) > 0:
+    
+    # Check if user has selected a supplier, otherwise fall back to first supplier
+    selected_supplier = state.get('selected_supplier', None)
+
+    
+    if selected_supplier:
+        # Use the user-selected supplier
+        supplier_info = selected_supplier
+        logger.info("Using user-selected supplier for profile.")
+    elif supplier_data and len(supplier_data) > 0:
+        # Fall back to first supplier if no selection made
         supplier_info = supplier_data[0]
+    else:
+        supplier_info = None
+    
+    if supplier_info:
         active_supplier = {
             "name": supplier_info.get('name', 'Supplier'),
             "location": supplier_info.get('location', 'Unknown'),
@@ -61,6 +75,8 @@ def analyze_negotiation_history(state: AgentState):
             "past_negotiations": len(supplier_offers),
             "communication_style": state.get('communication_style', "standard")
         }
+
+    logger.info(f"Active Supplier Profile: {active_supplier}")
     
     # Extract urgency and timing context
     urgency_level = 'medium'

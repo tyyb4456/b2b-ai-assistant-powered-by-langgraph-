@@ -1097,6 +1097,66 @@ async def continue_conversation_stream(
     )
 
 
+@router.post(
+    "/{thread_id}/select-supplier",
+    response_model=APIResponse[dict],
+    summary="Select a supplier for negotiation",
+    description="User selects a supplier from the top suppliers list to proceed with negotiation"
+)
+async def select_supplier(
+    thread_id: str,
+    supplier_data: dict,
+    service: EnhancedConversationService = Depends(get_enhanced_service_dep),
+    request_id: Optional[str] = Depends(get_request_id)
+):
+    """
+    Select a supplier from the top suppliers list
+    
+    **Path Parameters:**
+    - thread_id: Conversation identifier
+    
+    **Request Body:**
+    - supplier_data: The selected supplier object (must include name, email, location, etc.)
+    
+    **Returns:**
+    - Updated conversation state with selected_supplier set
+    
+    **Use Cases:**
+    - User clicks on a supplier from the list to start negotiation
+    - Selected supplier is saved to state for message drafting
+    """
+    try:
+        state = await service.graph_manager.get_state(thread_id)
+        
+        if not state:
+            return not_found_response(
+                resource="conversation",
+                identifier=thread_id,
+                request_id=request_id
+            )
+        
+        # Update state with selected supplier
+        state['selected_supplier'] = supplier_data
+        state['active_supplier_id'] = supplier_data.get('supplier_id', supplier_data.get('id', ''))
+        
+        await service.graph_manager.update_state(thread_id, state)
+        
+        return success_response(
+            data={
+                "message": f"Supplier {supplier_data.get('name', 'Unknown')} selected",
+                "selected_supplier": supplier_data,
+                "thread_id": thread_id
+            },
+            request_id=request_id
+        )
+    except Exception as e:
+        logger.error(f"Error selecting supplier: {str(e)}")
+        return error_response(
+            message=f"Error selecting supplier: {str(e)}",
+            request_id=request_id
+        )
+
+
 @router.get(
     "/stream/test",
     summary="Test SSE streaming",

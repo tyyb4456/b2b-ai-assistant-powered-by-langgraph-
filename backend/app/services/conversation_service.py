@@ -599,10 +599,13 @@ class EnhancedConversationService:
         logger.info(f"Starting new conversation: {thread_id}")
         
         initial_state = {
+            "thread_id": thread_id,  # Include thread_id in initial state
             "user_input": user_input,
             "status": "starting",
             "channel": channel,
         }
+
+        print(initial_state)
         
         if recipient_email:
             initial_state["recipient_email"] = recipient_email

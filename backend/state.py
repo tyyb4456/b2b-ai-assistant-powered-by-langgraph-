@@ -23,11 +23,13 @@ class AgentState(TypedDict):
     This defines the shared data structure passed between all nodes.
     """
     # Core identification
+    thread_id: str  # Thread ID for tracking workflow execution
     user_id: str
     session_id: str
     channel: str
     status : str
-    recipient_email = str
+    recipient_email: str
+    active_supplier_id: str  # Current supplier being negotiated with
 
     messages : Annotated[list, add_messages]
 

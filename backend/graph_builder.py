@@ -141,25 +141,34 @@ graph_builder.add_edge('notify_user_and_suggest_next_steps', END)
 
 graph_builder.add_edge('schedule_follow_up', END)
 
-# Setup memory saver for state persistence
-conn = sqlite3.connect(database='B2B-texttile-assistant.db', check_same_thread=False)
-checkpointer = AsyncSqliteSaver(conn=conn)
+# NOTE: Graph compilation with checkpointer is handled by GraphManager (app/services/graph_manager.py)
+# This avoids creating a synchronous sqlite3 connection at module import time.
+# For standalone CLI testing, use the functions below that compile the graph on-demand.
 
-# IMPORTANT: Specify interrupt_before to pause before receiving supplier response
-graph = graph_builder.compile(
-    checkpointer=checkpointer,
-    interrupt_before = ['receive_supplier_response'],  # Pause here for human input
-    debug=Config.ENABLE_DEBUG
-)
+def get_compiled_graph_for_cli():
+    """
+    Compile graph with synchronous checkpointer for CLI/standalone testing only.
+    DO NOT use this in FastAPI - use GraphManager instead!
+    """
+    conn = sqlite3.connect(database='B2B-texttile-assistant.db', check_same_thread=False)
+    checkpointer = AsyncSqliteSaver(conn=conn)
+    return graph_builder.compile(
+        checkpointer=checkpointer,
+        interrupt_before=['receive_supplier_response'],
+        debug=Config.ENABLE_DEBUG
+    ), conn
 
 
-def get_saved_state(thread_id: str):
+def get_saved_state(thread_id: str, graph=None, conn=None):
     """
     Retrieve the saved state for a specific thread_id
     
     Returns:
         The saved state dictionary or None if no state exists
     """
+    if graph is None:
+        graph, conn = get_compiled_graph_for_cli()
+    
     try:
         config = {"configurable": {"thread_id": thread_id}}
         state = graph.get_state(config)
@@ -176,10 +185,13 @@ def get_saved_state(thread_id: str):
         return None
 
 
-def list_all_threads():
+def list_all_threads(conn=None):
     """
     List all thread IDs that have saved states
     """
+    if conn is None:
+        _, conn = get_compiled_graph_for_cli()
+    
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT DISTINCT thread_id FROM checkpoints")
@@ -252,10 +264,13 @@ def process_events(events, phase=""):
             print()
 
 
-def run_new_workflow(thread_id: Optional[str] = None) :
+def run_new_workflow(thread_id: Optional[str] = None, graph=None, conn=None):
     """
     Run a NEW workflow (starts fresh)
     """
+    if graph is None:
+        graph, conn = get_compiled_graph_for_cli()
+    
     # Generate new thread_id for new conversation
     thread_id = thread_id or str(uuid.uuid4())
     quote_input_text = Config.DEFAULT_GET_QUOTE_INPUT
@@ -265,6 +280,7 @@ def run_new_workflow(thread_id: Optional[str] = None) :
     print(f"🆕 Starting NEW workflow with thread_id: {thread_id}")
     
     initial_state = {
+        "thread_id": thread_id,
         "user_input": quote_input_text, 
         "status": "starting",
         "recipient_email": "tybhsn001@gmail.com"
@@ -279,7 +295,7 @@ def run_new_workflow(thread_id: Optional[str] = None) :
     return thread_id
 
 
-def continue_workflow(thread_id: str, new_input: Optional[str] = None):
+def continue_workflow(thread_id: str, new_input: Optional[str] = None, graph=None, conn=None):
     """
     CONTINUE an existing workflow from saved state
     
@@ -287,10 +303,13 @@ def continue_workflow(thread_id: str, new_input: Optional[str] = None):
         thread_id: The thread ID to continue
         new_input: Optional new user input to process
     """
+    if graph is None:
+        graph, conn = get_compiled_graph_for_cli()
+    
     config = {"configurable": {"thread_id": thread_id}}
     
     # Check if state exists
-    saved_state = get_saved_state(thread_id)
+    saved_state = get_saved_state(thread_id, graph, conn)
     if not saved_state:
         print(f"❌ No saved state found for thread: {thread_id}")
         print("💡 Use run_new_workflow() to start a new conversation")
@@ -312,7 +331,7 @@ def continue_workflow(thread_id: str, new_input: Optional[str] = None):
     process_events(events, "CONTINUE")
 
 
-def resume_with_supplier_response(thread_id: str, supplier_response: str):
+def resume_with_supplier_response(thread_id: str, supplier_response: str, graph=None, conn=None):
     """
     Resume the workflow after receiving supplier's response
     
@@ -320,6 +339,9 @@ def resume_with_supplier_response(thread_id: str, supplier_response: str):
         thread_id: The thread ID from the paused workflow
         supplier_response: The supplier's response text
     """
+    if graph is None:
+        graph, conn = get_compiled_graph_for_cli()
+    
     config = {"configurable": {"thread_id": thread_id}}
     
     # Check current state
@@ -494,5 +516,3 @@ if __name__ == "__main__":
             print("  python graph_builder.py view <id>        - View saved state")
             print("  python graph_builder.py list             - List all saved threads")
             print("  python graph_builder.py demo             - Run checkpoint demo")
-
-# ed2aa9cb-22d0-4bfc-af7b-509536498ff6

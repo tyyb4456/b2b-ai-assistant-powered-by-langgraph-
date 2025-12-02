@@ -1,3 +1,4 @@
+import asyncio
 from state import AgentState
 from composio import Composio
 from composio_langchain import LangchainProvider
@@ -9,22 +10,17 @@ from database import SessionLocal
 from loguru import logger
 
 
-
-async def send_negotiation_message(state: AgentState):
+def _run_email_agent_sync(recipient_email: str, drafted_message: str) -> tuple:
     """
-    Node to send the drafted message to the user's email.
+    Run the email agent synchronously.
+    This is called via asyncio.to_thread to avoid blocking the async event loop.
     """
-
-    # Extract necessary information from state
-    recipient_email = state.get('active_supplier_email', 'igntayyab@gmail.com')
-    drafted_message = state.get('drafted_message', '')
-
     model = init_chat_model("google_genai:gemini-2.5-flash")
 
     composio = Composio(provider=LangchainProvider())
 
     tool_list = composio.tools.get(
-        user_id="0000-0000",  # replace with your composio user_id
+        user_id="tyb111",
         tools=["GMAIL_SEND_EMAIL"],
     )
 
@@ -43,7 +39,6 @@ async def send_negotiation_message(state: AgentState):
         system_prompt=EMAIL_AGENT_PROMPT,
     )
 
-    # Compose the query with the actual message information
     query = f"""
     Please send the following message to {recipient_email}:
     
@@ -59,7 +54,6 @@ async def send_negotiation_message(state: AgentState):
     Please execute and confirm completion.
     """
 
-   # Stream the agent's execution
     messages_log = []
     final_message_text = ""
     
@@ -68,13 +62,10 @@ async def send_negotiation_message(state: AgentState):
     ):
         for update in step.values():
             for message in update.get("messages", []):
-                # Extract text content from the message
                 if hasattr(message, 'content'):
                     if isinstance(message.content, str):
-                        # If content is a string, use it directly
                         text_content = message.content
                     elif isinstance(message.content, list):
-                        # If content is a list of content blocks, extract text
                         text_content = ""
                         for block in message.content:
                             if isinstance(block, dict) and block.get('type') == 'text':
@@ -87,22 +78,47 @@ async def send_negotiation_message(state: AgentState):
                     print(text_content)
                     messages_log.append(text_content)
                     
-                    # Store the last message text
                     if text_content:
                         final_message_text = text_content
+    
+    return messages_log, final_message_text
 
-    # 🔥 NEW: Create supplier request when workflow will pause
+
+async def send_negotiation_message(state: AgentState):
+    """
+    Node to send the drafted message to the user's email.
+    Uses asyncio.to_thread to run synchronous email agent code without blocking.
+    """
+    # Validate thread_id is present
+    
+    thread_id = state.get('thread_id')
+    if not thread_id:
+        logger.error("thread_id is missing from state!")
+        raise ValueError("thread_id must be present in state for negotiation message sender")
+
+    # Extract necessary information from state
+    recipient_email = state.get('active_supplier_email', 'igntayyab@gmail.com')
+    drafted_message = state.get('drafted_message', '')
+
+    logger.info(f"Sending negotiation message to {recipient_email}")
+
+    # Run the synchronous email agent in a thread pool to avoid blocking async event loop
+    messages_log, final_message_text = await asyncio.to_thread(
+        _run_email_agent_sync,
+        recipient_email,
+        drafted_message
+    )
+
+    # Create supplier request when workflow will pause
     db = SessionLocal()
     try:
         request_service = get_supplier_request_service(db)
         
-        # Extract supplier email from state
-        supplier_email = "igntayyab@gmail.com"
-        supplier_id = state.get("active_supplier_id")  # Add this to your state
+        supplier_id = state.get("active_supplier_id", "CANVAS_001") 
         
         # Create request
         await request_service.create_supplier_request(
-            thread_id=state.get("thread_id"),  # Add thread_id to your state
+            thread_id=thread_id,
             supplier_id=supplier_id,
             request_type="negotiation",
             request_subject=f"Negotiation Round {state.get('negotiation_rounds', 1)}",
@@ -124,7 +140,7 @@ async def send_negotiation_message(state: AgentState):
     # Update state to reflect email was sent
     state['email_sent'] = True
     state['drafted_message_sender_agent'] = messages_log
-    state['messages'] = [final_message_text],
+    state['messages'] = [final_message_text]
     state['status'] = 'email_sent'
     state['next_step'] = 'end'
     

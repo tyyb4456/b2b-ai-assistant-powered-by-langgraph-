@@ -942,10 +942,13 @@ async def start_conversation_stream(
     
     # Prepare initial state
     initial_state = {
+        "thread_id": thread_id,
         "user_input": request.user_input,
         "status": "starting",
         "channel": request.channel,
     }
+
+    logger.info(f"Initial state for streaming start: {initial_state}")
     
     if request.recipient_email:
         initial_state["recipient_email"] = request.recipient_email

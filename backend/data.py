@@ -24,7 +24,7 @@ def seed_suppliers():
             "supplier_id": "CANVAS_001",
             "name": "EcoCanvas Mills Turkey",
             "location": "Istanbul, Turkey",
-            "email": "sales@ecocanvas.tr",
+            "email": "igntayyab@gmail.com",
             "phone": "+90-212-555-0101",
             "website": "www.ecocanvas.tr",
             "price_per_unit": 4.80,

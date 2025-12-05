@@ -114,7 +114,20 @@ async def send_negotiation_message(state: AgentState):
     try:
         request_service = get_supplier_request_service(db)
         
-        supplier_id = state.get("active_supplier_id", "CANVAS_001") 
+        # Get supplier_id from multiple sources for robustness
+        supplier_id = state.get("active_supplier_id")
+        logger.info(f"Extracted supplier_id from active_supplier_id: {supplier_id}")
+        
+        # Fallback: try to get from selected_supplier
+        if not supplier_id:
+            selected_supplier = state.get("selected_supplier", {})
+            supplier_id = selected_supplier.get("supplier_id") or selected_supplier.get("id")
+            logger.info(f"Extracted supplier_id from selected_supplier: {supplier_id}")
+        
+        # Final fallback
+        if not supplier_id:
+            supplier_id = "CANVAS_001"  # Default supplier_id for fallback
+            logger.warning(f"No supplier_id found in state, using default: {supplier_id}")
         
         # Create request
         await request_service.create_supplier_request(

@@ -24,7 +24,7 @@ def seed_suppliers():
             "supplier_id": "CANVAS_001",
             "name": "EcoCanvas Mills Turkey",
             "location": "Istanbul, Turkey",
-            "email": "sales@classicdenim.cn",
+            "email": "igntayyab@gmail.com",
             "phone": "+90-212-555-0101",
             "website": "www.ecocanvas.tr",
             "price_per_unit": 4.80,
@@ -616,7 +616,7 @@ def seed_supplier_users():
         # Add a test user that matches your API request
         {
             "supplier_id": "CANVAS_001",
-            "email": "user@example.com",
+            "email": "igntayyab@gmail.com",
             "password_hash": "string",  # Matches your test password
             "full_name": "Test User",
             "role": "admin",

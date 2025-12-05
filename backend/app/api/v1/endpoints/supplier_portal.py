@@ -213,12 +213,13 @@ async def submit_response(
     db: Session = Depends(get_db)
 ):
     """
-    🔥 CRITICAL: Submit supplier response and trigger workflow resume
+    Submit supplier response (only store, do NOT resume workflow)
     
     This endpoint:
     1. Saves supplier response
-    2. Updates request status
-    3. Triggers workflow resume automatically
+    2. Updates request status to "responded"
+    3. Does NOT trigger workflow resume
+    4. Frontend will manually resume workflow when ready
     """
     logger.info(f"📝 Supplier response received for request: {request_id}")
     
@@ -239,7 +240,7 @@ async def submit_response(
             detail=f"Request is not pending: {req.status}"
         )
     
-    # Submit response and trigger workflow resume
+    # Submit response (store only, no auto-resume)
     try:
         result = await service.submit_supplier_response(
             request_id=request_id,
@@ -251,18 +252,71 @@ async def submit_response(
             user_agent=request.headers.get("user-agent")
         )
         
-        logger.success(f"✅ Response submitted and workflow resumed: {request_id}")
+        logger.success(f"✅ Response stored (not auto-resumed): {request_id}")
         
-        return success_response(
-            data=result,
-            message="Response submitted successfully. Workflow resumed."
-        )
+        return success_response(data=result)
         
     except Exception as e:
         logger.error(f"❌ Failed to submit response: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to submit response: {str(e)}"
+        )
+
+
+# ============================================
+# MANUAL WORKFLOW RESUME
+# ============================================
+
+@router.post("/requests/{request_id}/resume-workflow")
+async def resume_workflow(
+    request_id: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Manually resume workflow after supplier response (called from frontend)
+    
+    This endpoint is called by the buyer's frontend (App A) to manually
+    resume the workflow after reviewing the supplier's response.
+    """
+    logger.info(f"🚀 Manual workflow resume requested for request: {request_id}")
+    
+    service = get_supplier_request_service(db)
+    
+    # Verify request exists
+    req = service.get_request_by_id(request_id)
+    
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    if req.status != "responded":
+        raise HTTPException(
+            status_code=400,
+            detail=f"Request must be in 'responded' status to resume, current: {req.status}"
+        )
+    
+    # Trigger workflow resume
+    try:
+        resume_result = await service._trigger_workflow_resume(
+            req,
+            req.supplier_response
+        )
+        
+        logger.success(f"✅ Workflow resumed successfully: {request_id}")
+        
+        return success_response(data={
+            "request_id": request_id,
+            "thread_id": req.thread_id,
+            "workflow_resumed": True,
+            "resume_status": resume_result["status"],
+            "trigger_id": resume_result["trigger_id"]
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Failed to resume workflow: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to resume workflow: {str(e)}"
         )
 
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ResponseModal from '../components/modals/ResponseModal';
 
 // Mock API calls - replace with real API
 const API_BASE = 'http://localhost:8000/api/v1/supplier';
@@ -10,6 +11,8 @@ function SupplierDashboard() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
 
   useEffect(() => {
     // Check authentication
@@ -64,6 +67,23 @@ function SupplierDashboard() {
     localStorage.removeItem('supplier_token');
     localStorage.removeItem('supplier_user');
     navigate('/login');
+  };
+
+  const handleNotificationClick = (notification) => {
+    if (notification.request_id) {
+      setSelectedRequestId(notification.request_id);
+      setModalOpen(true);
+    }
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedRequestId(null);
+  };
+
+  const handleModalSuccess = () => {
+    // Refresh dashboard data after successful response
+    fetchDashboardData();
   };
 
   if (loading) {
@@ -178,12 +198,24 @@ function SupplierDashboard() {
 
             <div className="divide-y divide-gray-200">
               {notifications.slice(0, 5).map((notif) => (
-                <NotificationCard key={notif.notification_id} notification={notif} />
+                <NotificationCard 
+                  key={notif.notification_id} 
+                  notification={notif}
+                  onClick={() => handleNotificationClick(notif)}
+                />
               ))}
             </div>
           </div>
         )}
       </main>
+
+      {/* Response Modal */}
+      <ResponseModal
+        requestId={selectedRequestId}
+        isOpen={modalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleModalSuccess}
+      />
     </div>
   );
 }
@@ -260,9 +292,12 @@ function RequestCard({ request, onClick }) {
   );
 }
 
-function NotificationCard({ notification }) {
+function NotificationCard({ notification, onClick }) {
   return (
-    <div className="px-6 py-4">
+    <div 
+      onClick={onClick}
+      className={`px-6 py-4 ${onClick ? 'hover:bg-blue-50 cursor-pointer transition-colors' : ''}`}
+    >
       <div className="flex items-start gap-3">
         <div className="shrink-0 text-2xl">🔔</div>
         <div className="flex-1 min-w-0">
@@ -275,6 +310,14 @@ function NotificationCard({ notification }) {
           <p className="text-xs text-gray-400 mt-2">
             {new Date(notification.sent_at).toLocaleString()}
           </p>
+          {notification.request_id && onClick && (
+            <p className="text-xs text-blue-600 font-medium mt-2 flex items-center gap-1">
+              📝 Click to respond in modal
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </p>
+          )}
         </div>
       </div>
     </div>

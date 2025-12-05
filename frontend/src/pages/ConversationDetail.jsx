@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useConversationComprehensive, useConversationMessages, useConversationStatus, useSelectSupplier } from '../api/hooks';
 import * as api from '../api/endpoints';
@@ -302,8 +302,70 @@ export default function ConversationDetail() {
 // ============================================
 
 function OverviewTab({ conversation, selectedSupplier, setSelectedSupplier, selectSupplierMutation, threadId }) {
+  const [resumingWorkflow, setResumingWorkflow] = React.useState(false);
+  
+  // Check if supplier response is available
+  const hasSupplierResponse = conversation.is_paused && 
+    conversation.negotiation && 
+    conversation.negotiation.current_round_status === 'awaiting_supplier_response_review';
+
+  const handleResumeWorkflow = async () => {
+    try {
+      setResumingWorkflow(true);
+      // Get request ID from negotiation data (you may need to adjust based on your data structure)
+      const requestId = conversation.negotiation?.current_request_id;
+      if (!requestId) {
+        alert('Could not find supplier request ID');
+        return;
+      }
+      
+      const response = await fetch(`${window.location.origin.replace(/:\d+/, ':8000')}/api/v1/supplier/requests/${requestId}/resume-workflow`, {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        alert('✅ Workflow resumed successfully');
+        window.location.reload();
+      } else {
+        alert('❌ Failed to resume workflow');
+      }
+    } catch (error) {
+      console.error('Error resuming workflow:', error);
+      alert('Error: ' + error.message);
+    } finally {
+      setResumingWorkflow(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* SUPPLIER RESPONSE RECEIVED BANNER */}
+      {hasSupplierResponse && (
+        <Card>
+          <CardContent>
+            <div className="bg-success-50 border-l-4 border-success-500 p-4 rounded">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-success-900 mb-2">
+                    ✅ Supplier Response Received
+                  </h3>
+                  <p className="text-sm text-success-700 mb-3">
+                    The supplier has submitted their response. Review it and click below to resume the workflow and continue negotiation.
+                  </p>
+                  <Button
+                    onClick={handleResumeWorkflow}
+                    disabled={resumingWorkflow}
+                    className="bg-success-600 hover:bg-success-700 text-white"
+                  >
+                    {resumingWorkflow ? 'Resuming...' : 'Resume Workflow Now'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* BASIC INFORMATION */}
       <Card>
         <CardHeader>

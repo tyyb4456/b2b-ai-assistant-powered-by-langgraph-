@@ -102,7 +102,7 @@ class SupplierRequestService:
         ip_address: Optional[str] = None,
         user_agent: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Submit supplier response and trigger workflow resume"""
+        """Submit supplier response (store only, do NOT resume workflow)"""
         
         logger.info(f"Processing supplier response for request: {request_id}")
         
@@ -140,15 +140,14 @@ class SupplierRequestService:
         
         logger.success(f"✅ Supplier response saved: {request_id}")
         
-        # Trigger workflow resume
-        resume_result = await self._trigger_workflow_resume(request, response_text)
+        # ⚠️ IMPORTANT: Do NOT auto-resume workflow here
+        # Workflow will be resumed manually from frontend
         
         return {
             "request_id": request_id,
             "response_recorded": True,
-            "workflow_resume_triggered": resume_result["triggered"],
-            "resume_status": resume_result["status"],
-            "thread_id": request.thread_id
+            "thread_id": request.thread_id,
+            "message": "Response stored successfully. Awaiting manual workflow resume."
         }
     
     # ============================================

@@ -19,7 +19,6 @@ export const getConversation = (threadId) => {
 export const getConversationComprehensive = (threadId) => {
   return apiClient.get(`/conversations/${threadId}/comprehensive`);
 };
-
 export const getQuoteWorkflow = (threadId) => {
   return apiClient.get(`/conversations/${threadId}/quote`);
 };
@@ -58,6 +57,24 @@ export const resumeConversation = (threadId, supplierResponse) => {
   return apiClient.post(`/conversations/${threadId}/resume`, {
     supplier_response: supplierResponse,
   });
+};
+
+// ============================================
+// SUPPLIER RESPONSE WORKFLOW CONTROL
+// ============================================
+
+/**
+ * Check if supplier response is available for a request
+ */
+export const checkSupplierResponse = (threadId, requestId) => {
+  return apiClient.get(`/supplier/requests/${requestId}`);
+};
+
+/**
+ * Manually resume workflow after supplier response
+ */
+export const resumeWorkflowFromSupplierResponse = (requestId) => {
+  return apiClient.post(`/supplier/requests/${requestId}/resume-workflow`);
 };
 
 export const listConversations = (params = {}) => {

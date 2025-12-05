@@ -1,0 +1,63 @@
+2025-12-05 09:30:06 | INFO     | main:log_requests:100 - POST /api/v1/conversations/stream
+2025-12-05 09:30:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:938 - Starting streaming conversation for user: demo_user
+2025-12-05 09:30:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:951 - Initial state for streaming start: {'thread_id': 'demo_user_14e2c3ad-9046-4698-9379-6970a6bfde11', 'user_input': 'I need a quote for 5,000 meters of organic cotton canvas', 'status': 'starting', 'channel': 'web'}
+2025-12-05 09:30:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 168
+2025-12-05 09:30:06 | INFO     | main:log_requests:102 - POST /api/v1/conversations/stream - Status: 200
+2025-12-05 09:30:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_14e2c3ad-9046-4698-9379-6970a6bfde11
+2025-12-05 09:30:06 | INFO     | app.services.graph_manager:execute_workflow:89 - Starting workflow execution for thread: demo_user_14e2c3ad-9046-4698-9379-6970a6bfde11
+2025-12-05 09:30:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
+2025-12-05 09:30:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
+2025-12-05 09:30:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 199
+2025-12-05 09:30:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
+2025-12-05 09:30:09 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
+2025-12-05 09:30:09 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
+2025-12-05 09:30:09 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
+2025-12-05 09:30:09 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: get_quote
+2025-12-05 09:30:13 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: extract_parameters
+2025-12-05 09:30:13 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 129
+2025-12-05 09:30:13 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 283
+2025-12-05 09:30:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:222 - [SSE] Parameters extracted
+2025-12-05 09:39:00 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:39:00 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:39:00 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:39:00 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:39:30 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:39:30 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:39:30 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:39:30 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:40:00 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:40:00 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:40:00 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:40:00 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:40:30 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:40:30 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:40:30 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:40:30 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:41:00 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:41:00 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:41:00 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:41:00 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:42:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:42:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:42:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:42:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:43:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:43:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:43:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:43:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:44:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:44:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:44:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:44:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:45:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:45:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:45:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:45:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:46:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:46:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:46:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:46:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-05 09:47:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-05 09:47:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-05 09:47:22 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-05 09:47:22 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200

@@ -108,6 +108,8 @@ def validate_input_state(state: AgentState) -> Tuple[bool, Optional[str]]:
     if not params.get('fabric_details'):
         return False, "Missing fabric details in parameters"
     
+    logger.info("Input state validation passed")
+    
     return True, None
 
 
@@ -219,7 +221,10 @@ def get_shipping_rate(route_key: Optional[Tuple[str, str]], origin: str, destina
     # Check if both are in Asia (regional rate)
     asian_countries = ['China', 'India', 'Pakistan', 'Bangladesh', 'Vietnam', 'Thailand', 'Indonesia']
     if origin in asian_countries and destination in asian_countries:
+        logger.debug(f"Using regional shipping rate for {origin} to {destination}.")
         return QuoteConfig.SHIPPING_RATES[('default_regional',)]
+    
+    logger.debug(f"No specific shipping rate found for {origin} to {destination}, using default international rate.")
     
     # International rate
     return QuoteConfig.SHIPPING_RATES[('default_international',)]

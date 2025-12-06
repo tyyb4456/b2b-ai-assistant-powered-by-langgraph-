@@ -31,8 +31,8 @@ class Config:
     """Configuration management for the procurement graph"""
     DEFAULT_THREAD_ID = os.getenv("GRAPH_THREAD_ID", str(uuid.uuid4()))
     ENABLE_DEBUG = os.getenv("GRAPH_DEBUG", "false").lower() == "true"
-    DEFAULT_NEGOTIATION_INPUT = os.getenv("Can you improve the lead time from 60 to 45 days?DEFAULT_NEGOTIATION_INPUT", '''
-        ,
+    DEFAULT_NEGOTIATION_INPUT = os.getenv("DEFAULT_NEGOTIATION_INPUT", '''
+        Can you improve the lead time from 60 to 45 days?,
         The quoted price is too high, can we discuss?,
         Need better payment terms than 100% advance,
         Your competitor quoted 10% lower, can you match?

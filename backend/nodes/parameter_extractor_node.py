@@ -2,6 +2,7 @@ from langchain.chat_models import init_chat_model
 from models.paremeter_extractor_model import ExtractedRequest
 from langchain_core.messages import SystemMessage, HumanMessage
 from state import AgentState
+from loguru import logger
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -69,6 +70,8 @@ def extract_parameters(state: AgentState) -> dict:
 
         if extraction_result.clarification_questions:
             assistant_message += f" Clarification questions: {', '.join(extraction_result.clarification_questions)}"
+            logger.info(f"Clarification questions generated: {extraction_result.clarification_questions}")
+            logger.warning("Missing critical information, clarification needed.")
 
         updates = {
             'extracted_parameters' : extraction_result.model_dump(),

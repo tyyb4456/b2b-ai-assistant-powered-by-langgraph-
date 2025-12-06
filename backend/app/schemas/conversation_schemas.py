@@ -1,7 +1,7 @@
 """
 Enhanced Pydantic schemas for comprehensive conversation API responses
 
-These schemas expose all the rich data from AgentState to API consumers
+These schemas expose all the rich data from AgentState to API consumers 
 """
 from typing import Optional, Literal, Any, List, Dict
 from datetime import datetime

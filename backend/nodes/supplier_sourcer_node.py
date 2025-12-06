@@ -115,12 +115,9 @@ Return supplier_ids in your lists, not full objects."""
             supplier_map[sid] for sid in ai_result.top_supplier_ids 
             if sid in supplier_map
         ]
-        
-        print(f"\n🤖 AI Analysis:")
-        print(f"   Total Suppliers: {len(suppliers)}")
-        print(f"   Filtered: {len(filtered_suppliers)}")
-        print(f"   Top Recommendations: {len(top_recommendations)}")
+
         print(f"   Filtering Rationale: {ai_result.filtering_rationale[:100]}...")
+        logger.info(f"AI filtering succeeded: Total Suppliers: {len(suppliers)}, {len(filtered_suppliers)} suppliers filtered, {len(top_recommendations)} top recommendations, rationale: {ai_result.filtering_rationale[:100]}...")
         
         return {
             'filtered_suppliers': filtered_suppliers,
@@ -238,6 +235,10 @@ def search_suppliers_direct_sql(state : AgentState):
             query += " ORDER BY s.reputation_score DESC, s.lead_time_days ASC"
         
         query += " LIMIT 25"  # Get more suppliers for AI filtering
+
+        logger.info(f"Executing supplier search SQL with params: {params}")
+        logger.info(f"SQL Query: {query}")
+        logger.debug(f"SQL Query: {query}")
         
         # Execute query using engine directly
         
@@ -271,6 +272,10 @@ def search_suppliers_direct_sql(state : AgentState):
             all_suppliers.append(supplier)
         
         total_found = len(all_suppliers)
+
+        logger.info(f"Total suppliers found from SQL: {total_found}")
+        logger.info(f"Supplier IDs found: {[s.supplier_id for s in all_suppliers]}")
+        logger.debug(f"Suppliers found: {[s.supplier_id for s in all_suppliers]}")
         
         # If suppliers found, use AI to filter and analyze
         if total_found > 0:
@@ -320,7 +325,7 @@ def search_suppliers_direct_sql(state : AgentState):
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
-        print(f"❌ Error in search_suppliers_direct_sql:\n{error_details}")
+        logger.error(f"Error during supplier search: {str(e)}\n{error_details}")
         
         supplier_search_result =  SupplierSearchResult(
             request_id=extracted_params.get('item_id', 'ERROR'),

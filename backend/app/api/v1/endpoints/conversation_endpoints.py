@@ -5,7 +5,7 @@ Provides comprehensive endpoints for conversation management including:
 - Standard REST endpoints for CRUD operations
 - Detailed data exposure endpoints (comprehensive, quote, negotiation)
 - Real-time SSE streaming endpoints
-- Utility endpoints for specific data access
+- Utility endpoints for specific data access StartConversationRequest
 """
 from typing import Optional, AsyncIterator
 import asyncio
@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from loguru import logger
 import asyncio
-from starlette.responses import StreamingResponse as StarletteStreamingResponse
+# from starlette.responses import StreamingResponse as StarletteStreamingResponse
 
 from app.schemas.conversation_schemas import (
     ConversationComprehensiveResponse,
@@ -348,58 +348,58 @@ def format_sse_event(event_type: str, data: dict) -> str:
 # STANDARD REST ENDPOINTS
 # ============================================
 
-@router.post(
-    "",
-    response_model=APIResponse[dict],
-    status_code=status.HTTP_201_CREATED,
-    summary="Start a new conversation",
-    description="Initialize a new conversation workflow with user input"
-)
-async def start_conversation(
-    request: StartConversationRequest,
-    service: EnhancedConversationService = Depends(get_enhanced_service_dep),
-    request_id: Optional[str] = Depends(get_request_id),
-    user_id: Optional[str] = Depends(get_current_user)
-):
-    """
-    Start a new conversation workflow
+# @router.post(
+#     "",
+#     response_model=APIResponse[dict],
+#     status_code=status.HTTP_201_CREATED,
+#     summary="Start a new conversation",
+#     description="Initialize a new conversation workflow with user input"
+# )
+# async def start_conversation(
+#     request: StartConversationRequest,
+#     service: EnhancedConversationService = Depends(get_enhanced_service_dep),
+#     request_id: Optional[str] = Depends(get_request_id),
+#     user_id: Optional[str] = Depends(get_current_user)
+# ):
+#     """
+#     Start a new conversation workflow
     
-    **Request Body:**
-    - user_input: Initial user message (required)
-    - recipient_email: Email for quote delivery (optional)
-    - channel: Communication channel (default: "api")
+#     **Request Body:**
+#     - user_input: Initial user message (required)
+#     - recipient_email: Email for quote delivery (optional)
+#     - channel: Communication channel (default: "api")
     
-    **Returns:**
-    - thread_id: Unique conversation identifier
-    - status: Current workflow status
-    - intent: Classified user intent
-    - is_paused: Whether workflow is waiting for input
-    """
-    logger.info(f"Starting new conversation for user: {user_id}")
+#     **Returns:**
+#     - thread_id: Unique conversation identifier
+#     - status: Current workflow status
+#     - intent: Classified user intent
+#     - is_paused: Whether workflow is waiting for input
+#     """
+#     logger.info(f"Starting new conversation for user: {user_id}")
     
-    try:
-        result = await service.start_conversation(
-            user_input=request.user_input,
-            recipient_email=request.recipient_email,
-            channel=request.channel,
-            user_id=user_id
-        )
+#     try:
+#         result = await service.start_conversation(
+#             user_input=request.user_input,
+#             recipient_email=request.recipient_email,
+#             channel=request.channel,
+#             user_id=user_id
+#         )
         
-        logger.success(f"Conversation started: {result['thread_id']}")
+#         logger.success(f"Conversation started: {result['thread_id']}")
         
-        return created_response(
-            data=result,
-            request_id=request_id
-        )
+#         return created_response(
+#             data=result,
+#             request_id=request_id
+#         )
         
-    except Exception as e:
-        logger.error(f"Failed to start conversation: {e}")
-        return error_response(
-            error_code="WORKFLOW_EXECUTION_FAILED",
-            message=f"Failed to start conversation: {str(e)}",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            request_id=request_id
-        )
+#     except Exception as e:
+#         logger.error(f"Failed to start conversation: {e}")
+#         return error_response(
+#             error_code="WORKFLOW_EXECUTION_FAILED",
+#             message=f"Failed to start conversation: {str(e)}",
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             request_id=request_id
+#         )
 
 
 @router.get(
@@ -441,132 +441,132 @@ async def list_conversations(
     )
 
 
-@router.post(
-    "/{thread_id}/resume",
-    response_model=APIResponse[dict],
-    summary="Resume conversation with supplier response",
-    description="Resume a paused conversation with supplier's response"
-)
-async def resume_conversation(
-    thread_id: str,
-    request: ResumeConversationRequest,
-    service: EnhancedConversationService = Depends(get_enhanced_service_dep),
-    request_id: Optional[str] = Depends(get_request_id),
-    user_id: Optional[str] = Depends(get_current_user)
-):
-    """
-    Resume a paused conversation with supplier response
+# @router.post(
+#     "/{thread_id}/resume",
+#     response_model=APIResponse[dict],
+#     summary="Resume conversation with supplier response",
+#     description="Resume a paused conversation with supplier's response"
+# )
+# async def resume_conversation(
+#     thread_id: str,
+#     request: ResumeConversationRequest,
+#     service: EnhancedConversationService = Depends(get_enhanced_service_dep),
+#     request_id: Optional[str] = Depends(get_request_id),
+#     user_id: Optional[str] = Depends(get_current_user)
+# ):
+#     """
+#     Resume a paused conversation with supplier response
     
-    **Path Parameters:**
-    - thread_id: Conversation identifier
+#     **Path Parameters:**
+#     - thread_id: Conversation identifier
     
-    **Request Body:**
-    - supplier_response: Supplier's response message
+#     **Request Body:**
+#     - supplier_response: Supplier's response message
     
-    **Returns:**
-    - Updated conversation status
-    - New negotiation round number
-    - Whether still paused (for multi-round negotiations)
+#     **Returns:**
+#     - Updated conversation status
+#     - New negotiation round number
+#     - Whether still paused (for multi-round negotiations)
     
-    **Use Cases:**
-    - Continue negotiation after supplier responds
-    - Handle multi-round negotiations
-    - Progress towards contract or alternative actions
-    """
-    logger.info(f"Resuming conversation: {thread_id}")
+#     **Use Cases:**
+#     - Continue negotiation after supplier responds
+#     - Handle multi-round negotiations
+#     - Progress towards contract or alternative actions
+#     """
+#     logger.info(f"Resuming conversation: {thread_id}")
     
-    try:
-        result = await service.resume_with_supplier_response(
-            thread_id=thread_id,
-            supplier_response=request.supplier_response
-        )
+#     try:
+#         result = await service.resume_with_supplier_response(
+#             thread_id=thread_id,
+#             supplier_response=request.supplier_response
+#         )
         
-        logger.success(f"Conversation resumed: {thread_id}")
+#         logger.success(f"Conversation resumed: {thread_id}")
         
-        return success_response(
-            data=result,
-            request_id=request_id
-        )
+#         return success_response(
+#             data=result,
+#             request_id=request_id
+#         )
         
-    except ValueError as e:
-        logger.warning(f"Invalid resume request: {e}")
-        return error_response(
-            error_code="INVALID_OPERATION",
-            message=str(e),
-            status_code=status.HTTP_400_BAD_REQUEST,
-            request_id=request_id
-        )
-    except Exception as e:
-        logger.error(f"Failed to resume conversation: {e}")
-        return error_response(
-            error_code="WORKFLOW_EXECUTION_FAILED",
-            message=f"Failed to resume conversation: {str(e)}",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            request_id=request_id
-        )
+#     except ValueError as e:
+#         logger.warning(f"Invalid resume request: {e}")
+#         return error_response(
+#             error_code="INVALID_OPERATION",
+#             message=str(e),
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             request_id=request_id
+#         )
+#     except Exception as e:
+#         logger.error(f"Failed to resume conversation: {e}")
+#         return error_response(
+#             error_code="WORKFLOW_EXECUTION_FAILED",
+#             message=f"Failed to resume conversation: {str(e)}",
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             request_id=request_id
+#         )
 
 
-@router.post(
-    "/{thread_id}/continue",
-    response_model=APIResponse[dict],
-    summary="Continue conversation with new input",
-    description="Continue an existing conversation with new user message"
-)
-async def continue_conversation(
-    thread_id: str,
-    request: ContinueConversationRequest,
-    service: EnhancedConversationService = Depends(get_enhanced_service_dep),
-    request_id: Optional[str] = Depends(get_request_id),
-    user_id: Optional[str] = Depends(get_current_user)
-):
-    """
-    Continue conversation with new user input
+# @router.post(
+#     "/{thread_id}/continue",
+#     response_model=APIResponse[dict],
+#     summary="Continue conversation with new input",
+#     description="Continue an existing conversation with new user message"
+# )
+# async def continue_conversation(
+#     thread_id: str,
+#     request: ContinueConversationRequest,
+#     service: EnhancedConversationService = Depends(get_enhanced_service_dep),
+#     request_id: Optional[str] = Depends(get_request_id),
+#     user_id: Optional[str] = Depends(get_current_user)
+# ):
+#     """
+#     Continue conversation with new user input
     
-    **Path Parameters:**
-    - thread_id: Conversation identifier
+#     **Path Parameters:**
+#     - thread_id: Conversation identifier
     
-    **Request Body:**
-    - user_input: New user message
+#     **Request Body:**
+#     - user_input: New user message
     
-    **Returns:**
-    - Updated conversation status
+#     **Returns:**
+#     - Updated conversation status
     
-    **Use Cases:**
-    - Start new quote request in same conversation
-    - Modify requirements
-    - Ask follow-up questions
-    """
-    logger.info(f"Continuing conversation: {thread_id}")
+#     **Use Cases:**
+#     - Start new quote request in same conversation
+#     - Modify requirements
+#     - Ask follow-up questions
+#     """
+#     logger.info(f"Continuing conversation: {thread_id}")
     
-    try:
-        result = await service.continue_conversation(
-            thread_id=thread_id,
-            user_input=request.user_input
-        )
+#     try:
+#         result = await service.continue_conversation(
+#             thread_id=thread_id,
+#             user_input=request.user_input
+#         )
         
-        logger.success(f"Conversation continued: {thread_id}")
+#         logger.success(f"Conversation continued: {thread_id}")
         
-        return success_response(
-            data=result,
-            request_id=request_id
-        )
+#         return success_response(
+#             data=result,
+#             request_id=request_id
+#         )
         
-    except ValueError as e:
-        logger.warning(f"Invalid continue request: {e}")
-        return error_response(
-            error_code="INVALID_OPERATION",
-            message=str(e),
-            status_code=status.HTTP_400_BAD_REQUEST,
-            request_id=request_id
-        )
-    except Exception as e:
-        logger.error(f"Failed to continue conversation: {e}")
-        return error_response(
-            error_code="WORKFLOW_EXECUTION_FAILED",
-            message=f"Failed to continue conversation: {str(e)}",
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            request_id=request_id
-        )
+#     except ValueError as e:
+#         logger.warning(f"Invalid continue request: {e}")
+#         return error_response(
+#             error_code="INVALID_OPERATION",
+#             message=str(e),
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             request_id=request_id
+#         )
+#     except Exception as e:
+#         logger.error(f"Failed to continue conversation: {e}")
+#         return error_response(
+#             error_code="WORKFLOW_EXECUTION_FAILED",
+#             message=f"Failed to continue conversation: {str(e)}",
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             request_id=request_id
+#         )
 
 
 # ============================================
@@ -850,7 +850,7 @@ async def get_suppliers(
         request_id=request_id
     )
 
-
+# need improvements here
 @router.get(
     "/{thread_id}/messages",
     response_model=APIResponse[dict],
@@ -1182,8 +1182,14 @@ async def test_stream():
         generate(),
         media_type="text/event-stream",
         headers={
-            "Cache-Control": "no-cache, no-transform",
+            "Cache-Control": "no-cache, no-store, no-transform, must-revalidate",
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
+            "Content-Encoding": "none",
+            "Transfer-Encoding": "chunked",
+            "Content-Type": "text/event-stream; charset=utf-8",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
         }
     )

@@ -3,6 +3,7 @@ from langchain.chat_models import init_chat_model
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from pydantic import BaseModel, Field
+from loguru import logger
 
 class PreNegotiate(BaseModel):
     """Structured output model for pre-negotiation analysis"""
@@ -21,6 +22,14 @@ def start_negotiation(state: AgentState):
     """
     user_input = state.get("user_input", "")
     negotiation_messages = state.get('negotiation_messages', [])
+
+    logger.info("Starting negotiation initialization...")
+
+    if negotiation_messages:
+        logger.info(f"Existing negotiation messages found: {len(negotiation_messages)} messages")
+        logger.debug(f"Negotiation messages: {negotiation_messages}")
+    else:
+        logger.info("No existing negotiation messages found.")
     
     # Initialize the model
     model = init_chat_model("google_genai:gemini-2.5-flash")
@@ -39,6 +48,8 @@ def start_negotiation(state: AgentState):
     parser = StrOutputParser()
     objective_chain = objective_prompt | model | parser
     negotiation_objective = objective_chain.invoke({"user_input": user_input}).strip()
+
+    logger.info(f"Extracted negotiation objective: {negotiation_objective}")
     
     # --- Step 2: Extract topic and tone from conversation history ---
     structure_model = model.with_structured_output(PreNegotiate)
@@ -77,6 +88,9 @@ def start_negotiation(state: AgentState):
     negotiation_topic = structured_result.negotiation_topic
     conversation_tone = structured_result.conversation_tone
     
+    logger.info(f"Extracted negotiation topic: {negotiation_topic}")
+    logger.info(f"Extracted conversation tone: {conversation_tone}")
+
     # Create summary message
     message = f"""
         Negotiation initialized:\n"

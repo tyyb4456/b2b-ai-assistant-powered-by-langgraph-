@@ -6,7 +6,7 @@ from state import AgentState
 from models.negotiation_message_detail import NegotiationStrategy, DraftedMessage
 from dotenv import load_dotenv
 import uuid
-
+from utils.determining import determine_cultural_region
 
 load_dotenv()
 from loguru import logger
@@ -61,6 +61,7 @@ def analyze_negotiation_history(state: AgentState):
     elif supplier_data and len(supplier_data) > 0:
         # Fall back to first supplier if no selection made
         supplier_info = supplier_data[0]
+        logger.info("No user-selected supplier, using first supplier from search results.")
     else:
         supplier_info = None
     
@@ -95,25 +96,6 @@ def analyze_negotiation_history(state: AgentState):
         "active_supplier": active_supplier,  # Complete supplier profile
         "urgency_level": urgency_level
     }
-
-def determine_cultural_region(location: str) -> str:
-    """Determine cultural communication region based on supplier location"""
-    location_lower = location.lower()
-    
-    if any(country in location_lower for country in ['china', 'japan', 'korea', 'taiwan', 'singapore', 'hong kong']):
-        return 'east_asian'
-    elif any(country in location_lower for country in ['india', 'pakistan', 'bangladesh', 'sri lanka']):
-        return 'south_asian'  
-    elif any(country in location_lower for country in ['germany', 'italy', 'france', 'uk', 'netherlands', 'spain']):
-        return 'european'
-    elif any(country in location_lower for country in ['uae', 'turkey', 'egypt', 'saudi']):
-        return 'middle_eastern'
-    elif any(country in location_lower for country in ['mexico', 'brazil', 'argentina', 'colombia']):
-        return 'latin_american'
-    elif any(country in location_lower for country in ['usa', 'canada']):
-        return 'north_american'
-    else:
-        return 'international'
     
 def create_strategy_prompt():
     """Create prompt for negotiation strategy analysis"""

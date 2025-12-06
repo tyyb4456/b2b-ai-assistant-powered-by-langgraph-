@@ -1,5 +1,5 @@
 from state import AgentState
-import uuid
+from loguru import logger
 
 def receive_user_input(state: AgentState):
     """
@@ -20,15 +20,16 @@ def receive_user_input(state: AgentState):
     
     # Create the user message tuple for LangGraph message handling
     user_message = state['user_input']
-    session_id = state.get("session_id") or str(uuid.uuid4())
+    # session_id = state.get("session_id") or str(uuid.uuid4())
     channel = state.get("channel") or "api"
-    
+
+    logger.info(f"Received user input on channel {channel}: {user_message}")
 
     # This is initial input - normal flow
     assistant_message = f"Received your message via {channel}. Processing..."
     update_state = {
         'messages': [user_message, assistant_message],
-        'session_id': session_id,
+        # 'session_id': session_id,
         'next_step': 'intent_classification',
         'status': 'received_user_input',
     }

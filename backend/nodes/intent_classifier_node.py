@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Literal
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
-
+from loguru import logger
 from state import AgentState
 from dotenv import load_dotenv
 load_dotenv()
@@ -107,6 +107,8 @@ def classify_intent(state: AgentState):
 
         # Create assistant response message
         assistant_message = f"Intent classified as: {classification.intent} (confidence: {classification.confidence:.2f})"
+
+        logger.info(f"Classified intent: {classification.intent} with confidence {classification.confidence}")
 
         # Prepare state update
         state_update = {

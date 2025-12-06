@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from state import AgentState
 from models.analyze_supplier_response_model import SupplierIntent, ExtractedTerms, NegotiationAnalysis
+from loguru import logger
 
 load_dotenv()
 
@@ -303,6 +304,9 @@ def analyze_supplier_response(state: AgentState):
     try:
         # Step 1: Extract supplier response and context
         supplier_response = state.get('supplier_response')
+        logger.info("Starting analysis of supplier response...")
+        logger.info(f"Supplier Response: {supplier_response}")
+
         
         if not supplier_response:
             return {
@@ -391,7 +395,7 @@ def analyze_supplier_response(state: AgentState):
             supplier_intent, extracted_terms, strategic_analysis, context['negotiation_round']
         )
 
-        print('analyzing supplier response...')
+        logger.info("Supplier response analysis completed successfully.")
 
         terms_extracted = extracted_terms.model_dump() if extracted_terms else None
 

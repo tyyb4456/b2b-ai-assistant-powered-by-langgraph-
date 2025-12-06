@@ -1,958 +1,365 @@
-2025-12-05 18:28:29 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
-2025-12-05 18:28:36 | INFO     | main:lifespan:41 - ----------------------------------------
-2025-12-05 18:28:36 | INFO     | main:lifespan:42 - Starting B2B Textile Procurement API
-2025-12-05 18:28:36 | INFO     | main:lifespan:43 - Version: 1.0.0
-2025-12-05 18:28:36 | INFO     | main:lifespan:44 - Debug mode: False
-2025-12-05 18:28:36 | INFO     | main:lifespan:45 - ----------------------------------------
-2025-12-05 18:28:36 | SUCCESS  | main:lifespan:49 - LangGraph initialized
-2025-12-05 18:28:36 | INFO     | main:log_requests:100 - GET /
-2025-12-05 18:28:36 | INFO     | main:log_requests:102 - GET / - Status: 2002025-12-05 18:31:49 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations
-2025-12-05 18:31:49 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations - Status: 200
-2025-12-05 18:31:49 | INFO     | main:log_requests:100 - GET /api/v1/conversations
-2025-12-05 18:31:49 | INFO     | app.services.graph_manager:_ensure_initialized:42 - Initializing checkpoint database: B2B-textile-assistant.db
-2025-12-05 18:31:50 | SUCCESS  | app.services.graph_manager:_ensure_initialized:64 - LangGraph initialized successfully
-2025-12-05 18:31:50 | INFO     | app.services.conversation_service:list_conversations:868 - Found 2 conversations
-2025-12-05 18:31:50 | INFO     | main:log_requests:102 - GET /api/v1/conversations - Status: 200
-2025-12-05 19:42:02 | INFO     | main:log_requests:100 - POST /api/v1/conversations/stream
-2025-12-05 19:42:02 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:938 - Starting streaming conversation for user: demo_user
-2025-12-05 19:42:02 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:951 - Initial state for streaming start: {'thread_id': 'demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6', 'user_input': 'I need a quote for 5,000 meters of organic cotton canvas', 'status': 'starting', 'channel': 'web'}
-2025-12-05 19:42:02 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 168
-2025-12-05 19:42:02 | INFO     | main:log_requests:102 - POST /api/v1/conversations/stream - Status: 200
-2025-12-05 19:42:02 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:42:02 | INFO     | app.services.graph_manager:execute_workflow:89 - Starting workflow execution for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:42:02 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
-2025-12-05 19:42:02 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
-2025-12-05 19:42:02 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 199
-2025-12-05 19:42:02 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
-2025-12-05 19:42:11 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
-2025-12-05 19:42:11 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 19:42:12 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
-2025-12-05 19:42:12 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: get_quote
-2025-12-05 19:42:18 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: extract_parameters
-2025-12-05 19:42:18 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 129
-2025-12-05 19:42:18 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 573
-2025-12-05 19:42:18 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:222 - [SSE] Parameters extracted
-2025-12-05 19:42:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: search_suppliers_direct_sql
-2025-12-05 19:42:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 138
-2025-12-05 19:42:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
-2025-12-05 19:42:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:239 - [SSE] Found 5 suppliers
-2025-12-05 19:43:10 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: generate_quote
-2025-12-05 19:43:10 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 19:43:10 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 668
-2025-12-05 19:43:10 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:260 - [SSE] Quote generated: QT-20251205-3730DE10
-2025-12-05 19:43:11 | SUCCESS  | app.services.graph_manager:execute_workflow:96 - Workflow completed for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:43:11 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
-2025-12-05 19:43:11 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: quote_generated, paused: False
-2025-12-05 19:43:11 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:43:12 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 19:43:12 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 19:43:12 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:43:12 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 19:43:12 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 19:43:12 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:43:12 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 19:43:12 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 19:43:12 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:43:12 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 19:43:12 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 19:43:12 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:43:17 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:43:17 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:43:22 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/select-supplier
-2025-12-05 19:43:22 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/select-supplier - Status: 200
-2025-12-05 19:43:22 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/select-supplier
-2025-12-05 19:43:22 | INFO     | app.services.graph_manager:update_state:158 - Updated state for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:43:22 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/select-supplier - Status: 200
-2025-12-05 19:43:22 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 19:43:22 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 19:43:22 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:43:22 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:43:52 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:43:53 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:43:58 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:43:58 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:43:58 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/stream/continue
-2025-12-05 19:43:58 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/stream/continue - Status: 200
-2025-12-05 19:43:58 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/stream/continue
-2025-12-05 19:43:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:continue_conversation_stream:1056 - Continuing streaming conversation: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:43:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 171
-2025-12-05 19:43:58 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/stream/continue - Status: 200
-2025-12-05 19:43:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:43:58 | INFO     | app.services.graph_manager:continue_workflow:246 - Continuing workflow with updates for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:43:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
-2025-12-05 19:43:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
-2025-12-05 19:43:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 192
-2025-12-05 19:43:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
-2025-12-05 19:44:04 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
-2025-12-05 19:44:04 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 19:44:04 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
-2025-12-05 19:44:04 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: negotiate
-2025-12-05 19:44:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: start_negotiation
-2025-12-05 19:44:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 128
-2025-12-05 19:44:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 304
-2025-12-05 19:44:25 | INFO     | nodes.negotiation_message_drafter_node:analyze_negotiation_history:60 - Using user-selected supplier for profile.
-2025-12-05 19:44:25 | INFO     | nodes.negotiation_message_drafter_node:analyze_negotiation_history:79 - Active Supplier Profile: {'name': 'EcoCanvas Mills Turkey', 'location': 'Istanbul, Turkey', 'country': 'Unknown', 'email': 'igntayyab@gmail.com', 'reliability_score': 5.0, 'cultural_region': 'middle_eastern', 'past_negotiations': 1, 'communication_style': 'standard'}
-2025-12-05 19:44:28 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:44:28 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:44:34 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: draft_negotiation_message
-2025-12-05 19:44:34 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 163
-2025-12-05 19:44:34 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 673
-2025-12-05 19:44:34 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:271 - [SSE] Negotiation message drafted
-2025-12-05 19:45:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:45:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:45:58 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:45:58 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:46:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:46:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:46:48 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:46:48 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:46:53 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:46:53 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:46:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: validate_and_enhance_message
-2025-12-05 19:46:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 173
-2025-12-05 19:46:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 691
-2025-12-05 19:47:00 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:103 - Sending negotiation message to igntayyab@gmail.com
-2025-12-05 19:47:12 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:119 - Extracted supplier_id from active_supplier_id: CANVAS_001
-2025-12-05 19:47:12 | INFO     | app.services.supplier_request_service:create_supplier_request:48 - Creating supplier request for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6, supplier: CANVAS_001
-2025-12-05 19:47:12 | SUCCESS  | app.services.supplier_request_service:create_supplier_request:84 - ✅ Supplier request created: REQ-20251205-E68ABC3E
-2025-12-05 19:47:12 | INFO     | app.services.supplier_request_service:_send_request_notification:287 - 📧 Sending notification for request: REQ-20251205-E68ABC3E
-2025-12-05 19:47:12 | SUCCESS  | app.services.supplier_request_service:_send_request_notification:316 - ✅ Notifications sent to 2 users
-2025-12-05 19:47:12 | SUCCESS  | nodes.negotiation_message_sender:send_negotiation_message:147 - ✅ Supplier request created successfully
-2025-12-05 19:47:12 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: send_negotiation_message
-2025-12-05 19:47:12 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 143
-2025-12-05 19:47:12 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 658
-2025-12-05 19:47:13 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: __interrupt__
-2025-12-05 19:47:13 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:145 - [SSE] Node data is not dict: <class 'tuple'>
-2025-12-05 19:47:13 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Cannot convert node_data to dict, skipping
-2025-12-05 19:47:13 | SUCCESS  | app.services.graph_manager:continue_workflow:258 - Workflow continued successfully for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:47:13 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
-2025-12-05 19:47:13 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: email_sent, paused: True
-2025-12-05 19:47:13 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6
-2025-12-05 19:47:14 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 19:47:14 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 19:47:14 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 19:47:14 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 19:47:18 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:47:18 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:47:24 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251205-E68ABC3E
-2025-12-05 19:47:24 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251205-E68ABC3E - Status: 200
-2025-12-05 19:47:24 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/REQ-20251205-E68ABC3E
-2025-12-05 19:47:24 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/REQ-20251205-E68ABC3E - Status: 200
-2025-12-05 19:47:35 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251205-E68ABC3E/respond
-2025-12-05 19:47:35 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251205-E68ABC3E/respond - Status: 200
-2025-12-05 19:47:35 | INFO     | main:log_requests:100 - POST /api/v1/supplier/requests/REQ-20251205-E68ABC3E/respond
-2025-12-05 19:47:35 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:224 - 📝 Supplier response received for request: REQ-20251205-E68ABC3E
-2025-12-05 19:47:35 | INFO     | app.services.supplier_request_service:submit_supplier_response:107 - Processing supplier response for request: REQ-20251205-E68ABC3E
-2025-12-05 19:47:35 | SUCCESS  | app.services.supplier_request_service:submit_supplier_response:141 - ✅ Supplier response saved: REQ-20251205-E68ABC3E
-2025-12-05 19:47:35 | SUCCESS  | app.api.v1.endpoints.supplier_portal:submit_response:255 - ✅ Response stored (not auto-resumed): REQ-20251205-E68ABC3E
-2025-12-05 19:47:35 | INFO     | main:log_requests:102 - POST /api/v1/supplier/requests/REQ-20251205-E68ABC3E/respond - Status: 200
-2025-12-05 19:47:43 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:47:43 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:47:48 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 19:47:48 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 19:47:49 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/stream/resume
-2025-12-05 19:47:49 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/stream/resume - Status: 200
-2025-12-05 19:47:49 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/stream/resume
-2025-12-05 19:47:49 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/stream/resume - Status: 422
-2025-12-05 19:47:49 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 19:47:49 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 19:47:49 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 19:47:49 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 20:03:10 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
-2025-12-05 20:03:17 | INFO     | main:lifespan:41 - ----------------------------------------
-2025-12-05 20:03:17 | INFO     | main:lifespan:42 - Starting B2B Textile Procurement API
-2025-12-05 20:03:17 | INFO     | main:lifespan:43 - Version: 1.0.0
-2025-12-05 20:03:17 | INFO     | main:lifespan:44 - Debug mode: False
-2025-12-05 20:03:17 | INFO     | main:lifespan:45 - ----------------------------------------
-2025-12-05 20:03:17 | SUCCESS  | main:lifespan:49 - LangGraph initialized
-2025-12-05 20:09:52 | INFO     | main:log_requests:100 - GET /
-2025-12-05 20:09:52 | INFO     | main:log_requests:102 - GET / - Status: 200
-2025-12-05 20:10:19 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations
-2025-12-05 20:10:19 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations - Status: 200
-2025-12-05 20:10:19 | INFO     | main:log_requests:100 - GET /api/v1/conversations
-2025-12-05 20:10:19 | INFO     | app.services.graph_manager:_ensure_initialized:42 - Initializing checkpoint database: B2B-textile-assistant.db
-2025-12-05 20:10:19 | SUCCESS  | app.services.graph_manager:_ensure_initialized:64 - LangGraph initialized successfully
-2025-12-05 20:10:19 | INFO     | app.services.conversation_service:list_conversations:868 - Found 3 conversations
-2025-12-05 20:10:19 | INFO     | main:log_requests:102 - GET /api/v1/conversations - Status: 200
-2025-12-05 20:10:23 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 20:10:23 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 20:10:23 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 20:10:23 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:10:23 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 20:10:23 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 20:10:23 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:10:23 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 20:10:23 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:10:23 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 20:10:23 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 20:10:23 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:10:28 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:10:28 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:10:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:10:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:18:46 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:18:46 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:18:51 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:18:51 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:21:33 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 20:21:33 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 20:21:33 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 20:21:33 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 20:21:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 20:21:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 20:21:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 20:21:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 20:22:52 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:22:52 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:22:52 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:22:52 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:28:30 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:28:30 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:29:47 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive
-2025-12-05 20:29:47 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages
-2025-12-05 20:29:47 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/messages - Status: 200
-2025-12-05 20:29:47 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/comprehensive - Status: 200
-2025-12-05 20:29:52 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:29:52 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:29:57 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:29:57 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:30:02 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:30:02 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:30:03 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations
-2025-12-05 20:30:03 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations - Status: 200
-2025-12-05 20:30:03 | INFO     | main:log_requests:100 - GET /api/v1/conversations
-2025-12-05 20:30:03 | INFO     | app.services.conversation_service:list_conversations:868 - Found 3 conversations
-2025-12-05 20:30:03 | INFO     | main:log_requests:102 - GET /api/v1/conversations - Status: 200
-2025-12-05 20:30:10 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:30:10 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:30:15 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:30:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:30:20 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:30:20 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:30:25 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:30:25 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:30:30 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status
-2025-12-05 20:30:30 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_b74bb5c3-4800-44f8-80eb-8df28ff246e6/status - Status: 200
-2025-12-05 20:30:39 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations
-2025-12-05 20:30:39 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations - Status: 200
-2025-12-05 20:30:39 | INFO     | main:log_requests:100 - GET /api/v1/conversations
-2025-12-05 20:30:39 | INFO     | app.services.conversation_service:list_conversations:868 - Found 3 conversations
-2025-12-05 20:30:39 | INFO     | main:log_requests:102 - GET /api/v1/conversations - Status: 200
-2025-12-05 20:30:43 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/comprehensive
-2025-12-05 20:30:43 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/comprehensive - Status: 200
-2025-12-05 20:30:43 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:30:43 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/messages
-2025-12-05 20:30:43 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/comprehensive
-2025-12-05 20:30:43 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:30:43 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/messages - Status: 200
-2025-12-05 20:30:43 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:30:43 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/messages
-2025-12-05 20:30:43 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/messages - Status: 200
-2025-12-05 20:30:43 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:30:43 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/comprehensive - Status: 200
-2025-12-05 20:30:48 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:30:48 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:30:53 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:30:53 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:32:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:32:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:32:38 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:32:38 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:32:43 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:32:43 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:34:10 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:34:10 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:34:15 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:34:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:35:55 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/pending
-2025-12-05 20:35:55 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:35:55 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/pending
-2025-12-05 20:35:55 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:35:55 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:35:55 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/notifications
-2025-12-05 20:35:55 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:35:55 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:35:55 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:35:55 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:35:55 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:35:55 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:35:55 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:35:55 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:35:55 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:35:55 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:36:02 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251205-E68ABC3E
-2025-12-05 20:36:02 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251205-E68ABC3E - Status: 200
-2025-12-05 20:36:02 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/REQ-20251205-E68ABC3E
-2025-12-05 20:36:02 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/REQ-20251205-E68ABC3E - Status: 200
-2025-12-05 20:36:13 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status
-2025-12-05 20:36:13 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_7bf529e3-0732-4cf1-8d52-dbb5c2042163/status - Status: 200
-2025-12-05 20:36:20 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/stream
-2025-12-05 20:36:20 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/stream - Status: 200
-2025-12-05 20:36:20 | INFO     | main:log_requests:100 - POST /api/v1/conversations/stream
-2025-12-05 20:36:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:938 - Starting streaming conversation for user: demo_user
-2025-12-05 20:36:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:951 - Initial state for streaming start: {'thread_id': 'demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662', 'user_input': 'I need a quote for 5,000 meters of organic cotton canvas', 'status': 'starting', 'channel': 'web'}
-2025-12-05 20:36:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 168
-2025-12-05 20:36:21 | INFO     | main:log_requests:102 - POST /api/v1/conversations/stream - Status: 200
-2025-12-05 20:36:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662
-2025-12-05 20:36:21 | INFO     | app.services.graph_manager:execute_workflow:89 - Starting workflow execution for thread: demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662
-2025-12-05 20:36:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
-2025-12-05 20:36:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
-2025-12-05 20:36:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 199
-2025-12-05 20:36:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
-2025-12-05 20:36:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
-2025-12-05 20:36:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:36:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
-2025-12-05 20:36:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: get_quote
-2025-12-05 20:36:26 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:36:26 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:36:26 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:36:26 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:36:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: extract_parameters
-2025-12-05 20:36:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 129
-2025-12-05 20:36:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 302
-2025-12-05 20:36:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:222 - [SSE] Parameters extracted
-2025-12-05 20:36:54 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: search_suppliers_direct_sql
-2025-12-05 20:36:54 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 138
-2025-12-05 20:36:54 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
-2025-12-05 20:36:54 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:239 - [SSE] Found 7 suppliers
-2025-12-05 20:36:56 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:36:56 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:36:56 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:36:56 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:37:26 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:37:26 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:37:26 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:37:26 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:37:35 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: generate_quote
-2025-12-05 20:37:35 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:37:35 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 668
-2025-12-05 20:37:35 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:260 - [SSE] Quote generated: QT-20251205-00003FEC
-2025-12-05 20:37:36 | SUCCESS  | app.services.graph_manager:execute_workflow:96 - Workflow completed for thread: demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662
-2025-12-05 20:37:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
-2025-12-05 20:37:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: quote_generated, paused: False
-2025-12-05 20:37:36 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662
-2025-12-05 20:37:38 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/comprehensive
-2025-12-05 20:37:38 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/comprehensive - Status: 200
-2025-12-05 20:37:38 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/messages
-2025-12-05 20:37:38 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/comprehensive
-2025-12-05 20:37:38 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/messages - Status: 200
-2025-12-05 20:37:38 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:37:38 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:37:38 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/messages
-2025-12-05 20:37:38 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:37:38 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/messages - Status: 200
-2025-12-05 20:37:38 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/comprehensive - Status: 200
-2025-12-05 20:37:38 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:37:56 | INFO     | main:lifespan:54 - ------------------------------
-2025-12-05 20:37:56 | INFO     | main:lifespan:55 - Shutting down B2B Textile Procurement API
-2025-12-05 20:37:56 | SUCCESS  | main:lifespan:57 - Cleanup completed
-2025-12-05 20:37:56 | INFO     | main:lifespan:58 - ------------------------------
-2025-12-05 20:38:39 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
-2025-12-05 20:38:48 | INFO     | main:lifespan:41 - ----------------------------------------
-2025-12-05 20:38:48 | INFO     | main:lifespan:42 - Starting B2B Textile Procurement API
-2025-12-05 20:38:48 | INFO     | main:lifespan:43 - Version: 1.0.0
-2025-12-05 20:38:48 | INFO     | main:lifespan:44 - Debug mode: False
-2025-12-05 20:38:48 | INFO     | main:lifespan:45 - ----------------------------------------
-2025-12-05 20:38:48 | SUCCESS  | main:lifespan:49 - LangGraph initialized
-2025-12-05 20:38:48 | INFO     | main:log_requests:100 - GET /api/v1/conversations
-2025-12-05 20:38:48 | INFO     | app.services.graph_manager:_ensure_initialized:42 - Initializing checkpoint database: B2B-textile-assistant.db
-2025-12-05 20:38:49 | SUCCESS  | app.services.graph_manager:_ensure_initialized:64 - LangGraph initialized successfully
-2025-12-05 20:38:49 | INFO     | app.services.conversation_service:list_conversations:868 - Found 4 conversations
-2025-12-05 20:38:49 | INFO     | main:log_requests:102 - GET /api/v1/conversations - Status: 200
-2025-12-05 20:38:50 | INFO     | main:log_requests:100 - GET /api/v1/conversations
-2025-12-05 20:38:50 | INFO     | app.services.conversation_service:list_conversations:868 - Found 4 conversations
-2025-12-05 20:38:50 | INFO     | main:log_requests:102 - GET /api/v1/conversations - Status: 200
-2025-12-05 20:38:52 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/comprehensive
-2025-12-05 20:38:52 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/messages
-2025-12-05 20:38:52 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:38:52 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/messages - Status: 200
-2025-12-05 20:38:52 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/comprehensive - Status: 200
-2025-12-05 20:38:52 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:38:56 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:38:56 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:38:56 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:38:56 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:38:57 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/stream/continue
-2025-12-05 20:38:57 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/stream/continue - Status: 200
-2025-12-05 20:38:57 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/stream/continue
-2025-12-05 20:38:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:continue_conversation_stream:1056 - Continuing streaming conversation: demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662
-2025-12-05 20:38:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 171
-2025-12-05 20:38:57 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/stream/continue - Status: 200
-2025-12-05 20:38:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662
-2025-12-05 20:38:57 | INFO     | app.services.graph_manager:continue_workflow:246 - Continuing workflow with updates for thread: demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662
-2025-12-05 20:38:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
-2025-12-05 20:38:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
-2025-12-05 20:38:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 192
-2025-12-05 20:38:57 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
-2025-12-05 20:38:58 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:38:58 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:38:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
-2025-12-05 20:38:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:39:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
-2025-12-05 20:39:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: negotiate
-2025-12-05 20:39:03 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:39:03 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:39:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: start_negotiation
-2025-12-05 20:39:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 128
-2025-12-05 20:39:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 304
-2025-12-05 20:39:04 | INFO     | nodes.negotiation_message_drafter_node:analyze_negotiation_history:79 - Active Supplier Profile: {'name': 'Canvas Master India', 'location': 'Mumbai, India', 'country': 'Unknown', 'email': 'export@canvasmaster.in', 'reliability_score': 5.0, 'cultural_region': 'south_asian', 'past_negotiations': 1, 'communication_style': 'standard'}
-2025-12-05 20:39:09 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: draft_negotiation_message
-2025-12-05 20:39:09 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 163
-2025-12-05 20:39:09 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 657
-2025-12-05 20:39:09 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:271 - [SSE] Negotiation message drafted
-2025-12-05 20:39:13 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:39:13 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:39:24 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:39:24 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:39:25 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/select-supplier
-2025-12-05 20:39:25 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/select-supplier - Status: 200
-2025-12-05 20:39:25 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/select-supplier
-2025-12-05 20:39:25 | INFO     | app.services.graph_manager:update_state:158 - Updated state for thread: demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662
-2025-12-05 20:39:25 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/select-supplier - Status: 200
-2025-12-05 20:39:25 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/comprehensive
-2025-12-05 20:39:25 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/comprehensive - Status: 200
-2025-12-05 20:39:29 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:39:29 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:39:41 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status
-2025-12-05 20:39:41 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_ed515e7c-79ac-4661-8a5c-cbd266316662/status - Status: 200
-2025-12-05 20:39:53 | INFO     | main:log_requests:100 - POST /api/v1/conversations/stream
-2025-12-05 20:39:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:938 - Starting streaming conversation for user: demo_user
-2025-12-05 20:39:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:951 - Initial state for streaming start: {'thread_id': 'demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02', 'user_input': 'I need a quote for 5,000 meters of organic cotton canvas', 'status': 'starting', 'channel': 'web'}
-2025-12-05 20:39:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 168
-2025-12-05 20:39:53 | INFO     | main:log_requests:102 - POST /api/v1/conversations/stream - Status: 200
-2025-12-05 20:39:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:39:53 | INFO     | app.services.graph_manager:execute_workflow:89 - Starting workflow execution for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:39:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
-2025-12-05 20:39:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
-2025-12-05 20:39:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 199
-2025-12-05 20:39:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
-2025-12-05 20:39:55 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
-2025-12-05 20:39:55 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:39:55 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
-2025-12-05 20:39:55 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: get_quote
-2025-12-05 20:40:01 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: extract_parameters
-2025-12-05 20:40:01 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 129
-2025-12-05 20:40:01 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 532
-2025-12-05 20:40:01 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:222 - [SSE] Parameters extracted
-2025-12-05 20:40:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:40:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:40:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:40:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:40:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: search_suppliers_direct_sql
-2025-12-05 20:40:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 138
-2025-12-05 20:40:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
-2025-12-05 20:40:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:239 - [SSE] Found 5 suppliers
-2025-12-05 20:41:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: generate_quote
-2025-12-05 20:41:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:41:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 668
-2025-12-05 20:41:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:260 - [SSE] Quote generated: QT-20251205-4562792E
-2025-12-05 20:41:03 | SUCCESS  | app.services.graph_manager:execute_workflow:96 - Workflow completed for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:41:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
-2025-12-05 20:41:03 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: quote_generated, paused: False
-2025-12-05 20:41:03 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:41:05 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/comprehensive
-2025-12-05 20:41:05 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/comprehensive - Status: 200
-2025-12-05 20:41:05 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:41:05 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/messages
-2025-12-05 20:41:05 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/comprehensive
-2025-12-05 20:41:05 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:41:05 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/messages - Status: 200
-2025-12-05 20:41:05 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/messages
-2025-12-05 20:41:05 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:41:05 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/messages - Status: 200
-2025-12-05 20:41:05 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/comprehensive - Status: 200
-2025-12-05 20:41:05 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:41:10 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:41:10 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:41:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:41:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:41:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:41:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:41:15 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:41:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:41:15 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/stream/continue
-2025-12-05 20:41:15 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/stream/continue - Status: 200
-2025-12-05 20:41:15 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/stream/continue
-2025-12-05 20:41:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:continue_conversation_stream:1056 - Continuing streaming conversation: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:41:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 171
-2025-12-05 20:41:15 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/stream/continue - Status: 200
-2025-12-05 20:41:16 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:41:16 | INFO     | app.services.graph_manager:continue_workflow:246 - Continuing workflow with updates for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:41:16 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
-2025-12-05 20:41:16 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
-2025-12-05 20:41:16 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 192
-2025-12-05 20:41:16 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
-2025-12-05 20:41:18 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
-2025-12-05 20:41:18 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:41:18 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
-2025-12-05 20:41:18 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: negotiate
-2025-12-05 20:41:20 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:41:20 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:41:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: start_negotiation
-2025-12-05 20:41:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 128
-2025-12-05 20:41:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 306
-2025-12-05 20:41:25 | INFO     | nodes.negotiation_message_drafter_node:analyze_negotiation_history:79 - Active Supplier Profile: {'name': 'Canvas Master India', 'location': 'Mumbai, India', 'country': 'Unknown', 'email': 'export@canvasmaster.in', 'reliability_score': 5.0, 'cultural_region': 'south_asian', 'past_negotiations': 1, 'communication_style': 'standard'}
-2025-12-05 20:41:25 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:41:25 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:41:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: draft_negotiation_message
-2025-12-05 20:41:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 163
-2025-12-05 20:41:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 657
-2025-12-05 20:41:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:271 - [SSE] Negotiation message drafted
-2025-12-05 20:41:45 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:41:45 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:41:51 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:41:51 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:42:05 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: validate_and_enhance_message
-2025-12-05 20:42:05 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 173
-2025-12-05 20:42:05 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 691
-2025-12-05 20:42:05 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:103 - Sending negotiation message to export@canvasmaster.in
-2025-12-05 20:42:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:42:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:42:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:42:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:42:14 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:119 - Extracted supplier_id from active_supplier_id: None
-2025-12-05 20:42:14 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:125 - Extracted supplier_id from selected_supplier: None
-2025-12-05 20:42:14 | WARNING  | nodes.negotiation_message_sender:send_negotiation_message:130 - No supplier_id found in state, using default: CANVAS_001
-2025-12-05 20:42:14 | INFO     | app.services.supplier_request_service:create_supplier_request:48 - Creating supplier request for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02, supplier: CANVAS_001
-2025-12-05 20:42:14 | SUCCESS  | app.services.supplier_request_service:create_supplier_request:84 - ✅ Supplier request created: REQ-20251205-6906F8EF
-2025-12-05 20:42:14 | INFO     | app.services.supplier_request_service:_send_request_notification:287 - 📧 Sending notification for request: REQ-20251205-6906F8EF
-2025-12-05 20:42:14 | SUCCESS  | app.services.supplier_request_service:_send_request_notification:316 - ✅ Notifications sent to 2 users
-2025-12-05 20:42:14 | SUCCESS  | nodes.negotiation_message_sender:send_negotiation_message:147 - ✅ Supplier request created successfully
-2025-12-05 20:42:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: send_negotiation_message
-2025-12-05 20:42:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 143
-2025-12-05 20:42:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 265
-2025-12-05 20:42:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: __interrupt__
-2025-12-05 20:42:15 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:145 - [SSE] Node data is not dict: <class 'tuple'>
-2025-12-05 20:42:15 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Cannot convert node_data to dict, skipping
-2025-12-05 20:42:15 | SUCCESS  | app.services.graph_manager:continue_workflow:258 - Workflow continued successfully for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:42:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
-2025-12-05 20:42:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: email_sent, paused: True
-2025-12-05 20:42:15 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02
-2025-12-05 20:42:16 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/comprehensive
-2025-12-05 20:42:16 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/messages
-2025-12-05 20:42:16 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/messages - Status: 200
-2025-12-05 20:42:16 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/comprehensive - Status: 200
-2025-12-05 20:43:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:43:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:43:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:43:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:43:31 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status
-2025-12-05 20:43:31 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_f624c02e-1e56-4c5b-ae4f-f3f281d81f02/status - Status: 200
-2025-12-05 20:43:37 | INFO     | main:log_requests:100 - POST /api/v1/conversations/stream
-2025-12-05 20:43:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:938 - Starting streaming conversation for user: demo_user
-2025-12-05 20:43:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:951 - Initial state for streaming start: {'thread_id': 'demo_user_06a29601-3753-4b28-a338-6ac81994c9d4', 'user_input': 'I need a quote for 5,000 meters of organic cotton canvas', 'status': 'starting', 'channel': 'web'}
-2025-12-05 20:43:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 168
-2025-12-05 20:43:38 | INFO     | main:log_requests:102 - POST /api/v1/conversations/stream - Status: 200
-2025-12-05 20:43:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:43:38 | INFO     | app.services.graph_manager:execute_workflow:89 - Starting workflow execution for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:43:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
-2025-12-05 20:43:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
-2025-12-05 20:43:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 199
-2025-12-05 20:43:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
-2025-12-05 20:43:40 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
-2025-12-05 20:43:40 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:43:40 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
-2025-12-05 20:43:40 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: get_quote
-2025-12-05 20:43:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: extract_parameters
-2025-12-05 20:43:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 129
-2025-12-05 20:43:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 506
-2025-12-05 20:43:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:222 - [SSE] Parameters extracted
-2025-12-05 20:44:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: search_suppliers_direct_sql
-2025-12-05 20:44:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 138
-2025-12-05 20:44:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
-2025-12-05 20:44:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:239 - [SSE] Found 6 suppliers
-2025-12-05 20:44:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:44:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:44:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:44:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:44:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: generate_quote
-2025-12-05 20:44:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:44:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 668
-2025-12-05 20:44:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:260 - [SSE] Quote generated: QT-20251205-5B440F46
-2025-12-05 20:44:31 | SUCCESS  | app.services.graph_manager:execute_workflow:96 - Workflow completed for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:44:31 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
-2025-12-05 20:44:32 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: quote_generated, paused: False
-2025-12-05 20:44:32 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:44:33 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 20:44:33 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:44:33 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 20:44:33 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 20:44:33 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:44:33 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 20:44:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 20:44:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:44:33 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 20:44:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 20:44:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:44:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 20:44:38 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:44:38 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:44:41 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/select-supplier
-2025-12-05 20:44:41 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/select-supplier - Status: 200
-2025-12-05 20:44:41 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/select-supplier
-2025-12-05 20:44:41 | INFO     | app.services.graph_manager:update_state:158 - Updated state for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:44:41 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/select-supplier - Status: 200
-2025-12-05 20:44:41 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 20:44:41 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 20:44:43 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:44:43 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:44:48 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:44:48 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:44:51 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/continue
-2025-12-05 20:44:51 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/continue - Status: 200
-2025-12-05 20:44:51 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/continue
-2025-12-05 20:44:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:continue_conversation_stream:1056 - Continuing streaming conversation: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:44:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 171
-2025-12-05 20:44:51 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/continue - Status: 200
-2025-12-05 20:44:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:44:51 | INFO     | app.services.graph_manager:continue_workflow:246 - Continuing workflow with updates for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:44:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
-2025-12-05 20:44:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
-2025-12-05 20:44:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 192
-2025-12-05 20:44:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
-2025-12-05 20:44:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
-2025-12-05 20:44:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
-2025-12-05 20:44:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
-2025-12-05 20:44:53 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: negotiate
-2025-12-05 20:44:53 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:44:53 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:44:58 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:44:58 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:03 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:03 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:09 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:09 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:45:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:45:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:45:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:45:14 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:14 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: start_negotiation
-2025-12-05 20:45:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 128
-2025-12-05 20:45:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 306
-2025-12-05 20:45:14 | INFO     | nodes.negotiation_message_drafter_node:analyze_negotiation_history:60 - Using user-selected supplier for profile.
-2025-12-05 20:45:14 | INFO     | nodes.negotiation_message_drafter_node:analyze_negotiation_history:79 - Active Supplier Profile: {'name': 'EcoCanvas Mills Turkey', 'location': 'Istanbul, Turkey', 'country': 'Unknown', 'email': 'igntayyab@gmail.com', 'reliability_score': 5.0, 'cultural_region': 'middle_eastern', 'past_negotiations': 1, 'communication_style': 'standard'}
-2025-12-05 20:45:19 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:19 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:24 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:24 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:29 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:29 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:34 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:34 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:39 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:39 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:42 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: draft_negotiation_message
-2025-12-05 20:45:42 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 163
-2025-12-05 20:45:43 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 666
-2025-12-05 20:45:43 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:271 - [SSE] Negotiation message drafted
-2025-12-05 20:45:44 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:44 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:49 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:49 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:54 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:54 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:45:59 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:45:59 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:04 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:04 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:09 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:09 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:13 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/pending
-2025-12-05 20:46:13 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:46:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:46:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:46:13 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/notifications
-2025-12-05 20:46:13 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:46:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:46:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:46:14 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:14 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:19 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:19 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:24 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:24 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:29 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:29 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:34 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:34 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:39 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:39 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:43 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: validate_and_enhance_message
-2025-12-05 20:46:43 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 173
-2025-12-05 20:46:44 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 691
-2025-12-05 20:46:44 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:103 - Sending negotiation message to igntayyab@gmail.com
-2025-12-05 20:46:44 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:44 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:49 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:46:49 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:46:58 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:119 - Extracted supplier_id from active_supplier_id: CANVAS_001
-2025-12-05 20:46:58 | INFO     | app.services.supplier_request_service:create_supplier_request:48 - Creating supplier request for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4, supplier: CANVAS_001
-2025-12-05 20:46:58 | SUCCESS  | app.services.supplier_request_service:create_supplier_request:84 - ✅ Supplier request created: REQ-20251205-9EE2CB89
-2025-12-05 20:46:58 | INFO     | app.services.supplier_request_service:_send_request_notification:287 - 📧 Sending notification for request: REQ-20251205-9EE2CB89
-2025-12-05 20:46:58 | SUCCESS  | app.services.supplier_request_service:_send_request_notification:316 - ✅ Notifications sent to 2 users
-2025-12-05 20:46:58 | SUCCESS  | nodes.negotiation_message_sender:send_negotiation_message:147 - ✅ Supplier request created successfully
-2025-12-05 20:46:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: send_negotiation_message
-2025-12-05 20:46:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 143
-2025-12-05 20:46:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 300
-2025-12-05 20:46:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: __interrupt__
-2025-12-05 20:46:58 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:145 - [SSE] Node data is not dict: <class 'tuple'>
-2025-12-05 20:46:58 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Cannot convert node_data to dict, skipping
-2025-12-05 20:46:58 | SUCCESS  | app.services.graph_manager:continue_workflow:258 - Workflow continued successfully for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:46:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
-2025-12-05 20:46:58 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: email_sent, paused: True
-2025-12-05 20:46:58 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:47:00 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 20:47:00 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 20:47:00 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 20:47:00 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 20:47:09 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:47:09 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:47:09 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:47:09 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/notifications
-2025-12-05 20:47:09 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:47:09 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:47:09 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:47:09 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:47:09 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:47:09 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:47:25 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251205-9EE2CB89
-2025-12-05 20:47:25 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251205-9EE2CB89 - Status: 200
-2025-12-05 20:47:25 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/REQ-20251205-9EE2CB89
-2025-12-05 20:47:25 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/REQ-20251205-9EE2CB89 - Status: 200
-2025-12-05 20:47:25 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:47:25 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:47:25 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:47:25 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:47:30 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251205-9EE2CB89/respond
-2025-12-05 20:47:30 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251205-9EE2CB89/respond - Status: 200
-2025-12-05 20:47:30 | INFO     | main:log_requests:100 - POST /api/v1/supplier/requests/REQ-20251205-9EE2CB89/respond
-2025-12-05 20:47:30 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:224 - 📝 Supplier response received for request: REQ-20251205-9EE2CB89
-2025-12-05 20:47:30 | INFO     | app.services.supplier_request_service:submit_supplier_response:107 - Processing supplier response for request: REQ-20251205-9EE2CB89
-2025-12-05 20:47:30 | SUCCESS  | app.services.supplier_request_service:submit_supplier_response:141 - ✅ Supplier response saved: REQ-20251205-9EE2CB89
-2025-12-05 20:47:30 | SUCCESS  | app.api.v1.endpoints.supplier_portal:submit_response:255 - ✅ Response stored (not auto-resumed): REQ-20251205-9EE2CB89
-2025-12-05 20:47:30 | INFO     | main:log_requests:102 - POST /api/v1/supplier/requests/REQ-20251205-9EE2CB89/respond - Status: 200
-2025-12-05 20:47:32 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:47:32 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:47:32 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:47:32 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:47:34 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:47:34 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:47:40 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:47:40 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:47:56 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:47:56 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:47:56 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:47:56 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:48:26 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:48:26 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:48:26 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:48:26 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:48:47 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:48:47 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:48:49 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume
-2025-12-05 20:48:49 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume - Status: 200
-2025-12-05 20:48:49 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume
-2025-12-05 20:48:49 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume - Status: 422
-2025-12-05 20:48:52 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:48:52 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:48:54 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume
-2025-12-05 20:48:54 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume - Status: 422
-2025-12-05 20:49:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:49:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:49:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:49:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:49:19 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:49:19 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:50:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:50:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:50:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:50:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:51:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:51:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:51:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:51:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:51:44 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:51:44 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:52:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:52:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:52:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:52:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:52:44 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:52:44 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:52:46 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume
-2025-12-05 20:52:46 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume - Status: 422
-2025-12-05 20:53:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:53:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:53:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:53:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:54:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:54:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:54:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:54:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:55:04 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 20:55:04 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 20:55:04 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 20:55:04 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 20:55:04 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 20:55:04 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 20:55:04 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 20:55:04 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 20:55:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:55:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:55:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:55:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:55:19 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:55:19 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:55:19 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:55:19 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:55:19 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume
-2025-12-05 20:55:19 | INFO     | app.api.v1.endpoints.conversation_endpoints:resume_conversation_stream:992 - Resuming streaming conversation: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:55:19 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 169
-2025-12-05 20:55:19 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume - Status: 200
-2025-12-05 20:55:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:55:20 | INFO     | app.services.graph_manager:resume_with_supplier_response:198 - Resuming paused workflow with supplier response: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:55:22 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 20:55:22 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 20:55:22 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:55:22 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 20:55:22 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 20:55:22 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:55:37 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:55:37 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:56:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:56:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:56:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:56:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:56:27 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume
-2025-12-05 20:56:27 | INFO     | app.api.v1.endpoints.conversation_endpoints:resume_conversation_stream:992 - Resuming streaming conversation: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:56:27 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 169
-2025-12-05 20:56:27 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume - Status: 200
-2025-12-05 20:56:27 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:56:27 | INFO     | app.services.graph_manager:resume_with_supplier_response:198 - Resuming paused workflow with supplier response: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:56:36 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 20:56:36 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 20:56:36 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:56:36 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 20:56:36 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 20:56:36 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:57:13 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/pending
-2025-12-05 20:57:13 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:57:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:57:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:57:13 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/notifications
-2025-12-05 20:57:13 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:57:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:57:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:58:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:58:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:58:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:58:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:59:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 20:59:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 20:59:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 20:59:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 20:59:24 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume
-2025-12-05 20:59:24 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume - Status: 200
-2025-12-05 20:59:24 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume
-2025-12-05 20:59:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:resume_conversation_stream:992 - Resuming streaming conversation: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:59:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 169
-2025-12-05 20:59:24 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/stream/resume - Status: 200
-2025-12-05 20:59:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:59:24 | INFO     | app.services.graph_manager:resume_with_supplier_response:198 - Resuming paused workflow with supplier response: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 20:59:25 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:59:25 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:59:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: analyze_supplier_response
-2025-12-05 20:59:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 171
-2025-12-05 20:59:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 156
-2025-12-05 20:59:39 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 666
-2025-12-05 20:59:39 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:282 - [SSE] Supplier response analyzed
-2025-12-05 20:59:40 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:59:40 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:59:45 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:59:45 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:59:50 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:59:50 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 20:59:55 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 20:59:55 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:00 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:00 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:05 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:05 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:05 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: handle_clarification_request
-2025-12-05 21:00:05 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 168
-2025-12-05 21:00:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 209
-2025-12-05 21:00:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 197
-2025-12-05 21:00:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
-2025-12-05 21:00:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 516
-2025-12-05 21:00:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 204
-2025-12-05 21:00:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 682
-2025-12-05 21:00:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 202
-2025-12-05 21:00:06 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 197
-2025-12-05 21:00:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
-2025-12-05 21:00:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 317
-2025-12-05 21:00:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 669
-2025-12-05 21:00:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 691
-2025-12-05 21:00:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 304
-2025-12-05 21:00:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 159
-2025-12-05 21:00:07 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 669
-2025-12-05 21:00:08 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:103 - Sending negotiation message to igntayyab@gmail.com
-2025-12-05 21:00:10 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:10 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
-2025-12-05 21:00:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
-2025-12-05 21:00:13 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
-2025-12-05 21:00:13 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
-2025-12-05 21:00:15 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:20 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:20 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:25 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:25 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:30 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:30 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:35 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:35 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:40 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:40 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:45 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:45 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:50 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:50 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:55 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:00:55 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:00:59 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:119 - Extracted supplier_id from active_supplier_id: CANVAS_001
-2025-12-05 21:00:59 | INFO     | app.services.supplier_request_service:create_supplier_request:48 - Creating supplier request for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4, supplier: CANVAS_001
-2025-12-05 21:00:59 | SUCCESS  | app.services.supplier_request_service:create_supplier_request:84 - ✅ Supplier request created: REQ-20251205-2E85E5D3
-2025-12-05 21:00:59 | INFO     | app.services.supplier_request_service:_send_request_notification:287 - 📧 Sending notification for request: REQ-20251205-2E85E5D3
-2025-12-05 21:00:59 | SUCCESS  | app.services.supplier_request_service:_send_request_notification:316 - ✅ Notifications sent to 2 users
-2025-12-05 21:00:59 | SUCCESS  | nodes.negotiation_message_sender:send_negotiation_message:147 - ✅ Supplier request created successfully
-2025-12-05 21:00:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: send_negotiation_message
-2025-12-05 21:00:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 143
-2025-12-05 21:00:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 261
-2025-12-05 21:01:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: __interrupt__
-2025-12-05 21:01:00 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:145 - [SSE] Node data is not dict: <class 'tuple'>
-2025-12-05 21:01:00 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Cannot convert node_data to dict, skipping
-2025-12-05 21:01:00 | SUCCESS  | app.services.graph_manager:resume_with_supplier_response:216 - Workflow resumed and completed for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 21:01:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
-2025-12-05 21:01:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: email_sent, paused: True
-2025-12-05 21:01:00 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_06a29601-3753-4b28-a338-6ac81994c9d4
-2025-12-05 21:01:00 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:01:00 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:01:00 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 21:01:00 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 21:01:00 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 21:01:01 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 21:47:03 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 21:47:03 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:47:03 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 21:47:03 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
-2025-12-05 21:47:03 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:47:03 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 21:47:03 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive
-2025-12-05 21:47:03 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status
-2025-12-05 21:47:03 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages
-2025-12-05 21:47:03 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/messages - Status: 200
-2025-12-05 21:47:03 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/status - Status: 200
-2025-12-05 21:47:03 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_06a29601-3753-4b28-a338-6ac81994c9d4/comprehensive - Status: 200
+2025-12-06 09:07:14 | INFO     | app.core.logging:setup_logging:38 - Logging configured: level=INFO, file=app.log
+2025-12-06 09:07:21 | INFO     | main:lifespan:41 - ----------------------------------------
+2025-12-06 09:07:21 | INFO     | main:lifespan:42 - Starting B2B Textile Procurement API
+2025-12-06 09:07:21 | INFO     | main:lifespan:43 - Version: 1.0.0
+2025-12-06 09:07:21 | INFO     | main:lifespan:44 - Debug mode: False
+2025-12-06 09:07:21 | INFO     | main:lifespan:45 - ----------------------------------------
+2025-12-06 09:07:21 | SUCCESS  | main:lifespan:49 - LangGraph initialized
+2025-12-06 09:07:32 | INFO     | main:log_requests:100 - GET /
+2025-12-06 09:07:32 | INFO     | main:log_requests:102 - GET / - Status: 200
+2025-12-06 09:07:33 | INFO     | main:log_requests:100 - GET /favicon.ico
+2025-12-06 09:07:33 | INFO     | main:log_requests:102 - GET /favicon.ico - Status: 404
+2025-12-06 09:07:47 | INFO     | main:log_requests:100 - GET /
+2025-12-06 09:07:47 | INFO     | main:log_requests:102 - GET / - Status: 200
+2025-12-06 09:07:47 | INFO     | main:log_requests:100 - GET /favicon.ico
+2025-12-06 09:07:47 | INFO     | main:log_requests:102 - GET /favicon.ico - Status: 404
+2025-12-06 09:08:14 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations
+2025-12-06 09:08:14 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations - Status: 200
+2025-12-06 09:08:14 | INFO     | main:log_requests:100 - GET /api/v1/conversations
+2025-12-06 09:08:14 | INFO     | app.services.graph_manager:_ensure_initialized:42 - Initializing checkpoint database: B2B-textile-assistant.db
+2025-12-06 09:08:15 | SUCCESS  | app.services.graph_manager:_ensure_initialized:64 - LangGraph initialized successfully
+2025-12-06 09:08:15 | INFO     | app.services.conversation_service:list_conversations:868 - Found 0 conversations
+2025-12-06 09:08:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations - Status: 200
+2025-12-06 09:08:20 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/stream
+2025-12-06 09:08:20 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/stream - Status: 200
+2025-12-06 09:08:20 | INFO     | main:log_requests:100 - POST /api/v1/conversations/stream
+2025-12-06 09:08:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:938 - Starting streaming conversation for user: demo_user
+2025-12-06 09:08:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:start_conversation_stream:951 - Initial state for streaming start: {'thread_id': 'demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b', 'user_input': 'I need a quote for 5,000 meters of organic cotton canvas', 'status': 'starting', 'channel': 'web'}
+2025-12-06 09:08:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 168
+2025-12-06 09:08:20 | INFO     | main:log_requests:102 - POST /api/v1/conversations/stream - Status: 200
+2025-12-06 09:08:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:08:20 | INFO     | app.services.graph_manager:execute_workflow:89 - Starting workflow execution for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:08:20 | INFO     | nodes.user_input_receiver_node:receive_user_input:26 - Received user input on channel web: I need a quote for 5,000 meters of organic cotton canvas
+2025-12-06 09:08:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
+2025-12-06 09:08:20 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
+2025-12-06 09:08:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 199
+2025-12-06 09:08:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
+2025-12-06 09:08:23 | INFO     | nodes.intent_classifier_node:classify_intent:111 - Classified intent: get_quote with confidence 0.95
+2025-12-06 09:08:23 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
+2025-12-06 09:08:23 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
+2025-12-06 09:08:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
+2025-12-06 09:08:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: get_quote
+2025-12-06 09:08:29 | INFO     | nodes.parameter_extractor_node:extract_parameters:73 - Clarification questions generated: ['Do you require any specific certifications for the organic cotton canvas?']
+2025-12-06 09:08:29 | WARNING  | nodes.parameter_extractor_node:extract_parameters:74 - Missing critical information, clarification needed.
+2025-12-06 09:08:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: extract_parameters
+2025-12-06 09:08:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 129
+2025-12-06 09:08:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 417
+2025-12-06 09:08:29 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:222 - [SSE] Parameters extracted
+2025-12-06 09:08:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: search_suppliers_direct_sql
+2025-12-06 09:08:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 138
+2025-12-06 09:08:52 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
+2025-12-06 09:08:52 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:239 - [SSE] Found 7 suppliers
+2025-12-06 09:09:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: generate_quote
+2025-12-06 09:09:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
+2025-12-06 09:09:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 668
+2025-12-06 09:09:15 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:260 - [SSE] Quote generated: QT-20251206-A6FFFBCF
+2025-12-06 09:09:16 | SUCCESS  | app.services.graph_manager:execute_workflow:96 - Workflow completed for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:09:16 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
+2025-12-06 09:09:16 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: quote_generated, paused: False
+2025-12-06 09:09:16 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:09:18 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive
+2025-12-06 09:09:18 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages
+2025-12-06 09:09:18 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive - Status: 200
+2025-12-06 09:09:18 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages - Status: 200
+2025-12-06 09:09:18 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:09:18 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive
+2025-12-06 09:09:18 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:09:18 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages
+2025-12-06 09:09:18 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:09:18 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages - Status: 200
+2025-12-06 09:09:18 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive - Status: 200
+2025-12-06 09:09:18 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:09:23 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:09:23 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:09:26 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/select-supplier
+2025-12-06 09:09:26 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/select-supplier - Status: 200
+2025-12-06 09:09:26 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/select-supplier
+2025-12-06 09:09:26 | INFO     | app.services.graph_manager:update_state:158 - Updated state for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:09:26 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/select-supplier - Status: 200
+2025-12-06 09:09:26 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive
+2025-12-06 09:09:26 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive - Status: 200
+2025-12-06 09:09:28 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:09:28 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:10:03 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:10:03 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:10:08 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:10:08 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:10:13 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:10:13 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:10:18 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:10:18 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:10:23 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:10:23 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:10:24 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/continue
+2025-12-06 09:10:24 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/continue - Status: 200
+2025-12-06 09:10:24 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/continue
+2025-12-06 09:10:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:continue_conversation_stream:1056 - Continuing streaming conversation: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:10:24 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 171
+2025-12-06 09:10:24 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/continue - Status: 200
+2025-12-06 09:10:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:10:25 | INFO     | app.services.graph_manager:continue_workflow:246 - Continuing workflow with updates for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:10:25 | INFO     | nodes.user_input_receiver_node:receive_user_input:26 - Received user input on channel web: can you improve the lead time from 60 to 45 days?
+2025-12-06 09:10:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: receive_user_input
+2025-12-06 09:10:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 157
+2025-12-06 09:10:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 192
+2025-12-06 09:10:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 187
+2025-12-06 09:10:26 | INFO     | nodes.intent_classifier_node:classify_intent:111 - Classified intent: negotiate with confidence 0.9
+2025-12-06 09:10:26 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: classify_intent
+2025-12-06 09:10:26 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 147
+2025-12-06 09:10:26 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 190
+2025-12-06 09:10:26 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:211 - [SSE] Intent classified: negotiate
+2025-12-06 09:10:27 | INFO     | nodes.negotiation_starter_node:start_negotiation:26 - Starting negotiation initialization...
+2025-12-06 09:10:27 | INFO     | nodes.negotiation_starter_node:start_negotiation:32 - No existing negotiation messages found.
+2025-12-06 09:10:28 | INFO     | nodes.negotiation_starter_node:start_negotiation:52 - Extracted negotiation objective: Reduce lead time
+2025-12-06 09:10:30 | INFO     | nodes.negotiation_starter_node:start_negotiation:91 - Extracted negotiation topic: lead time improvement
+2025-12-06 09:10:30 | INFO     | nodes.negotiation_starter_node:start_negotiation:92 - Extracted conversation tone: direct
+2025-12-06 09:10:30 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: start_negotiation
+2025-12-06 09:10:30 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 128
+2025-12-06 09:10:30 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 299
+2025-12-06 09:10:30 | INFO     | nodes.negotiation_message_drafter_node:analyze_negotiation_history:60 - Using user-selected supplier for profile.
+2025-12-06 09:10:30 | INFO     | nodes.negotiation_message_drafter_node:analyze_negotiation_history:80 - Active Supplier Profile: {'name': 'EcoCanvas Mills Turkey', 'location': 'Istanbul, Turkey', 'country': 'Unknown', 'email': 'igntayyab@gmail.com', 'reliability_score': 5.0, 'cultural_region': 'middle_eastern', 'past_negotiations': 1, 'communication_style': 'standard'}
+2025-12-06 09:10:35 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: draft_negotiation_message
+2025-12-06 09:10:35 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 163
+2025-12-06 09:10:35 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 669
+2025-12-06 09:10:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:271 - [SSE] Negotiation message drafted
+2025-12-06 09:10:36 | INFO     | nodes.message_validator_node:validate_and_enhance_message:473 - Starting message validation and enhancement process.
+2025-12-06 09:10:36 | INFO     | nodes.message_validator_node:validate_and_enhance_message:494 - Drafted message extracted for validation (909 characters).
+2025-12-06 09:10:36 | INFO     | nodes.message_validator_node:extract_validation_context:299 - Using user-selected supplier for profile.
+2025-12-06 09:10:36 | INFO     | nodes.message_validator_node:extract_validation_context:317 - Extracted validation context successfully. in message_validator_node.py
+2025-12-06 09:10:36 | INFO     | nodes.message_validator_node:validate_and_enhance_message:502 - Invoking validation model with drafted message and context.
+2025-12-06 09:10:50 | INFO     | nodes.message_validator_node:validate_and_enhance_message:525 - 
+ VALIDATION RESULTS: Overall Quality Score: 0.68, Recommended Action: AUTO_ENHANCE, Critical Issues: 3, Clarity: 0.80, Completeness: 0.45, Professionalism: 0.90
+2025-12-06 09:10:50 | INFO     | nodes.message_validator_node:validate_and_enhance_message:528 - Ambiguities detected: 1 and the details are [AmbiguityIssue(issue_type='timeline', location='45-day lead time', severity='high', suggestion="Specify the trigger for the 45-day lead time (e.g., 'from order confirmation and advance payment receipt').", auto_fixable=True)]
+2025-12-06 09:10:50 | INFO     | nodes.message_validator_node:validate_and_enhance_message:530 - Missing information detected: 2 and the details are [MissingInformation(missing_field='payment_terms', importance='critical', context='Essential for establishing commercial terms for an initial order.', available_in_state=False, suggested_value=None), MissingInformation(missing_field='incoterms', importance='high', context='Crucial for defining shipping responsibilities and costs, impacting overall timeline and pricing.', available_in_state=False, suggested_value=None)]
+2025-12-06 09:10:50 | INFO     | nodes.message_validator_node:validate_and_enhance_message:573 - Auto-enhancing message to resolve issues...
+2025-12-06 09:10:50 | INFO     | nodes.message_validator_node:format_issues_for_enhancement:423 - Formatting issues for message enhancement.
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:597 - 
+ ENHANCEMENT COMPLETE:
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:598 -    Enhanced Message Length: 1345 characters
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:599 -    Removed Ambiguities: 1
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:600 -    Added Proactive Clarifications: 3
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:601 -    Improvement Summary: The message was enhanced by clarifying the start date for the requested 45-day lead time, adding crucial requests for standard payment terms, and confirming shipping methods and Incoterms. These additions address critical and high-priority missing information and ambiguities, making the commercial terms explicit and proactive. The tone remains professional and relationship-focused, aligning with cultural adaptation for a Middle Eastern supplier.
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:606 - Added clarifications during enhancement: 3 and the details are ['Start date for 45-day lead time.', 'Request for standard payment terms for initial orders.', 'Request for standard shipping methods and Incoterms.']
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:608 -    Quality Improvement: +0.55
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:609 -    Final Quality Score: 0.95
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:610 -    Changes Made: 4
+2025-12-06 09:11:04 | INFO     | nodes.message_validator_node:validate_and_enhance_message:611 -    Ready to Send: Yes
+2025-12-06 09:11:04 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: validate_and_enhance_message
+2025-12-06 09:11:04 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 173
+2025-12-06 09:11:04 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 691
+2025-12-06 09:11:04 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:103 - Sending negotiation message to igntayyab@gmail.com
+2025-12-06 09:11:13 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:119 - Extracted supplier_id from active_supplier_id: CANVAS_001
+2025-12-06 09:11:13 | INFO     | app.services.supplier_request_service:create_supplier_request:48 - Creating supplier request for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b, supplier: CANVAS_001
+2025-12-06 09:11:13 | SUCCESS  | app.services.supplier_request_service:create_supplier_request:84 - ✅ Supplier request created: REQ-20251206-E6DDB2DD
+2025-12-06 09:11:13 | INFO     | app.services.supplier_request_service:_send_request_notification:287 - 📧 Sending notification for request: REQ-20251206-E6DDB2DD
+2025-12-06 09:11:13 | SUCCESS  | app.services.supplier_request_service:_send_request_notification:316 - ✅ Notifications sent to 2 users
+2025-12-06 09:11:13 | SUCCESS  | nodes.negotiation_message_sender:send_negotiation_message:147 - ✅ Supplier request created successfully
+2025-12-06 09:11:13 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: send_negotiation_message
+2025-12-06 09:11:13 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 143
+2025-12-06 09:11:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 657
+2025-12-06 09:11:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: __interrupt__
+2025-12-06 09:11:14 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:145 - [SSE] Node data is not dict: <class 'tuple'>
+2025-12-06 09:11:14 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Cannot convert node_data to dict, skipping
+2025-12-06 09:11:14 | SUCCESS  | app.services.graph_manager:continue_workflow:258 - Workflow continued successfully for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:11:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
+2025-12-06 09:11:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: email_sent, paused: True
+2025-12-06 09:11:14 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:11:15 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive
+2025-12-06 09:11:15 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages
+2025-12-06 09:11:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages - Status: 200
+2025-12-06 09:11:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive - Status: 200
+2025-12-06 09:11:55 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:11:55 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:12:47 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251206-E6DDB2DD
+2025-12-06 09:12:47 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251206-E6DDB2DD - Status: 200
+2025-12-06 09:12:47 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/REQ-20251206-E6DDB2DD
+2025-12-06 09:12:47 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/REQ-20251206-E6DDB2DD - Status: 200
+2025-12-06 09:13:01 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251206-E6DDB2DD/respond
+2025-12-06 09:13:01 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251206-E6DDB2DD/respond - Status: 200
+2025-12-06 09:13:01 | INFO     | main:log_requests:100 - POST /api/v1/supplier/requests/REQ-20251206-E6DDB2DD/respond
+2025-12-06 09:13:01 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:224 - 📝 Supplier response received for request: REQ-20251206-E6DDB2DD
+2025-12-06 09:13:01 | INFO     | app.services.supplier_request_service:submit_supplier_response:107 - Processing supplier response for request: REQ-20251206-E6DDB2DD
+2025-12-06 09:13:01 | SUCCESS  | app.services.supplier_request_service:submit_supplier_response:141 - ✅ Supplier response saved: REQ-20251206-E6DDB2DD
+2025-12-06 09:13:01 | SUCCESS  | app.api.v1.endpoints.supplier_portal:submit_response:255 - ✅ Response stored (not auto-resumed): REQ-20251206-E6DDB2DD
+2025-12-06 09:13:01 | INFO     | main:log_requests:102 - POST /api/v1/supplier/requests/REQ-20251206-E6DDB2DD/respond - Status: 200
+2025-12-06 09:13:10 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:13:10 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:13:14 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume
+2025-12-06 09:13:14 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume - Status: 200
+2025-12-06 09:13:14 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume
+2025-12-06 09:13:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:resume_conversation_stream:992 - Resuming streaming conversation: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:13:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 169
+2025-12-06 09:13:14 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume - Status: 200
+2025-12-06 09:13:14 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:13:14 | INFO     | app.services.graph_manager:resume_with_supplier_response:198 - Resuming paused workflow with supplier response: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:13:14 | INFO     | nodes.supplier_response_analyzer_node:analyze_supplier_response:307 - Starting analysis of supplier response...
+2025-12-06 09:13:15 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:13:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:13:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: analyze_supplier_response
+2025-12-06 09:13:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 171
+2025-12-06 09:13:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 156
+2025-12-06 09:13:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 666
+2025-12-06 09:13:25 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:282 - [SSE] Supplier response analyzed
+2025-12-06 09:13:39 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-06 09:13:39 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-06 09:13:39 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-06 09:13:39 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-06 09:14:09 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/pending
+2025-12-06 09:14:09 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/pending - Status: 200
+2025-12-06 09:14:09 | INFO     | main:log_requests:100 - GET /api/v1/supplier/notifications
+2025-12-06 09:14:09 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-06 09:14:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: handle_clarification_request
+2025-12-06 09:14:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 168
+2025-12-06 09:14:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 209
+2025-12-06 09:14:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 197
+2025-12-06 09:14:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
+2025-12-06 09:14:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 427
+2025-12-06 09:14:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 204
+2025-12-06 09:14:21 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 682
+2025-12-06 09:14:22 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 202
+2025-12-06 09:14:22 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 197
+2025-12-06 09:14:22 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
+2025-12-06 09:14:22 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 310
+2025-12-06 09:14:22 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 672
+2025-12-06 09:14:22 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 691
+2025-12-06 09:14:22 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 661
+2025-12-06 09:14:22 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 159
+2025-12-06 09:14:23 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 669
+2025-12-06 09:14:23 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:103 - Sending negotiation message to igntayyab@gmail.com
+2025-12-06 09:14:33 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:119 - Extracted supplier_id from active_supplier_id: CANVAS_001
+2025-12-06 09:14:33 | INFO     | app.services.supplier_request_service:create_supplier_request:48 - Creating supplier request for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b, supplier: CANVAS_001
+2025-12-06 09:14:33 | SUCCESS  | app.services.supplier_request_service:create_supplier_request:84 - ✅ Supplier request created: REQ-20251206-DA05C3B0
+2025-12-06 09:14:33 | INFO     | app.services.supplier_request_service:_send_request_notification:287 - 📧 Sending notification for request: REQ-20251206-DA05C3B0
+2025-12-06 09:14:33 | SUCCESS  | app.services.supplier_request_service:_send_request_notification:316 - ✅ Notifications sent to 2 users
+2025-12-06 09:14:33 | SUCCESS  | nodes.negotiation_message_sender:send_negotiation_message:147 - ✅ Supplier request created successfully
+2025-12-06 09:14:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: send_negotiation_message
+2025-12-06 09:14:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 143
+2025-12-06 09:14:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 657
+2025-12-06 09:14:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: __interrupt__
+2025-12-06 09:14:33 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:145 - [SSE] Node data is not dict: <class 'tuple'>
+2025-12-06 09:14:33 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Cannot convert node_data to dict, skipping
+2025-12-06 09:14:33 | SUCCESS  | app.services.graph_manager:resume_with_supplier_response:216 - Workflow resumed and completed for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:14:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
+2025-12-06 09:14:33 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: email_sent, paused: True
+2025-12-06 09:14:33 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:14:35 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive
+2025-12-06 09:14:35 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages
+2025-12-06 09:14:35 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages - Status: 200
+2025-12-06 09:14:35 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive - Status: 200
+2025-12-06 09:18:18 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:18:18 | INFO     | app.services.graph_manager:_ensure_initialized:42 - Initializing checkpoint database: B2B-textile-assistant.db
+2025-12-06 09:18:18 | INFO     | main:log_requests:102 - GET /api/v1/supplier/notifications - Status: 200
+2025-12-06 09:18:19 | SUCCESS  | app.services.graph_manager:_ensure_initialized:64 - LangGraph initialized successfully
+2025-12-06 09:18:19 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:34:14 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251206-67E0F211
+2025-12-06 09:34:14 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251206-67E0F211 - Status: 200
+2025-12-06 09:34:14 | INFO     | main:log_requests:100 - GET /api/v1/supplier/requests/REQ-20251206-67E0F211
+2025-12-06 09:34:14 | INFO     | main:log_requests:102 - GET /api/v1/supplier/requests/REQ-20251206-67E0F211 - Status: 200
+2025-12-06 09:34:20 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251206-67E0F211/respond
+2025-12-06 09:34:20 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251206-67E0F211/respond - Status: 200
+2025-12-06 09:34:20 | INFO     | main:log_requests:100 - POST /api/v1/supplier/requests/REQ-20251206-67E0F211/respond
+2025-12-06 09:34:20 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:224 - 📝 Supplier response received for request: REQ-20251206-67E0F211
+2025-12-06 09:34:20 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:225 - Response Type: accept
+2025-12-06 09:34:20 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:226 - Response Text: I accept
+2025-12-06 09:34:20 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:227 - Response Data: None
+2025-12-06 09:34:20 | INFO     | app.services.supplier_request_service:submit_supplier_response:107 - Processing supplier response for request: REQ-20251206-67E0F211
+2025-12-06 09:34:20 | SUCCESS  | app.services.supplier_request_service:submit_supplier_response:141 - ✅ Supplier response saved: REQ-20251206-67E0F211
+2025-12-06 09:34:20 | SUCCESS  | app.api.v1.endpoints.supplier_portal:submit_response:258 - ✅ Response stored (not auto-resumed): REQ-20251206-67E0F211
+2025-12-06 09:34:20 | INFO     | main:log_requests:102 - POST /api/v1/supplier/requests/REQ-20251206-67E0F211/respond - Status: 200
+2025-12-06 09:18:49 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:18:49 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:18:51 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume
+2025-12-06 09:18:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:resume_conversation_stream:992 - Resuming streaming conversation: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:18:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 169
+2025-12-06 09:18:51 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume - Status: 200
+2025-12-06 09:18:51 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:18:51 | INFO     | app.services.graph_manager:resume_with_supplier_response:198 - Resuming paused workflow with supplier response: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:18:51 | INFO     | nodes.supplier_response_analyzer_node:analyze_supplier_response:307 - Starting analysis of supplier response...
+2025-12-06 09:18:51 | INFO     | nodes.supplier_response_analyzer_node:analyze_supplier_response:308 - Supplier Response: resume
+2025-12-06 09:18:59 | INFO     | nodes.supplier_response_analyzer_node:analyze_supplier_response:398 - Supplier response analysis completed successfully.
+2025-12-06 09:18:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: analyze_supplier_response
+2025-12-06 09:18:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 171
+2025-12-06 09:18:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 156
+2025-12-06 09:18:59 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 668
+2025-12-06 09:19:00 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:282 - [SSE] Supplier response analyzed
+2025-12-06 09:20:04 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:20:04 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:20:04 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:20:04 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:32:30 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive
+2025-12-06 09:32:30 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive - Status: 200
+2025-12-06 09:32:30 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages
+2025-12-06 09:32:30 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages - Status: 200
+2025-12-06 09:32:30 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:32:30 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive
+2025-12-06 09:32:30 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages
+2025-12-06 09:32:30 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:32:30 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:32:30 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages - Status: 200
+2025-12-06 09:32:30 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive - Status: 200
+2025-12-06 09:32:30 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:32:34 | INFO     | main:log_requests:100 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume
+2025-12-06 09:32:34 | INFO     | main:log_requests:102 - OPTIONS /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume - Status: 200
+2025-12-06 09:32:34 | INFO     | main:log_requests:100 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume
+2025-12-06 09:32:34 | INFO     | app.api.v1.endpoints.conversation_endpoints:resume_conversation_stream:992 - Resuming streaming conversation: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:32:34 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:83 - [SSE] Sending connected event, size: 169
+2025-12-06 09:32:34 | INFO     | main:log_requests:102 - POST /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/stream/resume - Status: 200
+2025-12-06 09:32:34 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:87 - [SSE] Starting stream for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:32:34 | INFO     | app.services.graph_manager:resume_with_supplier_response:198 - Resuming paused workflow with supplier response: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:32:34 | INFO     | nodes.supplier_response_analyzer_node:analyze_supplier_response:307 - Starting analysis of supplier response...
+2025-12-06 09:32:34 | INFO     | nodes.supplier_response_analyzer_node:analyze_supplier_response:308 - Supplier Response: resume
+2025-12-06 09:32:35 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:32:35 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:32:47 | INFO     | nodes.supplier_response_analyzer_node:analyze_supplier_response:398 - Supplier response analysis completed successfully.
+2025-12-06 09:32:47 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: analyze_supplier_response
+2025-12-06 09:32:47 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 171
+2025-12-06 09:32:47 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 156
+2025-12-06 09:32:48 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 666
+2025-12-06 09:32:48 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:282 - [SSE] Supplier response analyzed
+2025-12-06 09:33:15 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:33:15 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:33:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: handle_clarification_request
+2025-12-06 09:33:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 168
+2025-12-06 09:33:36 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 209
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 197
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 427
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 204
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 682
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 202
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 197
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 203
+2025-12-06 09:33:37 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 310
+2025-12-06 09:33:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 672
+2025-12-06 09:33:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 691
+2025-12-06 09:33:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 661
+2025-12-06 09:33:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 159
+2025-12-06 09:33:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 669
+2025-12-06 09:33:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 661
+2025-12-06 09:33:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 159
+2025-12-06 09:33:38 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 671
+2025-12-06 09:33:39 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 159
+2025-12-06 09:33:39 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 669
+2025-12-06 09:33:39 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:103 - Sending negotiation message to igntayyab@gmail.com
+2025-12-06 09:33:45 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status
+2025-12-06 09:33:45 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/status - Status: 200
+2025-12-06 09:33:48 | INFO     | nodes.negotiation_message_sender:send_negotiation_message:119 - Extracted supplier_id from active_supplier_id: CANVAS_001
+2025-12-06 09:33:48 | INFO     | app.services.supplier_request_service:create_supplier_request:48 - Creating supplier request for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b, supplier: CANVAS_001
+2025-12-06 09:33:48 | SUCCESS  | app.services.supplier_request_service:create_supplier_request:84 - ✅ Supplier request created: REQ-20251206-67E0F211
+2025-12-06 09:33:48 | INFO     | app.services.supplier_request_service:_send_request_notification:287 - 📧 Sending notification for request: REQ-20251206-67E0F211
+2025-12-06 09:33:48 | SUCCESS  | app.services.supplier_request_service:_send_request_notification:316 - ✅ Notifications sent to 2 users
+2025-12-06 09:33:48 | SUCCESS  | nodes.negotiation_message_sender:send_negotiation_message:147 - ✅ Supplier request created successfully
+2025-12-06 09:33:48 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: send_negotiation_message
+2025-12-06 09:33:48 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:162 - [SSE] Sending node_progress event, size: 143
+2025-12-06 09:33:49 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:203 - [SSE] Sending message event, size: 657
+2025-12-06 09:33:49 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:141 - [SSE] Processing node: __interrupt__
+2025-12-06 09:33:49 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:145 - [SSE] Node data is not dict: <class 'tuple'>
+2025-12-06 09:33:49 | WARNING  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:152 - [SSE] Cannot convert node_data to dict, skipping
+2025-12-06 09:33:49 | SUCCESS  | app.services.graph_manager:resume_with_supplier_response:216 - Workflow resumed and completed for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:33:49 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:295 - [SSE] Workflow generator exhausted, fetching final state
+2025-12-06 09:33:49 | INFO     | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:301 - [SSE] Final state - status: email_sent, paused: True
+2025-12-06 09:33:49 | SUCCESS  | app.api.v1.endpoints.conversation_endpoints:stream_workflow_events:318 - [SSE] Stream completed for thread: demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b
+2025-12-06 09:33:50 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive
+2025-12-06 09:33:50 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages
+2025-12-06 09:33:50 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/messages - Status: 200
+2025-12-06 09:33:50 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_6a16e941-3820-4ba0-b60d-844f5402a25b/comprehensive - Status: 200

@@ -4,6 +4,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 import re
 from datetime import datetime
+from loguru import logger
 
 from state import AgentState
 from models.message_validation_model import (
@@ -288,11 +289,20 @@ enhancement_prompt = create_message_enhancement_prompt()
 def extract_validation_context(state: AgentState) -> Dict[str, Any]:
     """Extract relevant context for message validation"""
     
-    # Get supplier information
-    supplier_data = {}
-    top_suppliers = state.get('top_suppliers', [])
-    if top_suppliers:
-        supplier_data = top_suppliers[0]
+    supplier_data = state.get('top_suppliers', [])
+
+    selected_supplier = state.get('selected_supplier', None)
+
+    if selected_supplier:
+        # Use the user-selected supplier
+        supplier_info = selected_supplier
+        logger.info("Using user-selected supplier for profile.")
+    elif supplier_data and len(supplier_data) > 0:
+        # Fall back to first supplier if no selection made
+        supplier_info = supplier_data[0]
+        logger.info("No user-selected supplier, using first supplier from search results.")
+    else:
+        supplier_info = None
     
     # Get original request parameters
     extracted_params = state.get('extracted_parameters', {})
@@ -303,9 +313,11 @@ def extract_validation_context(state: AgentState) -> Dict[str, Any]:
     # Get message history
     negotiation_history = state.get('negotiation_history', [])
     message_history = format_message_history(negotiation_history)
+
+    logger.info("Extracted validation context successfully. in message_validator_node.py")
     
     return {
-        'supplier_data': supplier_data,
+        'supplier_data': supplier_info,
         'fabric_details': fabric_details,
         'logistics_details': logistics_details,
         'price_constraints': price_constraints,
@@ -348,6 +360,7 @@ def detect_simple_jargon(message: str, supplier_location: str) -> List[JargonTer
                     term, supplier_location
                 )
             ))
+    logger.info(f"Detected {len(detected)} jargon terms in message.")
     
     return detected
 
@@ -406,6 +419,8 @@ def prepare_available_context(state: AgentState) -> Dict[str, Any]:
 
 def format_issues_for_enhancement(validation_result: MessageValidationResult) -> Dict[str, str]:
     """Format validation issues for the enhancement prompt"""
+
+    logger.info("Formatting issues for message enhancement.")
     
     return {
         'ambiguities': "\n".join([
@@ -428,6 +443,7 @@ def format_issues_for_enhancement(validation_result: MessageValidationResult) ->
             f"- [Priority {clarif.priority}] {clarif.topic}: {clarif.suggested_addition}"
             for clarif in validation_result.proactive_clarifications
         ]) or "None recommended"
+        
     }
 
 def validate_and_enhance_message(state: AgentState):
@@ -453,9 +469,8 @@ def validate_and_enhance_message(state: AgentState):
     """
     
     try:
-        print("\n" + "="*70)
-        print("🔍 MESSAGE VALIDATION & ENHANCEMENT")
-        print("="*70)
+
+        logger.info("Starting message validation and enhancement process.")
         
         # Step 1: Extract drafted message and context
         drafted_message_data = state.get('drafted_message_data', {})
@@ -475,15 +490,16 @@ def validate_and_enhance_message(state: AgentState):
                 "messages": ["Cannot validate empty message"],
                 "status": "validation_error"
             }
-        
-        print(f"\n📝 Analyzing message ({len(drafted_message_text)} characters)...")
+
+        logger.info(f"Drafted message extracted for validation ({len(drafted_message_text)} characters).")
         
         # Step 2: Extract validation context
         context = extract_validation_context(state)
         supplier_data = context['supplier_data']
         
         # Step 3: Perform AI-powered validation analysis
-        print("🤖 Running AI validation analysis...")
+
+        logger.info("Invoking validation model with drafted message and context.")
         
         validation_formatted_prompt = validation_prompt.invoke({
             "drafted_message": drafted_message_text,
@@ -504,30 +520,20 @@ def validate_and_enhance_message(state: AgentState):
         validation_result: MessageValidationResult = validation_model.invoke(
             validation_formatted_prompt
         )
-        
-        # Step 4: Display validation results
-        print(f"\n📊 VALIDATION RESULTS:")
-        print(f"   Overall Quality Score: {validation_result.overall_quality_score:.2f}")
-        print(f"   - Clarity: {validation_result.clarity_score:.2f}")
-        print(f"   - Completeness: {validation_result.completeness_score:.2f}")
-        print(f"   - Professionalism: {validation_result.professionalism_score:.2f}")
-        print(f"\n   Critical Issues: {validation_result.critical_issues_count}")
-        print(f"   Recommended Action: {validation_result.recommended_action.upper()}")
+        # Step 4: Log validation results
+
+        logger.info(f"\n VALIDATION RESULTS: Overall Quality Score: {validation_result.overall_quality_score:.2f}, Recommended Action: {validation_result.recommended_action.upper()}, Critical Issues: {validation_result.critical_issues_count}, Clarity: {validation_result.clarity_score:.2f}, Completeness: {validation_result.completeness_score:.2f}, Professionalism: {validation_result.professionalism_score:.2f}")
         
         if validation_result.ambiguities:
-            print(f"   ⚠️  Ambiguities: {len(validation_result.ambiguities)}")
+            logger.info(f"Ambiguities detected: {len(validation_result.ambiguities)} and the details are {validation_result.ambiguities}")
         if validation_result.missing_information:
-            print(f"   ⚠️  Missing Info: {len(validation_result.missing_information)}")
+            logger.info(f"Missing information detected: {len(validation_result.missing_information)} and the details are {validation_result.missing_information}")
         if validation_result.contradictions:
-            print(f"   🚨 Contradictions: {len(validation_result.contradictions)}")
+            logger.info(f"Contradictions detected: {len(validation_result.contradictions)} and the details are {validation_result.contradictions}")
         
         # Step 5: Decide on action based on validation score
         if validation_result.overall_quality_score >= 0.8:
-            print("\n✅ Message quality is excellent - ready to send as-is")
-
-        # Step 5: Decide on action based on validation score
-        if validation_result.overall_quality_score >= 0.8:
-            print("\n✅ Message quality is excellent - ready to send as-is")
+            logger.info("Message quality is excellent - ready to send as-is")
             
             return {
                 "message_validation": validation_result.model_dump(),
@@ -542,7 +548,7 @@ def validate_and_enhance_message(state: AgentState):
             }
         
         elif validation_result.recommended_action == "major_revision_needed":
-            print("\n🚨 CRITICAL: Message needs major revision - flagging for human review")
+            logger.warning("CRITICAL: Message needs major revision - flagging for human review")
             
             return {
                 "message_validation": validation_result.model_dump(),
@@ -564,7 +570,7 @@ def validate_and_enhance_message(state: AgentState):
             }
         
         # Step 6: Auto-enhance the message
-        print("\n🔧 Auto-enhancing message to resolve issues...")
+        logger.info("Auto-enhancing message to resolve issues...")
         
         # Prepare context for enhancement
         available_context = prepare_available_context(state)
@@ -587,100 +593,24 @@ def validate_and_enhance_message(state: AgentState):
             enhancement_formatted_prompt
         )
 
-        # Step 4: Display validation results
-        print(f"\n📊 VALIDATION RESULTS:")
-        print(f"   Overall Quality Score: {validation_result.overall_quality_score:.2f}")
-        print(f"   - Clarity: {validation_result.clarity_score:.2f}")
-        print(f"   - Completeness: {validation_result.completeness_score:.2f}")
-        print(f"   - Professionalism: {validation_result.professionalism_score:.2f}")
-        print(f"\n   Critical Issues: {validation_result.critical_issues_count}")
-        print(f"   Recommended Action: {validation_result.recommended_action.upper()}")
-
-        if validation_result.ambiguities:
-            print(f"   ⚠️  Ambiguities: {len(validation_result.ambiguities)}")
-        if validation_result.missing_information:
-            print(f"   ⚠️  Missing Info: {len(validation_result.missing_information)}")
-        if validation_result.contradictions:
-            print(f"   🚨 Contradictions: {len(validation_result.contradictions)}")
-
-        # Step 5: Decide on action based on validation score
-        if validation_result.overall_quality_score >= 0.8:
-            print("\n✅ Message quality is excellent - ready to send as-is")
-            
-            return {
-                "message_validation": validation_result.model_dump(),
-                "validated_message": drafted_message_text,
-                "validation_passed": True,
-                "requires_human_review": False,
-                "next_step": "send_negotiation_message",
-                "messages": [
-                    f"✅ Message validated successfully (Quality: {validation_result.overall_quality_score:.2f})"
-                ],
-                "status": "message_validated"
-            }
-        
-        elif validation_result.recommended_action == "major_revision_needed":
-            print("\n🚨 CRITICAL: Message needs major revision - flagging for human review")
-            
-            return {
-                "message_validation": validation_result.model_dump(),
-                "validated_message": None,
-                "validation_passed": False,
-                "requires_human_review": True,
-                "validation_issues": {
-                    "critical_issues": validation_result.critical_issues_count,
-                    "ambiguities": len(validation_result.ambiguities),
-                    "missing_info": len(validation_result.missing_information),
-                    "contradictions": len(validation_result.contradictions)
-                },
-                "next_step": "request_human_review",
-                "messages": [
-                    f"🚨 Message validation failed (Score: {validation_result.overall_quality_score:.2f}). "
-                    f"Critical issues found: {validation_result.critical_issues_count}. Human review required."
-                ],
-                "status": "validation_failed"
-            }
-        
-        # Step 6: Auto-enhance the message
-        print("\n🔧 Auto-enhancing message to resolve issues...")
-        
-        # Prepare context for enhancement
-        available_context = prepare_available_context(state)
-        formatted_issues = format_issues_for_enhancement(validation_result)
-        
-        enhancement_formatted_prompt = enhancement_prompt.invoke({
-            "original_message": drafted_message_text,
-            "ambiguities": formatted_issues['ambiguities'],
-            "missing_info": formatted_issues['missing_info'],
-            "jargon_terms": formatted_issues['jargon_terms'],
-            "proactive_clarifications": formatted_issues['proactive_clarifications'],
-            "available_context": str(available_context),
-            "supplier_name": supplier_data.get('name', 'Supplier'),
-            "supplier_location": supplier_data.get('location', 'Unknown'),
-            "cultural_region": determine_cultural_region(supplier_data.get('location', '')),
-            "communication_style": supplier_data.get('communication_style', 'standard')
-        })
-        
-        enhanced_result: EnhancedMessage = enhancement_model.invoke(
-            enhancement_formatted_prompt
-        )
-        
         # Step 7: Display enhancement results
-        print(f"\n✨ ENHANCEMENT COMPLETE:")
-        print(f"   Quality Improvement: +{enhanced_result.quality_improvement:.2f}")
-        print(f"   Final Quality Score: {enhanced_result.final_quality_score:.2f}")
-        print(f"   Changes Made: {len(enhanced_result.changes_made)}")
-        print(f"   Ready to Send: {'✅ Yes' if enhanced_result.ready_to_send else '⚠️ No'}")
-        
-        if enhanced_result.added_clarifications:
-            print(f"\n   📎 Added Clarifications:")
-            for clarif in enhanced_result.added_clarifications[:3]:
-                print(f"      • {clarif[:80]}...")
-        
+        logger.info(f"\n ENHANCEMENT COMPLETE:")
+        logger.info(f"   Enhanced Message Length: {len(enhanced_result.enhanced_message)} characters")
+        logger.info(f"   Removed Ambiguities: {len(enhanced_result.removed_ambiguities)}")
+        logger.info(f"   Added Proactive Clarifications: {len(enhanced_result.added_clarifications)}")
+        logger.info(f"   Improvement Summary: {enhanced_result.improvement_summary}")
+
         if enhanced_result.remaining_issues:
-            print(f"\n   ⚠️ Remaining Issues ({len(enhanced_result.remaining_issues)}):")
-            for issue in enhanced_result.remaining_issues:
-                print(f"      • {issue}")
+            logger.info(f"Remaining issues after enhancement: {len(enhanced_result.remaining_issues)} and the details are {enhanced_result.remaining_issues}")
+        if enhanced_result.added_clarifications:
+            logger.info(f"Added clarifications during enhancement: {len(enhanced_result.added_clarifications)} and the details are {enhanced_result.added_clarifications}")
+
+        logger.info(f"   Quality Improvement: +{enhanced_result.quality_improvement:.2f}")
+        logger.info(f"   Final Quality Score: {enhanced_result.final_quality_score:.2f}")
+        logger.info(f"   Changes Made: {len(enhanced_result.changes_made)}")
+        logger.info(f"   Ready to Send: {'Yes' if enhanced_result.ready_to_send else 'No'}")
+
+
         
         # Step 8: Create comprehensive assistant message
         assistant_message = f"""🔍 **Message Validation Complete**
@@ -713,9 +643,6 @@ def validate_and_enhance_message(state: AgentState):
             requires_review = False
             status = "message_enhanced_ready"
         
-        print(f"\n{'='*70}")
-        print(f"🎯 NEXT STEP: {next_step.upper()}")
-        print(f"{'='*70}\n")
 
         # Step 10: Update the drafted message in state
         updated_drafted_message_data = {
@@ -756,7 +683,7 @@ def validate_and_enhance_message(state: AgentState):
         
     except Exception as e:
         error_message = f"Error in message validation: {str(e)}"
-        print(f"\n❌ {error_message}")
+        logger.error(error_message)
         
         import traceback
         traceback.print_exc()
@@ -768,71 +695,3 @@ def validate_and_enhance_message(state: AgentState):
             "status": "validation_error",
             "validation_passed": False
         }
-
-# ===== TESTING UTILITIES =====
-
-def test_message_validation():
-    """Test the validation system with sample messages"""
-    
-    print("\n" + "="*70)
-    print("🧪 TESTING MESSAGE VALIDATION SYSTEM")
-    print("="*70)
-    
-    # Test Case 1: Ambiguous message
-    test_message_1 = """
-    We can offer you a good price for the fabric. 
-    Delivery will be soon. 
-    Please confirm if interested.
-    """
-    
-    print("\n📝 Test 1: Ambiguous Message")
-    print(f"Message: {test_message_1.strip()}")
-    print("\nExpected Issues:")
-    print("  ❌ 'good price' - no specific amount")
-    print("  ❌ 'soon' - no specific timeline")
-    print("  ❌ No currency specified")
-    print("  ❌ No fabric specifications")
-    
-    # Test Case 2: Complete but jargon-heavy message
-    test_message_2 = """
-    We can supply 5,000 meters of 120 GSM cotton poplin fabric 
-    at $3.50 USD per meter, FOB Shanghai.
-    Lead time is 45 days from L/C receipt.
-    MOQ is 3,000 meters. GOTS certified.
-    """
-    
-    print("\n\n📝 Test 2: Jargon-Heavy but Complete Message")
-    print(f"Message: {test_message_2.strip()}")
-    print("\nExpected Issues:")
-    print("  ⚠️ GSM needs explanation")
-    print("  ⚠️ FOB needs explanation")
-    print("  ⚠️ L/C needs explanation")
-    print("  ⚠️ MOQ needs explanation")
-    print("  ✅ All critical info present")
-    
-    # Test Case 3: Contradictory message
-    test_message_3 = """
-    Our price is $4.00 per meter for 5,000 meters.
-    For bulk orders over 3,000 meters, we offer $4.50 per meter.
-    Payment terms: 50% advance, 50% on delivery.
-    Also, full payment required before shipment.
-    """
-    
-    print("\n\n📝 Test 3: Contradictory Message")
-    print(f"Message: {test_message_3.strip()}")
-    print("\nExpected Issues:")
-    print("  🚨 Price contradiction: $4.00 then $4.50")
-    print("  🚨 Payment contradiction: 50/50 split then full advance")
-    print("  ❌ Bulk pricing logic backwards")
-    
-    print("\n" + "="*70)
-
-
-if __name__ == "__main__":
-    # Run tests
-    test_message_validation()
-    
-    print("\n\n💡 To use in production:")
-    print("   from nodes.message_validator_node import validate_and_enhance_message")
-    print("   result = validate_and_enhance_message(agent_state)")
-    print("\n✅ Message Validator Node ready for integration!")

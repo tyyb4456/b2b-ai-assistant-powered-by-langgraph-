@@ -222,6 +222,9 @@ async def submit_response(
     4. Frontend will manually resume workflow when ready
     """
     logger.info(f"📝 Supplier response received for request: {request_id}")
+    logger.info(f"Response Type: {response.response_type}")
+    logger.info(f"Response Text: {response.response_text}")
+    logger.info(f"Response Data: {response.response_data}")
     
     service = get_supplier_request_service(db)
     

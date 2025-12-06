@@ -8,7 +8,7 @@ from datetime import datetime
 import uuid
 from loguru import logger
 
-from app.services.graph_manager import get_graph_manager
+from app.services.graph_manager import get_graph_manager 
 from app.schemas.conversation_schemas import (
     # Comprehensive response
     ConversationComprehensiveResponse,
@@ -590,7 +590,7 @@ class EnhancedConversationService:
         self,
         user_input: str,
         recipient_email: Optional[str] = None,
-        channel: str = "api",
+        # channel: str = "api",
         user_id: Optional[str] = None
     ) -> dict[str, Any]:
         """Start a new conversation workflow"""
@@ -602,7 +602,7 @@ class EnhancedConversationService:
             "thread_id": thread_id,  # Include thread_id in initial state
             "user_input": user_input,
             "status": "starting",
-            "channel": channel,
+            # "channel": channel,
         }
 
         print(initial_state)

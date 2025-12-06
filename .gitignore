@@ -5,3 +5,32 @@ B2B-textile-assistant.db-shm
 B2B-textile-assistant.db-wal
 B2B-texttile-assistant.db 
 app.log
+
+2025-12-06 11:17:33 | INFO     | app.services.conversation_service:get_conversation_comprehensive:667 - 📋 [get_conversation_comprehensive] Negotiation.current_request_id: None
+2025-12-06 11:17:33 | SUCCESS  | app.services.conversation_service:get_conversation_comprehensive:701 - ✅ [get_conversation_comprehensive] Response generated wit
+h negotiation.current_request_id: None
+2025-12-06 11:17:33 | INFO     | main:log_requests:102 - GET /api/v1/conversations/demo_user_afc97b0f-d924-4420-9466-690890bd3968/comprehensive - Status: 200    
+INFO:     127.0.0.1:58408 - "GET /api/v1/conversations/demo_user_afc97b0f-d924-4420-9466-690890bd3968/comprehensive HTTP/1.1" 200 OK
+2025-12-06 11:17:45 | INFO     | main:log_requests:100 - GET /api/v1/conversations/demo_user_afc97b0f-d924-4420-9466-690890bd3968/statu
+
+...
+2025-12-06 11:17:56 | INFO     | main:log_requests:100 - OPTIONS /api/v1/supplier/requests/REQ-20251206-1B930CD1/respond
+2025-12-06 11:17:56 | INFO     | main:log_requests:102 - OPTIONS /api/v1/supplier/requests/REQ-20251206-1B930CD1/respond - Status: 200
+INFO:     127.0.0.1:58437 - "OPTIONS /api/v1/supplier/requests/REQ-20251206-1B930CD1/respond HTTP/1.1" 200 OK
+2025-12-06 11:17:56 | INFO     | main:log_requests:100 - POST /api/v1/supplier/requests/REQ-20251206-1B930CD1/respond
+2025-12-06 11:17:56 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:224 - 📝 Supplier response received for request: REQ-20251206-1B930CD1
+2025-12-06 11:17:56 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:225 - Response Type: accept
+2025-12-06 11:17:56 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:226 - Response Text: accept
+2025-12-06 11:17:56 | INFO     | app.api.v1.endpoints.supplier_portal:submit_response:227 - Response Data: None
+2025-12-06 11:17:56 | INFO     | app.services.supplier_request_service:submit_supplier_response:107 - Processing supplier response for request: REQ-20251206-1B930CD1
+2025-12-06 11:17:56 | SUCCESS  | app.services.supplier_request_service:submit_supplier_response:141 - ✅ Supplier response saved: REQ-20251206-1B930CD1
+2025-12-06 11:17:56 | INFO     | app.services.supplier_request_service:submit_supplier_response:148 - 🔄 [submit_supplier_response] Attempting to update state for thread: demo_user_afc97b0f-d924-4420-9466-690890bd3968
+2025-12-06 11:17:56 | INFO     | app.services.supplier_request_service:submit_supplier_response:152 - 🔄 [submit_supplier_response] Setting current_request_id to: REQ-20251206-1B930CD1
+2025-12-06 11:17:56 | INFO     | app.services.graph_manager:update_state:158 - Updated state for thread: demo_user_afc97b0f-d924-4420-9466-690890bd3968
+2025-12-06 11:17:56 | SUCCESS  | app.services.supplier_request_service:submit_supplier_response:158 - ✅ [submit_supplier_response] Updated conversation state wit
+h current_request_id: REQ-20251206-1B930CD1
+2025-12-06 11:17:56 | INFO     | app.services.supplier_request_service:submit_supplier_response:163 - ✅ [submit_supplier_response] VERIFICATION - current_request
+_id in state now: REQ-20251206-1B930CD1
+2025-12-06 11:17:56 | SUCCESS  | app.api.v1.endpoints.supplier_portal:submit_response:258 - ✅ Response stored (not auto-resumed): REQ-20251206-1B930CD1
+2025-12-06 11:17:56 | INFO     | main:log_requests:102 - POST /api/v1/supplier/requests/REQ-20251206-1B930CD1/respond - Status: 200
+INFO:     127.0.0.1:58437 - "POST /api/v1/supplier/requests/REQ-20251206-1B930CD1/respond HTTP/1.1" 200 OK

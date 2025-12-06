@@ -95,11 +95,28 @@ export default function ConversationDetail() {
   // Handle Resume Conversation (with streaming)
   const handleResume = () => {
     console.log('[ConversationDetail] 🚀 Starting resume stream for thread:', threadId);
+    console.log('[ConversationDetail] Full conversation object:', JSON.stringify(conversation, null, 2));
+    console.log('[ConversationDetail] negotiation object:', JSON.stringify(conversation.negotiation, null, 2));
+    
+    // 🔥 FIX: Get the request_id so backend can fetch the actual supplier response
+    const requestId = conversation.negotiation?.current_request_id;
+    console.log('[ConversationDetail] 📋 Extracted requestId:', requestId);
+    console.log('[ConversationDetail] negotiation keys:', conversation.negotiation ? Object.keys(conversation.negotiation) : 'null');
+    
+    if (!requestId) {
+      console.error('[ConversationDetail] ❌ current_request_id is missing!');
+      console.error('[ConversationDetail] Available negotiation fields:', conversation.negotiation ? Object.keys(conversation.negotiation) : 'No negotiation object');
+      alert('Could not find supplier request ID. Please try again.');
+      return;
+    }
+    
+    console.log('[ConversationDetail] ✅ Found requestId:', requestId);
     
     streaming.startStreaming((onEvent, onComplete, onError) => {
+      console.log('[ConversationDetail] 📤 Calling resumeConversationStream with:', { threadId, requestId });
       return api.resumeConversationStream(
         threadId,
-        'resume', // Trigger resume workflow (supplier response already saved in DB)
+        requestId, // 🔥 FIXED: Pass request_id instead of fake 'resume' string
         onEvent,
         // Wrap onComplete to pass threadId
         (data) => {

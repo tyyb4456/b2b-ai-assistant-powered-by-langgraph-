@@ -332,6 +332,7 @@ class EnhancedConversationService:
             validation_passed=state.get('validation_passed', False),
             last_message_confidence=state.get('last_message_confidence'),
             active_supplier_email=state.get('active_supplier_email'),
+            current_request_id=state.get('current_request_id'),
             email_sent=state.get('email_sent', False),
             pdf_generated=state.get('pdf_generated', False)
         )
@@ -649,6 +650,7 @@ class EnhancedConversationService:
         state = await self.graph_manager.get_state(thread_id)
         
         if not state:
+            logger.warning(f"⚠️ No state found for thread: {thread_id}")
             return None
         
         is_paused = await self.graph_manager.is_workflow_paused(thread_id)

@@ -1,7 +1,7 @@
 """
 Enhanced Pydantic schemas for comprehensive conversation API responses
 
-These schemas expose all the rich data from AgentState to API consumers 
+These schemas expose all the rich data from AgentState to API consumers ResumeConversationRequest
 """
 from typing import Optional, Literal, Any, List, Dict
 from datetime import datetime
@@ -537,17 +537,20 @@ class StartConversationRequest(BaseModel):
 
 class ResumeConversationRequest(BaseModel):
     """Request to resume a paused conversation (e.g., with supplier response)"""
-    supplier_response: str = Field(
-        ...,
-        min_length=1,
+    supplier_response: Optional[str] = Field(
+        None,
         max_length=10000,
-        description="Supplier's response message to continue negotiation"
+        description="Supplier's response message to continue negotiation (optional - will fetch from DB if not provided)"
+    )
+    request_id: Optional[str] = Field(
+        None,
+        description="Request ID to fetch supplier response from database"
     )
     
     class Config:
         json_schema_extra = {
             "example": {
-                "supplier_response": "We can offer $4.20 per meter with 30-day lead time"
+                "request_id": "REQ-20251206-E6DDB2DD"
             }
         }
 

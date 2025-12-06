@@ -138,10 +138,35 @@ class SupplierRequestService:
         self.db.add(response_history)
         self.db.commit()
         
-        logger.success(f"✅ Supplier response saved: {request_id}")
+        logger.success(f"Supplier response saved: {request_id}")
         
-        # ⚠️ IMPORTANT: Do NOT auto-resume workflow here
-        # Workflow will be resumed manually from frontend
+        # 🔥 UPDATE conversation state with current_request_id so App A can see it
+        try:
+            from app.services.graph_manager import get_graph_manager
+            graph_manager = get_graph_manager()
+            
+            logger.info(f"submit_supplier_response Attempting to update state for thread: {request.thread_id}")
+            
+            # Update only the current_request_id key - do NOT pass entire state
+            update_dict = {'current_request_id': request_id}
+            logger.info(f"submit_supplier_response Setting current_request_id to: {request_id}")
+            
+            # Update the state without running workflow
+            success = await graph_manager.update_state(request.thread_id, update_dict)
+            
+            if success:
+                logger.success(f"submit_supplier_response Updated conversation state with current_request_id: {request_id}")
+                
+                # Verify the update
+                updated_state = await graph_manager.get_state(request.thread_id)
+                verified_request_id = updated_state.get('current_request_id') if updated_state else None
+                logger.info(f"submit_supplier_response VERIFICATION - current_request_id in state now: {verified_request_id}")
+            else:
+                logger.warning(f"submit_supplier_response State update returned False for thread: {request.thread_id}")
+        except Exception as e:
+            logger.warning(f"submit_supplier_response Could not update conversation state with request_id: {e}")
+            import traceback
+            logger.error(f"submit_supplier_response Traceback: {traceback.format_exc()}")
         
         return {
             "request_id": request_id,

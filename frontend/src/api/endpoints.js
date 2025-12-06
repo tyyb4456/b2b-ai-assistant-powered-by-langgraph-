@@ -271,17 +271,19 @@ export const continueConversationStream = (threadId, userInput, onEvent, onCompl
 
 /**
  * Resume conversation with streaming
+ * 🔥 FIXED: Now accepts request_id to fetch actual supplier response from backend
  */
-export const resumeConversationStream = (threadId, supplierResponse, onEvent, onComplete, onError) => {
+export const resumeConversationStream = (threadId, requestId, onEvent, onComplete, onError) => {
   const url = `${apiClient.defaults.baseURL}/conversations/${threadId}/stream/resume`;
   console.log('[API] 🎬 resumeConversationStream called');
   console.log('[API] 🆔 Thread ID:', threadId);
-  console.log('[API] 💬 Supplier response:', supplierResponse.substring(0, 100));
+  console.log('[API] 📋 Request ID:', requestId);
+  console.log('[API] 📝 Sending request_id to backend to fetch actual supplier response');
   
   return createXHRStream(
     url,
     'POST',
-    { supplier_response: supplierResponse },
+    { request_id: requestId }, // 🔥 FIXED: Send request_id instead of hardcoded string
     onEvent,
     onComplete,
     onError

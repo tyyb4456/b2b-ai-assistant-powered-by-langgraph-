@@ -1005,13 +1005,49 @@ async def resume_conversation_stream(
             detail=f"Conversation is not paused: {thread_id}"
         )
     
+    # 🔥 FIX: Fetch the actual supplier response from the database instead of using request parameter
+    supplier_response = request.supplier_response
+    if supplier_response:
+        logger.info(f"Initial supplier response length: {len(supplier_response) if supplier_response else 0}")
+        logger.info(f"Request ID for fetching supplier response: {request.request_id}")
+        logger.info(f"Type of supplier response provided: {type(supplier_response)}")
+        logger.info(f"Supplier response preview: {supplier_response[:100] if supplier_response else 'N/A'}")
+    
+    if not supplier_response and request.request_id:
+        # Fetch the actual supplier response from the SupplierRequest record
+        logger.info(f"Fetching supplier response for request_id: {request.request_id}")
+        try:
+            # Query the database directly to get the supplier response
+            from database import SupplierRequest
+            db = service.db
+            supplier_request_record = db.query(SupplierRequest).filter(
+                SupplierRequest.request_id == request.request_id
+            ).first()
+            
+            if supplier_request_record and supplier_request_record.supplier_response:
+                supplier_response = supplier_request_record.supplier_response
+                logger.info(f"Fetched supplier response from DB: {supplier_response[:100]}...")
+            else:
+                logger.warning(f"Could not find supplier response in DB for request_id: {request.request_id}")
+                # Fall back to the provided supplier_response (will check if empty below)
+        except Exception as e:
+            logger.warning(f"Failed to fetch supplier response from DB: {e}")
+            # Continue - will fail validation if supplier_response is empty
+    
+    if not supplier_response:
+        logger.error(f"No supplier response provided or found for resuming conversation: {thread_id}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Supplier response is required (either supply directly or provide request_id)"
+        )
+    
     async def event_generator():
         """Async generator that yields SSE events"""
         try:
             async for event_data in stream_workflow_events(
                 service=service,
                 thread_id=thread_id,
-                initial_state={"supplier_response": request.supplier_response},
+                initial_state={"supplier_response": supplier_response},
                 workflow_type="resume"
             ):
                 yield event_data

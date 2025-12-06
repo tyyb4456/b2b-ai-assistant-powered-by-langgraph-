@@ -87,6 +87,7 @@ class AgentState(TypedDict):
     drafted_message : str
     active_supplier_email : str
     last_message_confidence : Optional[float]
+    current_request_id : Optional[str] = None
     message_id : Optional[str]
     requires_review : bool
     fallback_options : List[str]

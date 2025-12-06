@@ -15,7 +15,6 @@ from app.api.deps import get_db, get_current_supplier_user
 from app.services.supplier_request_service import get_supplier_request_service
 from app.utils.response import success_response, created_response, error_response
 from database import SupplierUser, SupplierRequest
-from loguru import logger
 
 router = APIRouter(prefix="/supplier", tags=["supplier-portal"])
 

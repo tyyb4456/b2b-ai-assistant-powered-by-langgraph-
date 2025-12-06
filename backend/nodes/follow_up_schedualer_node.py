@@ -10,6 +10,7 @@ import json
 from models.scheduale_follow_up_model import FollowUpAnalysis, FollowUpSchedule, FollowUpMessage
 from database import SessionLocal, FollowUpSchedule as FollowUpScheduleDB, FollowUpMessage as FollowUpMessageDB
 from utils.determining import determine_cultural_region
+from loguru import logger
 load_dotenv()
 
 
@@ -563,7 +564,7 @@ def schedule_follow_up(state: AgentState) :
         updated_history = state.get('negotiation_history', []) + [follow_up_entry]
         
         # Step 8: Create assistant response message
-        assistant_message = f"""📅 **Follow-up Schedule Created**
+        assistant_message = f""" **Follow-up Schedule Created**
 
 **Delay Analysis:**
 - Reason: {follow_up_analysis.delay_reason.replace('_', ' ').title()}
@@ -638,13 +639,16 @@ Ready to maintain momentum while respecting supplier's timeline needs."""
                 db.add(future_message)
             
             db.commit()
+        
             
-            print(f"\n✅ Follow-up schedule saved to database")
-            print(f"   Schedule ID: {schedule_id}")
-            print(f"   Messages scheduled: {len(follow_up_dates)}")
-            
+
+            logger.success("Follow-up schedule saved to database")
+            logger.info(f"   Schedule ID: {schedule_id}")
+            logger.info(f"   Messages scheduled: {len(follow_up_dates)}")
+
+
         except Exception as db_error:
-            print(f"⚠️ Database save failed: {db_error}")
+            logger.error(f"Database save failed: {db_error}")
             db.rollback()
         finally:
             db.close()

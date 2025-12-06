@@ -7,6 +7,7 @@ from state import AgentState
 from dotenv import load_dotenv
 from models.notify_and_sugest_model import FailureAnalysis, NextStepsRecommendation, NegotiationAdjustment, AlternativeSupplier, MarketStrategy
 import uuid
+from loguru import logger
 
 load_dotenv()
 
@@ -416,7 +417,7 @@ def notify_user_and_suggest_next_steps(state: AgentState) -> dict:
     
     try:
         print("\n" + "="*70)
-        print("🔴 NEGOTIATION FAILURE ANALYSIS & NEXT STEPS")
+        logger.info("NEGOTIATION FAILURE ANALYSIS & NEXT STEPS")
         print("="*70)
         
         # Step 1: Extract comprehensive negotiation context
@@ -429,13 +430,13 @@ def notify_user_and_suggest_next_steps(state: AgentState) -> dict:
                 "next_step": "handle_error"
             }
         
-        print(f"\n📊 Context extracted:")
-        print(f"   Supplier: {context['supplier_name']}")
-        print(f"   Rounds: {context['negotiation_rounds']}")
-        print(f"   Final intent: {context['supplier_intent']}")
+        logger.info(f"Context extracted:")
+        logger.info(f"   Supplier: {context['supplier_name']}")
+        logger.info(f"   Rounds: {context['negotiation_rounds']}")
+        logger.info(f"   Final intent: {context['supplier_intent']}")
         
         # Step 2: Perform failure analysis
-        print("\n🔍 Analyzing failure root causes...")
+        logger.info("Analyzing failure root causes...")
         
         failure_analysis_formatted_prompt = failure_analysis_prompt.invoke({
             "original_request": str(context['original_request']),
@@ -455,26 +456,26 @@ def notify_user_and_suggest_next_steps(state: AgentState) -> dict:
         
         failure_analysis: FailureAnalysis = failure_analysis_model.invoke(failure_analysis_formatted_prompt)
         
-        print(f"   ✅ Failure category: {failure_analysis.failure_category}")
-        print(f"   ✅ Severity: {failure_analysis.severity}")
-        print(f"   ✅ Root causes: {len(failure_analysis.root_causes)}")
+        logger.info(f"   Failure category: {failure_analysis.failure_category}")
+        logger.info(f"   Severity: {failure_analysis.severity}")
+        logger.info(f"   Root causes: {len(failure_analysis.root_causes)}")
         
         # Step 3: Generate alternative suppliers and adjustments
-        print("\n🏭 Generating alternative suppliers...")
+        logger.info("Generating alternative suppliers...")
         
         top_suppliers = state.get('top_suppliers', [])
         alternative_suppliers = generate_alternative_suppliers(top_suppliers, context['supplier_name'])
         negotiation_adjustments = generate_negotiation_adjustments(failure_analysis, context['original_request'])
         
-        print(f"   ✅ Found {len(alternative_suppliers)} alternative suppliers")
-        print(f"   ✅ Generated {len(negotiation_adjustments)} adjustment options")
+        logger.success(f"   Found {len(alternative_suppliers)} alternative suppliers")
+        logger.success(f"   Generated {len(negotiation_adjustments)} adjustment options")
         
         # Step 4: Check if we have alternatives or need to warn user
         if not alternative_suppliers and not negotiation_adjustments:
-            print("\n   ⚠️ WARNING: No alternatives or adjustments available!")
+            logger.warning("\n   WARNING: No alternatives or adjustments available!")
         
         # Step 5: Develop comprehensive recommendations
-        print("\n💡 Developing strategic recommendations...")
+        logger.info(" Developing strategic recommendations...")
         
         # Extract strategic importance and stakeholder impact
         extracted_params = state.get('extracted_parameters', {})
@@ -516,10 +517,10 @@ def notify_user_and_suggest_next_steps(state: AgentState) -> dict:
             priority_ranking=recommendations_only.priority_ranking
         )
         
-        print(f"   ✅ Recommendations generated (confidence: {recommendations.confidence_score:.2f})")
+        logger.success(f"   Recommendations generated (confidence: {recommendations.confidence_score:.2f})")
         
         # Step 7: Create user notification message
-        print("\n📝 Creating user notification...")
+        logger.info("Creating user notification...")
         
         notification_message = create_user_notification_message(failure_analysis, recommendations, context)
         
@@ -529,9 +530,8 @@ def notify_user_and_suggest_next_steps(state: AgentState) -> dict:
         # Step 9: Determine follow-up actions
         follow_up_actions = determine_follow_up_actions(failure_analysis, recommendations)
         
-        print(f"\n✅ Analysis complete!")
-        print(f"   Next step: {follow_up_actions['primary_next_step']}")
-        print("="*70 + "\n")
+        logger.success(f"Analysis complete!")
+        logger.info(f"   Next step: {follow_up_actions['primary_next_step']}")
         
         # Step 10: Prepare comprehensive state updates
         state_updates = {
@@ -560,7 +560,7 @@ def notify_user_and_suggest_next_steps(state: AgentState) -> dict:
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
-        print(f"\n❌ Error in failure analysis:\n{error_details}")
+        logger.error(f"Error in failure analysis:\n{error_details}")
         
         error_message = f"Error in failure analysis and recommendations: {str(e)}"
         return {
@@ -677,4 +677,4 @@ def log_failure_analysis_metrics(state: AgentState, failure_analysis: FailureAna
         "urgency_level": state.get('extracted_parameters', {}).get('urgency_level', 'unknown')
     }
     
-    print(f"📊 Failure Analysis Metrics: {metrics}")
+    logger.info(f"Failure Analysis Metrics: {metrics}")

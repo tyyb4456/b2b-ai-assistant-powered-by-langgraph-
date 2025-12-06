@@ -67,7 +67,7 @@ async def stream_workflow_events(
     thread_id: str,
     initial_state: Optional[dict] = None,
     workflow_type: str = "start"
-) -> AsyncIterator[bytes]:  # 🔥 Changed from str to bytes
+) -> AsyncIterator[bytes]:  # Changed from str to bytes
     """
     Stream workflow execution events as SSE
     
@@ -82,8 +82,8 @@ async def stream_workflow_events(
         })
         logger.info(f"[SSE] Sending connected event, size: {len(event_data)}")
         yield event_data.encode('utf-8')  # 🔥 Encode to bytes
-        await asyncio.sleep(0.1)  # 🔥 CRITICAL: Force immediate flush to client
-        
+        await asyncio.sleep(0.1)  #  CRITICAL: Force immediate flush to client
+    
         logger.info(f"[SSE] Starting stream for thread: {thread_id}")
         
         # Choose the right workflow method
@@ -202,7 +202,7 @@ async def stream_workflow_events(
                         })
                         logger.info(f"[SSE] Sending message event, size: {len(event_data)}")
                         yield event_data.encode('utf-8')
-                        await asyncio.sleep(0.1)  # 🔥 Force flush
+                        await asyncio.sleep(0.1)  #  Force flush
             
             # Send specific events for important nodes
             if node_name == "classify_intent":
@@ -289,7 +289,7 @@ async def stream_workflow_events(
                     yield event_data.encode('utf-8')
             
             # Small delay between events - forces buffer flush
-            await asyncio.sleep(0.15)  # 🔥 INCREASED for better visibility
+            await asyncio.sleep(0.15)  # INCREASED for better visibility
         
         # Get final state and send completion
         logger.info(f"[SSE] Workflow generator exhausted, fetching final state")
@@ -344,62 +344,6 @@ def format_sse_event(event_type: str, data: dict) -> str:
     
     return event_str
 
-# ============================================
-# STANDARD REST ENDPOINTS
-# ============================================
-
-# @router.post(
-#     "",
-#     response_model=APIResponse[dict],
-#     status_code=status.HTTP_201_CREATED,
-#     summary="Start a new conversation",
-#     description="Initialize a new conversation workflow with user input"
-# )
-# async def start_conversation(
-#     request: StartConversationRequest,
-#     service: EnhancedConversationService = Depends(get_enhanced_service_dep),
-#     request_id: Optional[str] = Depends(get_request_id),
-#     user_id: Optional[str] = Depends(get_current_user)
-# ):
-#     """
-#     Start a new conversation workflow
-    
-#     **Request Body:**
-#     - user_input: Initial user message (required)
-#     - recipient_email: Email for quote delivery (optional)
-#     - channel: Communication channel (default: "api")
-    
-#     **Returns:**
-#     - thread_id: Unique conversation identifier
-#     - status: Current workflow status
-#     - intent: Classified user intent
-#     - is_paused: Whether workflow is waiting for input
-#     """
-#     logger.info(f"Starting new conversation for user: {user_id}")
-    
-#     try:
-#         result = await service.start_conversation(
-#             user_input=request.user_input,
-#             recipient_email=request.recipient_email,
-#             channel=request.channel,
-#             user_id=user_id
-#         )
-        
-#         logger.success(f"Conversation started: {result['thread_id']}")
-        
-#         return created_response(
-#             data=result,
-#             request_id=request_id
-#         )
-        
-#     except Exception as e:
-#         logger.error(f"Failed to start conversation: {e}")
-#         return error_response(
-#             error_code="WORKFLOW_EXECUTION_FAILED",
-#             message=f"Failed to start conversation: {str(e)}",
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             request_id=request_id
-#         )
 
 
 @router.get(
@@ -439,134 +383,6 @@ async def list_conversations(
         data=conversations,
         request_id=request_id
     )
-
-
-# @router.post(
-#     "/{thread_id}/resume",
-#     response_model=APIResponse[dict],
-#     summary="Resume conversation with supplier response",
-#     description="Resume a paused conversation with supplier's response"
-# )
-# async def resume_conversation(
-#     thread_id: str,
-#     request: ResumeConversationRequest,
-#     service: EnhancedConversationService = Depends(get_enhanced_service_dep),
-#     request_id: Optional[str] = Depends(get_request_id),
-#     user_id: Optional[str] = Depends(get_current_user)
-# ):
-#     """
-#     Resume a paused conversation with supplier response
-    
-#     **Path Parameters:**
-#     - thread_id: Conversation identifier
-    
-#     **Request Body:**
-#     - supplier_response: Supplier's response message
-    
-#     **Returns:**
-#     - Updated conversation status
-#     - New negotiation round number
-#     - Whether still paused (for multi-round negotiations)
-    
-#     **Use Cases:**
-#     - Continue negotiation after supplier responds
-#     - Handle multi-round negotiations
-#     - Progress towards contract or alternative actions
-#     """
-#     logger.info(f"Resuming conversation: {thread_id}")
-    
-#     try:
-#         result = await service.resume_with_supplier_response(
-#             thread_id=thread_id,
-#             supplier_response=request.supplier_response
-#         )
-        
-#         logger.success(f"Conversation resumed: {thread_id}")
-        
-#         return success_response(
-#             data=result,
-#             request_id=request_id
-#         )
-        
-#     except ValueError as e:
-#         logger.warning(f"Invalid resume request: {e}")
-#         return error_response(
-#             error_code="INVALID_OPERATION",
-#             message=str(e),
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             request_id=request_id
-#         )
-#     except Exception as e:
-#         logger.error(f"Failed to resume conversation: {e}")
-#         return error_response(
-#             error_code="WORKFLOW_EXECUTION_FAILED",
-#             message=f"Failed to resume conversation: {str(e)}",
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             request_id=request_id
-#         )
-
-
-# @router.post(
-#     "/{thread_id}/continue",
-#     response_model=APIResponse[dict],
-#     summary="Continue conversation with new input",
-#     description="Continue an existing conversation with new user message"
-# )
-# async def continue_conversation(
-#     thread_id: str,
-#     request: ContinueConversationRequest,
-#     service: EnhancedConversationService = Depends(get_enhanced_service_dep),
-#     request_id: Optional[str] = Depends(get_request_id),
-#     user_id: Optional[str] = Depends(get_current_user)
-# ):
-#     """
-#     Continue conversation with new user input
-    
-#     **Path Parameters:**
-#     - thread_id: Conversation identifier
-    
-#     **Request Body:**
-#     - user_input: New user message
-    
-#     **Returns:**
-#     - Updated conversation status
-    
-#     **Use Cases:**
-#     - Start new quote request in same conversation
-#     - Modify requirements
-#     - Ask follow-up questions
-#     """
-#     logger.info(f"Continuing conversation: {thread_id}")
-    
-#     try:
-#         result = await service.continue_conversation(
-#             thread_id=thread_id,
-#             user_input=request.user_input
-#         )
-        
-#         logger.success(f"Conversation continued: {thread_id}")
-        
-#         return success_response(
-#             data=result,
-#             request_id=request_id
-#         )
-        
-#     except ValueError as e:
-#         logger.warning(f"Invalid continue request: {e}")
-#         return error_response(
-#             error_code="INVALID_OPERATION",
-#             message=str(e),
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             request_id=request_id
-#         )
-#     except Exception as e:
-#         logger.error(f"Failed to continue conversation: {e}")
-#         return error_response(
-#             error_code="WORKFLOW_EXECUTION_FAILED",
-#             message=f"Failed to continue conversation: {str(e)}",
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             request_id=request_id
-#         )
 
 
 # ============================================

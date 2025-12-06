@@ -2,8 +2,8 @@ from typing import Dict, Any, List, Optional
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
-import uuid
 from datetime import datetime
+from loguru import logger
 
 from state import AgentState
 from models.clarification_models import (
@@ -15,6 +15,7 @@ from models.clarification_models import (
     EnhancedClarificationResponse
 )
 
+from utils.determining import determine_cultural_region
 load_dotenv()
 
 # Initialize model
@@ -79,14 +80,17 @@ def classify_clarification_request(state: AgentState) -> Dict[str, Any]:
     """
     
     try:
-        print("\n" + "="*70)
-        print("🔍 STEP 1: CLASSIFYING CLARIFICATION REQUEST")
-        print("="*70)
+        # print("\n" + "="*70)
+        # print("🔍 STEP 1: CLASSIFYING CLARIFICATION REQUEST")
+        # print("="*70)
+
+        logger.info("CLASSIFYING CLARIFICATION REQUEST")
         
         # Extract supplier message
         supplier_message = state.get('supplier_response') or state.get('human_response')
         
         if not supplier_message:
+            logger.error("No supplier message to classify")
             return {
                 "error": "No supplier message to classify",
                 "status": "classification_error"
@@ -94,7 +98,25 @@ def classify_clarification_request(state: AgentState) -> Dict[str, Any]:
         
         # Extract context
         extracted_params = state.get('extracted_parameters', {})
-        supplier_data = state.get('top_suppliers', [{}])[0]
+        
+        # Extract supplier data
+        supplier_data = state.get('top_suppliers', [])
+
+        # Check if user has selected a supplier, otherwise fall back to first supplier
+        selected_supplier = state.get('selected_supplier', None)
+
+        
+        if selected_supplier:
+            # Use the user-selected supplier
+            active_supplier = selected_supplier
+            logger.info("Using user-selected supplier for profile.")
+        elif supplier_data and len(supplier_data) > 0:
+            # Fall back to first supplier if no selection made
+            active_supplier = supplier_data[0]
+            logger.info("No user-selected supplier, using first supplier from search results.")
+        else:
+            active_supplier = None
+
         negotiation_history = state.get('negotiation_history', [])
         
         # Count previous clarifications on similar topics
@@ -102,6 +124,8 @@ def classify_clarification_request(state: AgentState) -> Dict[str, Any]:
             h for h in negotiation_history 
             if h.get('type') == 'clarification_request'
         ])
+
+        logger.info(f"Previous clarifications found: {previous_clarifications}")
         
         # Format history
         comm_history = format_communication_history(negotiation_history[-3:])
@@ -110,8 +134,8 @@ def classify_clarification_request(state: AgentState) -> Dict[str, Any]:
         formatted_prompt = classification_prompt.invoke({
             "supplier_message": supplier_message,
             "negotiation_round": state.get('negotiation_rounds', 0),
-            "supplier_name": supplier_data.get('name', 'Supplier'),
-            "supplier_location": supplier_data.get('location', 'Unknown'),
+            "supplier_name": active_supplier.get('name', 'Supplier'),
+            "supplier_location": active_supplier.get('location', 'Unknown'),
             "previous_clarifications": previous_clarifications,
             "our_last_message": state.get('drafted_message', 'Initial outreach'),
             "communication_history": comm_history,
@@ -123,21 +147,22 @@ def classify_clarification_request(state: AgentState) -> Dict[str, Any]:
         
         classification: ClarificationClassification = classification_model.invoke(formatted_prompt)
         
-        # Display results
-        print(f"\n📊 CLASSIFICATION RESULTS:")
-        print(f"   Request Type: {classification.request_type}")
-        print(f"   Questions Identified: {len(classification.questions)}")
-        print(f"   Supplier Confusion Level: {classification.supplier_confusion_level.upper()}")
-        print(f"   Root Cause: {classification.root_cause_analysis[:80]}...")
-        print(f"   Urgency: {classification.urgency_level.upper()}")
-        print(f"   Deal Impact: {classification.deal_impact}")
-        print(f"   Supplier Engagement: {classification.supplier_engagement_signal}")
+        # # Display results
+
+        logger.info(f"Request Type: {classification.request_type}")
+        logger.info(f"Questions Identified: {len(classification.questions)}")
+        logger.info(f"Supplier Confusion Level: {classification.supplier_confusion_level.upper()}")
+        logger.info(f"Root Cause: {classification.root_cause_analysis[:80]}...")
+        logger.info(f"Urgency: {classification.urgency_level.upper()}") 
+        logger.info(f"Deal Impact: {classification.deal_impact}")
+        logger.info(f"Supplier Engagement: {classification.supplier_engagement_signal}")
+
         
         if classification.is_circular_confusion:
-            print(f"   ⚠️  CIRCULAR CONFUSION DETECTED!")
+            logger.warning("CIRCULAR CONFUSION DETECTED")
         
         if classification.escalation_recommended:
-            print(f"   🚨 ESCALATION RECOMMENDED")
+            logger.warning("ESCALATION RECOMMENDED FOR THIS REQUEST")
         
         return {
             "clarification_classification": classification.model_dump(),
@@ -149,7 +174,7 @@ def classify_clarification_request(state: AgentState) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        print(f"\n❌ Classification Error: {str(e)}")
+        logger.error(f"Classification Error: {str(e)}")
         return {
             "error": str(e),
             "status": "classification_error"
@@ -200,22 +225,21 @@ def search_historical_context(state: AgentState) -> Dict[str, Any]:
     STEP 2: Search historical context for previous answers
     
     Purpose:
-    - Find if we've answered this before
+    - Find if we have answered this before
     - Detect if our terms have evolved
     - Identify circular confusion patterns
     - Provide strategic recommendations
     """
     
     try:
-        print("\n" + "="*70)
-        print("🔍 STEP 2: SEARCHING HISTORICAL CONTEXT")
-        print("="*70)
+
+        logger.info("SEARCHING HISTORICAL CONTEXT")
         
         classification = state.get('clarification_classification', {})
         questions = classification.get('questions', [])
         
         if not questions:
-            print("   No questions to search for")
+            logger.info("No questions identified, skipping historical search")
             return {"historical_context": None}
         
         # Format questions for search
@@ -232,7 +256,7 @@ def search_historical_context(state: AgentState) -> Dict[str, Any]:
         # Get original vs current terms
         extracted_params = state.get('extracted_parameters', {})
         original_terms = format_terms(extracted_params)
-        current_terms = format_terms(extracted_params)  # In real system, track evolution
+        current_terms = format_terms(extracted_params)
         
         # Invoke search
         formatted_prompt = historical_search_prompt.invoke({
@@ -245,20 +269,19 @@ def search_historical_context(state: AgentState) -> Dict[str, Any]:
         history_result: HistoricalContextResult = historical_search_model.invoke(formatted_prompt)
         
         # Display results
-        print(f"\n📚 HISTORICAL CONTEXT RESULTS:")
-        print(f"   Found Previous Answers: {history_result.found_previous_answers}")
+        logger.info(f"Found Previous Answers: {history_result.found_previous_answers}")
         
         if history_result.found_previous_answers:
-            print(f"   Previous Answers Found: {len(history_result.previous_answers)}")
+            logger.info("Previous Relevant Answers:")
             for i, ans in enumerate(history_result.previous_answers[:3], 1):
-                print(f"      {i}. Round {ans.negotiation_round}: {ans.original_question[:50]}...")
-                print(f"         Relevance: {ans.relevance_score:.2f}")
+                logger.info(f"      {i}. Round {ans.negotiation_round}: {ans.original_question[:50]}...")
+                logger.info(f"         Relevance: {ans.relevance_score:.2f}")
         
         if history_result.information_evolved:
-            print(f"   ⚠️  INFORMATION EVOLVED: {history_result.evolution_details}")
+            logger.warning(f"INFORMATION EVOLVED: {history_result.evolution_details}")
         
-        print(f"   Pattern: {history_result.supplier_behavior_pattern}")
-        print(f"   Recommendation: {history_result.recommendation[:80]}...")
+        logger.info(f"Pattern: {history_result.supplier_behavior_pattern}")
+        logger.info(f"Recommendation: {history_result.recommendation[:80]}...")
         
         return {
             "historical_context": history_result.model_dump(),
@@ -268,7 +291,7 @@ def search_historical_context(state: AgentState) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        print(f"\n❌ Historical Search Error: {str(e)}")
+        logger.error(f"Historical Search Error: {str(e)}")
         return {
             "error": str(e),
             "historical_context": None
@@ -355,9 +378,7 @@ def validate_available_information(state: AgentState) -> Dict[str, Any]:
     """
     
     try:
-        print("\n" + "="*70)
-        print("🔍 STEP 3: VALIDATING AVAILABLE INFORMATION")
-        print("="*70)
+        logger.info("STEP 3: VALIDATING AVAILABLE INFORMATION")
         
         classification = state.get('clarification_classification', {})
         questions = classification.get('questions', [])
@@ -368,13 +389,13 @@ def validate_available_information(state: AgentState) -> Dict[str, Any]:
             for i, q in enumerate(questions)
         ])
         
-        # Gather all available information
+        # Gather information
         extracted_params = state.get('extracted_parameters', {})
         supplier_data = state.get('top_suppliers', [{}])[0]
         quote_data = state.get('generated_quote', {})
         previous_terms = state.get('extracted_terms', {})
         
-        # Get our previous messages
+        # Get previous messages
         our_messages = get_conversation_history(state.get('negotiation_history', []))
         
         # Invoke validation
@@ -389,27 +410,31 @@ def validate_available_information(state: AgentState) -> Dict[str, Any]:
         
         validation: InformationValidation = information_validation_model.invoke(formatted_prompt)
         
-        # Display results
-        print(f"\n📋 INFORMATION VALIDATION RESULTS:")
-        print(f"   Can Answer Completely: {'✅ Yes' if validation.can_answer_completely else '⚠️ No'}")
-        print(f"   Completeness Score: {validation.completeness_score:.2f}")
-        print(f"   Available Information: {len(validation.available_information)} items")
-        print(f"   Missing Information: {len(validation.missing_information)} items")
-        print(f"   Consistency Check: {'✅ Passed' if validation.consistency_check_passed else '❌ Failed'}")
+        # Results
+        logger.info("INFORMATION VALIDATION RESULTS")
+        logger.info(f"Can Answer Completely: {validation.can_answer_completely}")
+        logger.info(f"Completeness Score: {validation.completeness_score:.2f}")
+        logger.info(f"Available Information Count: {len(validation.available_information)}")
+        logger.info(f"Missing Information Count: {len(validation.missing_information)}")
+        logger.info(f"Consistency Check Passed: {validation.consistency_check_passed}")
         
         if validation.consistency_issues:
-            print(f"   ⚠️ Consistency Issues:")
+            logger.warning("Consistency Issues Detected")
             for issue in validation.consistency_issues[:3]:
-                print(f"      • {issue}")
+                logger.warning(f"Issue: {issue}")
         
-        print(f"   Recommended Action: {validation.recommended_action.upper()}")
+        logger.info(f"Recommended Action: {validation.recommended_action}")
         
-        # Show critical missing info
-        critical_missing = [m for m in validation.missing_information if m.criticality == 'critical']
+        # Critical missing info
+        critical_missing = [
+            m for m in validation.missing_information 
+            if m.criticality == "critical"
+        ]
+        
         if critical_missing:
-            print(f"\n   🚨 CRITICAL MISSING INFO:")
+            logger.warning("Critical Missing Information Detected")
             for item in critical_missing:
-                print(f"      • {item.field_name}: {item.why_needed}")
+                logger.warning(f"{item.field_name}: {item.why_needed}")
         
         return {
             "information_validation": validation.model_dump(),
@@ -421,11 +446,12 @@ def validate_available_information(state: AgentState) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        print(f"\n❌ Information Validation Error: {str(e)}")
+        logger.error(f"Information Validation Error: {str(e)}")
         return {
             "error": str(e),
             "status": "validation_error"
         }
+
 
 
 # ===== 4. RESPONSE GENERATION PROMPT - BALANCED =====
@@ -499,47 +525,35 @@ def generate_comprehensive_response(state: AgentState) -> Dict[str, Any]:
     """
     
     try:
-        print("\n" + "="*70)
-        print("✍️ STEP 4: GENERATING COMPREHENSIVE RESPONSE")
-        print("="*70)
+        logger.info("STEP 4: GENERATING COMPREHENSIVE RESPONSE")
         
-        # Gather all context
         classification = state.get('clarification_classification', {})
         historical_context = state.get('historical_context', {})
         info_validation = state.get('information_validation', {})
         
-        # Check if we have critical missing info
+        # Check if critical info missing
         if state.get('recommended_action') == 'request_user_input':
-            print("\n⚠️ CRITICAL INFO MISSING - Need user input before responding")
+            logger.warning("Critical information missing. User input required before responding.")
             return {
                 "error": "Missing critical information - user input required",
                 "status": "needs_user_input",
                 "missing_info": state.get('missing_critical_info', [])
             }
         
-        # Extract supplier and deal context
+        # Extract context
         supplier_data = state.get('top_suppliers', [{}])[0]
         extracted_params = state.get('extracted_parameters', {})
         fabric_details = extracted_params.get('fabric_details', {})
         
-        # Format classified questions
+        # Format inputs
         questions_formatted = format_classified_questions(classification.get('questions', []))
+        available_info_text = format_available_information(info_validation.get('available_information', []))
+        missing_info_text = format_missing_information(info_validation.get('missing_information', []))
         
-        # Format available/missing info
-        available_info_text = format_available_information(
-            info_validation.get('available_information', [])
-        )
-        missing_info_text = format_missing_information(
-            info_validation.get('missing_information', [])
-        )
-        
-        # Determine special instructions
         special_instructions = generate_special_instructions(state)
-        
-        # Cultural region
         cultural_region = determine_cultural_region(supplier_data.get('location', ''))
         
-        # Invoke response generation
+        # Prepare prompt
         formatted_prompt = response_generation_prompt.invoke({
             "classified_questions": questions_formatted,
             "historical_context": format_dict_for_prompt(historical_context),
@@ -563,20 +577,20 @@ def generate_comprehensive_response(state: AgentState) -> Dict[str, Any]:
         
         response: ClarificationResponse = response_generation_model.invoke(formatted_prompt)
         
-        # Display results
-        print(f"\n📝 RESPONSE GENERATED:")
-        print(f"   Main Sections: {len(response.main_response_sections)}")
-        print(f"   Proactive Additions: {len(response.proactive_additions)}")
-        print(f"   Examples Provided: {len(response.examples_provided)}")
-        print(f"   Clarity Score: {response.clarity_score:.2f}")
-        print(f"   Completeness Score: {response.completeness_score:.2f}")
-        print(f"   Confidence in Resolution: {response.confidence_in_resolution:.2f}")
+        # Log results
+        logger.info("Response generated.")
+        logger.info(f"Main sections: {len(response.main_response_sections)}")
+        logger.info(f"Proactive additions: {len(response.proactive_additions)}")
+        logger.info(f"Examples provided: {len(response.examples_provided)}")
+        logger.info(f"Clarity score: {response.clarity_score:.2f}")
+        logger.info(f"Completeness score: {response.completeness_score:.2f}")
+        logger.info(f"Confidence in resolution: {response.confidence_in_resolution:.2f}")
         
-        # Assemble full response text
+        # Build final response
         full_response_text = assemble_response_text(response)
         
-        print(f"\n   Response Length: {len(full_response_text)} characters")
-        print(f"   Estimated Reading Time: {response.estimated_reading_time}")
+        logger.info(f"Response length: {len(full_response_text)} characters")
+        logger.info(f"Estimated reading time: {response.estimated_reading_time}")
         
         return {
             "clarification_response": response.model_dump(),
@@ -588,13 +602,14 @@ def generate_comprehensive_response(state: AgentState) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        print(f"\n❌ Response Generation Error: {str(e)}")
+        logger.error(f"Response Generation Error: {str(e)}")
         import traceback
         traceback.print_exc()
         return {
             "error": str(e),
             "status": "generation_error"
         }
+
 
 
 # ===== 5. QUALITY VALIDATION PROMPT - BALANCED =====
@@ -664,41 +679,34 @@ def validate_clarification_quality(state: AgentState) -> Dict[str, Any]:
     """
     
     try:
-        print("\n" + "="*70)
-        print("🔍 STEP 5: VALIDATING CLARIFICATION QUALITY")
-        print("="*70)
+        logger.info("STEP 5: VALIDATING CLARIFICATION QUALITY")
         
-        # Get drafted response
         drafted_response = state.get('drafted_clarification', '')
         
         if not drafted_response:
+            logger.error("No drafted response found for validation.")
             return {
                 "error": "No drafted response to validate",
                 "status": "validation_error"
             }
         
-        # Get context
         classification = state.get('clarification_classification', {})
         questions = classification.get('questions', [])
         supplier_data = state.get('top_suppliers', [{}])[0]
         
-        # Format questions for validation
         questions_text = "\n".join([
             f"{i+1}. {q.get('question_text')}"
             for i, q in enumerate(questions)
         ])
         
-        # Get history for consistency check
         history_text = format_full_negotiation_history(
             state.get('negotiation_history', [])
         )
         
-        # Previous terms
         previous_terms_text = format_dict_for_prompt(
             state.get('extracted_terms', {})
         )
         
-        # Invoke validation
         formatted_prompt = quality_validation_prompt.invoke({
             "supplier_questions": questions_text,
             "drafted_response": drafted_response,
@@ -711,31 +719,29 @@ def validate_clarification_quality(state: AgentState) -> Dict[str, Any]:
         
         validation: ClarificationQualityValidation = quality_validation_model.invoke(formatted_prompt)
         
-        # Display results
-        print(f"\n📊 QUALITY VALIDATION RESULTS:")
-        print(f"   Overall Quality: {validation.overall_quality_score:.2f}")
-        print(f"   - Clarity: {validation.clarity_score:.2f}")
-        print(f"   - Completeness: {validation.completeness_score:.2f}")
-        print(f"   - Consistency: {validation.consistency_score:.2f}")
-        print(f"   - Helpfulness: {validation.helpfulness_score:.2f}")
-        
-        print(f"\n   All Questions Answered: {'✅ Yes' if validation.all_questions_answered else '❌ No'}")
+        logger.info("Quality validation completed.")
+        logger.info(f"Overall quality score: {validation.overall_quality_score:.2f}")
+        logger.info(f"Clarity score: {validation.clarity_score:.2f}")
+        logger.info(f"Completeness score: {validation.completeness_score:.2f}")
+        logger.info(f"Consistency score: {validation.consistency_score:.2f}")
+        logger.info(f"Helpfulness score: {validation.helpfulness_score:.2f}")
+        logger.info(f"All questions answered: {validation.all_questions_answered}")
         
         if validation.unanswered_questions:
-            print(f"   ⚠️ Unanswered Questions:")
+            logger.warning("Unanswered questions detected:")
             for q in validation.unanswered_questions:
-                print(f"      • {q}")
+                logger.warning(f"Unanswered: {q}")
         
-        print(f"   Consistency Check: {'✅ Passed' if validation.consistency_with_history else '❌ Failed'}")
+        logger.info(f"Consistency with history: {validation.consistency_with_history}")
         
         if validation.inconsistencies_found:
-            print(f"   ⚠️ Inconsistencies:")
+            logger.warning("Inconsistencies found:")
             for inc in validation.inconsistencies_found:
-                print(f"      • {inc}")
+                logger.warning(f"Inconsistency: {inc}")
         
-        print(f"   Critical Issues: {validation.critical_issues_count}")
-        print(f"   Ready to Send: {'✅ Yes' if validation.ready_to_send else '⚠️ No'}")
-        print(f"   Recommended Action: {validation.recommended_action.upper()}")
+        logger.info(f"Critical issues count: {validation.critical_issues_count}")
+        logger.info(f"Ready to send: {validation.ready_to_send}")
+        logger.info(f"Recommended action: {validation.recommended_action}")
         
         return {
             "clarification_quality_validation": validation.model_dump(),
@@ -748,7 +754,7 @@ def validate_clarification_quality(state: AgentState) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        print(f"\n❌ Quality Validation Error: {str(e)}")
+        logger.error(f"Quality Validation Error: {str(e)}")
         return {
             "error": str(e),
             "status": "quality_validation_error"
@@ -814,15 +820,12 @@ def enhance_clarification_response(state: AgentState) -> Dict[str, Any]:
     """
     
     try:
-        print("\n" + "="*70)
-        print("🔧 STEP 6: ENHANCING CLARIFICATION RESPONSE")
-        print("="*70)
+        logger.info("STEP 6: ENHANCING CLARIFICATION RESPONSE")
         
-        # Check if enhancement needed
         recommended_action = state.get('recommended_action', 'send_as_is')
         
         if recommended_action == 'send_as_is':
-            print("   ✅ Quality excellent - no enhancement needed")
+            logger.info("Quality is sufficient, no enhancement required.")
             return {
                 "clarification_enhanced": False,
                 "final_clarification": state.get('drafted_clarification'),
@@ -830,20 +833,17 @@ def enhance_clarification_response(state: AgentState) -> Dict[str, Any]:
             }
         
         if recommended_action in ['human_review_required', 'major_revision_needed']:
-            print("   🚨 Quality issues too severe for auto-enhancement")
-            print("   Escalating to human review")
+            logger.warning("Quality issues too severe for auto enhancement. Escalating to human review.")
             return {
                 "clarification_enhanced": False,
                 "requires_human_review": True,
                 "status": "needs_human_review"
             }
         
-        # Get original response and quality issues
         original_response = state.get('drafted_clarification', '')
         validation = state.get('clarification_quality_validation', {})
         info_validation = state.get('information_validation', {})
         
-        # Format issues
         issues_text = format_quality_issues(validation.get('issues', []))
         unanswered = "\n".join(validation.get('unanswered_questions', []))
         inconsistencies = "\n".join(validation.get('inconsistencies_found', []))
@@ -851,7 +851,6 @@ def enhance_clarification_response(state: AgentState) -> Dict[str, Any]:
             info_validation.get('available_information', [])
         )
         
-        # Invoke enhancement
         formatted_prompt = enhancement_prompt.invoke({
             "original_response": original_response,
             "quality_issues": issues_text,
@@ -862,18 +861,17 @@ def enhance_clarification_response(state: AgentState) -> Dict[str, Any]:
         
         enhanced: EnhancedClarificationResponse = enhancement_model.invoke(formatted_prompt)
         
-        # Display results
-        print(f"\n✨ ENHANCEMENT COMPLETE:")
-        print(f"   Quality Improvement: +{enhanced.quality_improvement:.2f}")
-        print(f"   Final Quality Score: {enhanced.final_quality_score:.2f}")
-        print(f"   Improvements Made: {len(enhanced.improvements_made)}")
-        print(f"   Elements Added: {len(enhanced.added_elements)}")
-        print(f"   Ready to Send: {'✅ Yes' if enhanced.ready_to_send else '⚠️ No'}")
+        logger.info("Enhancement completed.")
+        logger.info(f"Quality improvement: {enhanced.quality_improvement:.2f}")
+        logger.info(f"Final quality score: {enhanced.final_quality_score:.2f}")
+        logger.info(f"Improvements made: {len(enhanced.improvements_made)}")
+        logger.info(f"Elements added: {len(enhanced.added_elements)}")
+        logger.info(f"Ready to send: {enhanced.ready_to_send}")
         
         if enhanced.remaining_concerns:
-            print(f"\n   ⚠️ Remaining Concerns:")
+            logger.warning("Remaining concerns detected:")
             for concern in enhanced.remaining_concerns:
-                print(f"      • {concern}")
+                logger.warning(f"Concern: {concern}")
         
         return {
             "clarification_enhancement": enhanced.model_dump(),
@@ -886,11 +884,12 @@ def enhance_clarification_response(state: AgentState) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        print(f"\n❌ Enhancement Error: {str(e)}")
+        logger.error(f"Enhancement Error: {str(e)}")
         return {
             "error": str(e),
             "status": "enhancement_error"
         }
+
 
 
 # ===== MAIN ORCHESTRATOR =====
@@ -911,9 +910,7 @@ def handle_clarification_request(state: AgentState):
     """
     
     try:
-        print("\n" + "="*70)
-        print("🎯 COMPREHENSIVE CLARIFICATION HANDLER")
-        print("="*70)
+        logger.info("COMPREHENSIVE CLARIFICATION HANDLER")
         
         # Step 1: Classify
         result = classify_clarification_request(state)
@@ -924,7 +921,7 @@ def handle_clarification_request(state: AgentState):
         # Step 2: Search History
         result = search_historical_context(state)
         if result.get('error'):
-            print("   ⚠️ Historical search failed, continuing without history...")
+            logger.warning("Historical search failed, continuing without history")
         state.update(result)
         
         # Step 3: Validate Information
@@ -935,7 +932,7 @@ def handle_clarification_request(state: AgentState):
         
         # Check if we need user input
         if result.get('recommended_action') == 'request_user_input':
-            print("\n🚨 Missing critical information - need user input")
+            logger.warning("Missing critical information - need user input")
             return {
                 **state,
                 "next_step": "request_user_input",
@@ -962,9 +959,7 @@ def handle_clarification_request(state: AgentState):
         
         # Check final status
         if result.get('requires_human_review'):
-            print("\n" + "="*70)
-            print("🚨 HUMAN REVIEW REQUIRED")
-            print("="*70)
+            logger.warning("Human review required")
             return {
                 **state,
                 "next_step": "request_human_review",
@@ -972,42 +967,38 @@ def handle_clarification_request(state: AgentState):
             }
         
         if not result.get('ready_to_send'):
-            print("\n" + "="*70)
-            print("⚠️ CLARIFICATION NOT READY")
-            print("="*70)
+            logger.warning("Clarification not ready")
             return {
                 **state,
                 "next_step": "revise_clarification",
                 "status": "needs_revision"
             }
         
-        # Success!
-        print("\n" + "="*70)
-        print("✅ CLARIFICATION READY TO SEND")
-        print("="*70)
+        # Success
+        logger.info("Clarification ready to send")
         
         final_response = state.get('final_clarification')
         
-        assistant_message = f"""✅ **Comprehensive Clarification Prepared**
+        assistant_message = f"""Comprehensive Clarification Prepared
 
-**Classification:**
+Classification:
 - Type: {state.get('clarification_classification', {}).get('request_type', 'N/A')}
 - Questions: {len(state.get('clarification_questions', []))}
 - Confusion Level: {state.get('confusion_level', 'N/A').upper()}
 - Urgency: {state.get('clarification_classification', {}).get('urgency_level', 'N/A').upper()}
 
-**Quality Metrics:**
+Quality Metrics:
 - Overall Score: {state.get('final_quality_score', state.get('quality_score', 0.0)):.2f}/1.0
 - Clarity: {state.get('clarification_quality_validation', {}).get('clarity_score', 0.0):.2f}
 - Completeness: {state.get('clarification_quality_validation', {}).get('completeness_score', 0.0):.2f}
-- All Questions Answered: {'✅ Yes' if state.get('all_questions_answered') else '⚠️ No'}
+- All Questions Answered: {"Yes" if state.get('all_questions_answered') else "No"}
 
-**Processing:**
-- Historical Context: {'✅ Found' if state.get('found_previous_answers') else '❌ None'}
-- Enhanced: {'✅ Yes' if state.get('clarification_enhanced') else 'Not needed'}
+Processing:
+- Historical Context: {"Found" if state.get('found_previous_answers') else "None"}
+- Enhanced: {"Yes" if state.get('clarification_enhanced') else "Not needed"}
 - Quality Improvement: +{state.get('quality_improvement', 0.0):.2f}
 
-**Ready to send to:** {state.get('top_suppliers', [{}])[0].get('name', 'Supplier')}"""
+Ready to send to: {state.get('top_suppliers', [{}])[0].get('name', 'Supplier')}"""
 
         return {
             **state,
@@ -1020,9 +1011,7 @@ def handle_clarification_request(state: AgentState):
         }
         
     except Exception as e:
-        print(f"\n❌ Clarification Handler Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Clarification Handler Error: {str(e)}", exc_info=True)
         
         return {
             **state,
@@ -1231,44 +1220,3 @@ def determine_response_tone(classification: Dict[str, Any]) -> str:
         return "detailed, patient, thorough"
     else:
         return "professional, clear, collaborative"
-
-
-def determine_cultural_region(location: str) -> str:
-    """Determine cultural region from location"""
-    location_lower = location.lower()
-    
-    if any(c in location_lower for c in ['china', 'japan', 'korea', 'taiwan', 'singapore', 'hong kong']):
-        return 'east_asian'
-    elif any(c in location_lower for c in ['india', 'pakistan', 'bangladesh', 'sri lanka']):
-        return 'south_asian'
-    elif any(c in location_lower for c in ['germany', 'italy', 'france', 'uk', 'spain', 'netherlands']):
-        return 'european'
-    elif any(c in location_lower for c in ['uae', 'turkey', 'egypt', 'saudi']):
-        return 'middle_eastern'
-    elif any(c in location_lower for c in ['mexico', 'brazil', 'argentina', 'colombia']):
-        return 'latin_american'
-    elif any(c in location_lower for c in ['usa', 'canada']):
-        return 'north_american'
-    else:
-        return 'international'
-
-
-# ===== TESTING =====
-
-if __name__ == "__main__":
-    print("\n" + "="*70)
-    print("🧪 ENHANCED CLARIFICATION NODE - READY")
-    print("="*70)
-    print("\nFeatures:")
-    print("  ✅ 6-stage comprehensive processing")
-    print("  ✅ LLM-powered classification")
-    print("  ✅ Historical context search")
-    print("  ✅ Information validation")
-    print("  ✅ Comprehensive response generation")
-    print("  ✅ Quality validation gate")
-    print("  ✅ Auto-enhancement")
-    print("\nTo integrate:")
-    print("  1. Add to graph_builder.py")
-    print("  2. Route from analyze_supplier_response when intent='clarification_request'")
-    print("  3. Connect to send_clarification_response")
-    print("\n" + "="*70)

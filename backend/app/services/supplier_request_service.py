@@ -81,7 +81,7 @@ class SupplierRequestService:
         self.db.commit()
         self.db.refresh(request)
         
-        logger.success(f"✅ Supplier request created: {request_id}")
+        logger.success(f"Supplier request created: {request_id}")
         
         # Send notification to supplier
         await self._send_request_notification(request)
@@ -215,7 +215,7 @@ class SupplierRequestService:
             trigger.resume_started_at = datetime.utcnow()
             self.db.commit()
             
-            logger.info(f"📡 Resuming workflow: {request.thread_id}")
+            logger.info(f"Resuming workflow: {request.thread_id}")
             
             # Use graph manager's resume method
             events = []
@@ -231,7 +231,7 @@ class SupplierRequestService:
             trigger.resume_completed_at = datetime.utcnow()
             self.db.commit()
             
-            logger.success(f"✅ Workflow resumed successfully: {request.thread_id}")
+            logger.success(f"Workflow resumed successfully: {request.thread_id}")
             
             return {
                 "triggered": True,
@@ -241,7 +241,7 @@ class SupplierRequestService:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to resume workflow: {e}")
+            logger.error(f"Failed to resume workflow: {e}")
             
             trigger.resume_status = "failed"
             trigger.error_message = str(e)
@@ -341,7 +341,7 @@ class SupplierRequestService:
         
         self.db.commit()
         
-        logger.success(f"✅ Notifications sent to {len(supplier_users)} users")
+        logger.success(f"Notifications sent to {len(supplier_users)} users")
     
     # ============================================
     # EXPIRATION HANDLING
@@ -362,7 +362,7 @@ class SupplierRequestService:
         self.db.commit()
         
         if expired_count > 0:
-            logger.warning(f"⚠️ Expired {expired_count} old requests")
+            logger.warning(f"Expired {expired_count} old requests")
         
         return expired_count
 

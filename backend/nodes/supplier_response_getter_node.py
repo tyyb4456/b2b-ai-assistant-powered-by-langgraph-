@@ -1,5 +1,5 @@
 from state import AgentState
-
+from loguru import logger
 
 # NEW: Node to receive supplier response
 def receive_supplier_response(state: AgentState):
@@ -18,6 +18,8 @@ def receive_supplier_response(state: AgentState):
     
     # Process the supplier response
     negotiation_rounds = state.get('negotiation_rounds', 0) + 1
+
+    logger.info(f"Received supplier response: {supplier_response}")
     
     return {
         'messages': [f'📨 Received supplier response: {supplier_response[:100]}...'],

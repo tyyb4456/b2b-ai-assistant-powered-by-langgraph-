@@ -220,7 +220,7 @@ async def submit_response(
     3. Does NOT trigger workflow resume
     4. Frontend will manually resume workflow when ready
     """
-    logger.info(f"📝 Supplier response received for request: {request_id}")
+    logger.info(f"Supplier response received for request: {request_id}")
     logger.info(f"Response Type: {response.response_type}")
     logger.info(f"Response Text: {response.response_text}")
     logger.info(f"Response Data: {response.response_data}")
@@ -254,7 +254,7 @@ async def submit_response(
             user_agent=request.headers.get("user-agent")
         )
         
-        logger.success(f"✅ Response stored (not auto-resumed): {request_id}")
+        logger.success(f"Response stored (not auto-resumed): {request_id}")
         
         return success_response(data=result)
         
@@ -281,7 +281,7 @@ async def resume_workflow(
     This endpoint is called by the buyer's frontend (App A) to manually
     resume the workflow after reviewing the supplier's response.
     """
-    logger.info(f"🚀 Manual workflow resume requested for request: {request_id}")
+    logger.info(f"Manual workflow resume requested for request: {request_id}")
     
     service = get_supplier_request_service(db)
     
@@ -304,7 +304,7 @@ async def resume_workflow(
             req.supplier_response
         )
         
-        logger.success(f"✅ Workflow resumed successfully: {request_id}")
+        logger.success(f"Workflow resumed successfully: {request_id}")
         
         return success_response(data={
             "request_id": request_id,
@@ -315,7 +315,7 @@ async def resume_workflow(
         })
         
     except Exception as e:
-        logger.error(f"❌ Failed to resume workflow: {e}")
+        logger.error(f"Failed to resume workflow: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to resume workflow: {str(e)}"

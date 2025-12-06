@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import uuid
 from datetime import datetime, timedelta
 import json
-
+from loguru import logger
 load_dotenv()
 
 
@@ -20,7 +20,21 @@ def extract_comprehensive_context(state: AgentState) -> Dict[str, Any]:
     
     # Extract supplier data
     supplier_data = state.get('top_suppliers', [])
-    active_supplier = supplier_data[0] if supplier_data else {}
+
+    # Check if user has selected a supplier, otherwise fall back to first supplier
+    selected_supplier = state.get('selected_supplier', None)
+
+    
+    if selected_supplier:
+        # Use the user-selected supplier
+        active_supplier = selected_supplier
+        logger.info("Using user-selected supplier for profile.")
+    elif supplier_data and len(supplier_data) > 0:
+        # Fall back to first supplier if no selection made
+        active_supplier = supplier_data[0]
+        logger.info("No user-selected supplier, using first supplier from search results.")
+    else:
+        active_supplier = None
     
     # Extract negotiation history
     negotiation_history = state.get('negotiation_history', [])
@@ -149,6 +163,7 @@ def extract_comprehensive_context(state: AgentState) -> Dict[str, Any]:
             'quoted_price': quote_price
         }
     }
+    logger.info(f"Comprehensive context extraction complete. and the length is {len(json.dumps(context))} characters.")
     
     return context
 
@@ -210,6 +225,8 @@ def analyze_negotiation_journey(
     if isinstance(extracted_terms, dict):
         if extracted_terms.get('concessions_offered'):
             analysis['concessions_made'] = extracted_terms['concessions_offered']
+
+    logger.info(f"Negotiation journey analysis complete, length of key points: {len(analysis['key_discussion_points'])}")
     
     return analysis
 
@@ -380,6 +397,8 @@ def assess_contract_risk(context: Dict[str, Any]) -> RiskAssessment:
         recommended_clauses.append("Detailed Quality Specifications Annexure")
         recommended_clauses.append("Sample Approval Requirements")
         recommended_clauses.append("Testing Protocol Specifications")
+
+    logger.warning(f"Risk assessment complete with overall risk level: {risk_level} and score: {overall_risk_score:.2f}")
     
     return RiskAssessment(
         overall_risk_level=risk_level,
@@ -495,6 +514,8 @@ def determine_compliance_requirements(
     
     if required_certifications:
         documentation_requirements.append(f'Certification documents: {", ".join(required_certifications)}')
+
+    logger.info(f"Compliance requirements determined with {len(required_certifications)} certifications and {len(industry_standards)} standards.")  
     
     return ComplianceRequirements(
         required_certifications=required_certifications,
@@ -621,6 +642,8 @@ def structure_financial_terms(
             }
         ]
     
+    logger.info(f"Financial terms structured for risk level: {risk_level} with {len(payment_milestones)} milestones.")
+    
     # Currency terms
     currency_terms = f"""
     All payments shall be made in {currency}. 
@@ -651,6 +674,8 @@ def structure_financial_terms(
         """
     else:
         price_escalation_clause = None
+
+    logger.info("Financial terms structuring complete.")
     
     return FinancialTermsDetail(
         payment_milestones=payment_milestones,
@@ -798,6 +823,8 @@ def structure_delivery_terms(
     
     if fabric_specs.get('certifications'):
         required_shipping_documents.append(f"Certification Documents: {', '.join(fabric_specs['certifications'])}")
+    
+    logger.info(f"Delivery terms structuring complete. Calculated delivery date: {delivery_date.strftime('%Y-%m-%d')}, Incoterm: {incoterm}")
     
     return DeliveryTermsDetail(
         order_date=order_date.strftime('%Y-%m-%d'),
@@ -963,6 +990,8 @@ def structure_quality_framework(
        - Second rejection: Supplier pays 5% penalty on rejected portion value
        - Third rejection: Buyer has right to terminate contract with full refund plus 10% penalty
     """
+
+    logger.info(f"Quality assurance framework structured for risk level: {risk_level} with AQL: {aql_level}")
     
     return QualityAssuranceFramework(
         aql_level=aql_level,
@@ -1230,16 +1259,16 @@ def initiate_contract(state: AgentState):
     IMPROVED Node: initiate_contract - Comprehensive Contract Drafting Agent
     
     Improvements:
-    1. ✅ Comprehensive context extraction from proper model parsing
-    2. ✅ Risk-based contract customization
-    3. ✅ Detailed financial terms with milestone payments
-    4. ✅ Calculated delivery dates with buffers
-    5. ✅ Comprehensive quality assurance framework
-    6. ✅ Compliance and certification integration
-    7. ✅ Industry standards incorporation
-    8. ✅ Geographic and jurisdiction considerations
-    9. ✅ Negotiation history integration
-    10. ✅ Dynamic clause selection based on risk
+    1. Comprehensive context extraction from proper model parsing
+    2. Risk-based contract customization
+    3. Detailed financial terms with milestone payments
+    4. Calculated delivery dates with buffers
+    5. Comprehensive quality assurance framework
+    6. Compliance and certification integration
+    7. Industry standards incorporation
+    8. Geographic and jurisdiction considerations
+    9. Negotiation history integration
+    10. Dynamic clause selection based on risk
     
     Process Flow:
     1. Extract comprehensive context from state (proper model parsing)
@@ -1261,95 +1290,85 @@ def initiate_contract(state: AgentState):
     """
     
     try:
-        print("\n" + "="*80)
-        print("🏗️  INITIATING COMPREHENSIVE CONTRACT DRAFTING")
-        print("="*80)
+        # print("\n" + "="*80)
+        # print("🏗️  INITIATING COMPREHENSIVE CONTRACT DRAFTING")
+        # print("="*80)
+
+        logger.info("INITIATING COMPREHENSIVE CONTRACT DRAFTING")
         
         # ========================================
         # PHASE 1: COMPREHENSIVE CONTEXT EXTRACTION
         # ========================================
-        print("\n[PHASE 1] Extracting comprehensive context...")
+
+
+        logger.info("Extracting comprehensive context from agent state...")
         context = extract_comprehensive_context(state)
         
-        print(f"✓ Supplier: {context['supplier_information']['name']}")
-        print(f"✓ Fabric: {context['fabric_specifications']['fabric_type']}")
-        print(f"✓ Quantity: {context['fabric_specifications']['quantity']:,} {context['fabric_specifications']['unit']}")
-        print(f"✓ Contract Value: {context['pricing_terms']['currency']} {context['pricing_terms']['total_value']:,.2f}")
-        print(f"✓ Negotiation Rounds: {context['negotiation_context']['total_rounds']}")
         
+        logger.info(f"Comprehensive context extracted for supplier: {context['supplier_information']['name']}, fabric: {context['fabric_specifications']['fabric_type']}, quantity: {context['fabric_specifications']['quantity']:,} {context['fabric_specifications']['unit']}, contract value: {context['pricing_terms']['currency']} {context['pricing_terms']['total_value']:,.2f}, negotiation rounds: {context['negotiation_context']['total_rounds']}.")
+
+
         # ========================================
         # PHASE 2: RISK ASSESSMENT
         # ========================================
-        print("\n[PHASE 2] Performing risk assessment...")
+
+
+        logger.info("Performing holistic contract risk assessment...")
         risk_assessment = assess_contract_risk(context)
         
-        print(f"✓ Overall Risk Level: {risk_assessment.overall_risk_level.upper()}")
-        print(f"✓ Risk Score: {risk_assessment.risk_score:.1f}/100")
-        print(f"✓ Supplier Reliability Risk: {risk_assessment.supplier_reliability_risk:.1f}/100")
-        print(f"✓ Financial Risk: {risk_assessment.financial_risk:.1f}/100")
-        print(f"✓ Risk Factors Identified: {len(risk_assessment.risk_factors)}")
+
+        logger.info(f"Risk assessment complete. Overall Risk Level: {risk_assessment.overall_risk_level.upper()}, Risk Score: {risk_assessment.risk_score:.1f}/100, Supplier Reliability Risk: {risk_assessment.supplier_reliability_risk:.1f}/100, Financial Risk: {risk_assessment.financial_risk:.1f}/100, Risk Factors Identified: {len(risk_assessment.risk_factors)}.")
         
         if risk_assessment.risk_factors:
-            print("  Risk Factors:")
+            
+            logger.info("Risk Factors Identified:")
             for rf in risk_assessment.risk_factors[:3]:
-                print(f"    - {rf}")
+                logger.info(f"    - {rf}")
         
         # ========================================
         # PHASE 3: COMPLIANCE & STANDARDS
         # ========================================
-        print("\n[PHASE 3] Determining compliance requirements...")
+    
+        logger.info("Determining compliance and quality requirements...")
         compliance = determine_compliance_requirements(context, risk_assessment)
         
-        print(f"✓ Inspection Level: {compliance.inspection_level.upper()}")
-        print(f"✓ Third-party Inspection: {'Required' if compliance.third_party_inspection_required else 'Optional'}")
-        print(f"✓ Required Certifications: {len(compliance.required_certifications)}")
-        print(f"✓ Industry Standards: {len(compliance.industry_standards)}")
-        print(f"✓ Testing Requirements: {len(compliance.testing_requirements)}")
+
+        logger.info(f"Compliance requirements determined. Inspection Level: {compliance.inspection_level.upper()}, Third-party Inspection: {'Required' if compliance.third_party_inspection_required else 'Optional'}, Required Certifications: {len(compliance.required_certifications)}, Industry Standards: {len(compliance.industry_standards)}, Testing Requirements: {len(compliance.testing_requirements)}.")
         
         # ========================================
         # PHASE 4: FINANCIAL TERMS STRUCTURING
         # ========================================
-        print("\n[PHASE 4] Structuring financial terms...")
+
+        logger.info("Structuring detailed financial terms...")
         financial_terms = structure_financial_terms(context, risk_assessment)
         
-        print(f"✓ Payment Milestones: {len(financial_terms.payment_milestones)}")
-        print(f"✓ Bank Guarantee: {'Required' if financial_terms.bank_guarantee_required else 'Not required'}")
-        if financial_terms.bank_guarantee_required:
-            print(f"  - Guarantee Amount: {financial_terms.bank_guarantee_amount_percentage}% of contract value")
-        print(f"✓ Late Payment Interest: {financial_terms.late_payment_interest_rate}% per annum")
-        print(f"✓ Retention: {financial_terms.retention_amount_percentage or 0}%")
+
+        logger.info(f"Financial terms structured with {len(financial_terms.payment_milestones)} payment milestones, bank guarantee: {'required' if financial_terms.bank_guarantee_required else 'not required'}, late payment interest: {financial_terms.late_payment_interest_rate}%, retention: {financial_terms.retention_amount_percentage or 0}%.")
         
         # ========================================
         # PHASE 5: DELIVERY TERMS STRUCTURING
         # ========================================
-        print("\n[PHASE 5] Structuring delivery terms...")
+
+        logger.info("Structuring detailed delivery terms...")
         delivery_terms = structure_delivery_terms(context, risk_assessment)
-        
-        print(f"✓ Order Date: {delivery_terms.order_date}")
-        print(f"✓ Production Start: {delivery_terms.production_start_date}")
-        print(f"✓ Inspection Date: {delivery_terms.inspection_date}")
-        print(f"✓ Shipment Date: {delivery_terms.shipment_date}")
-        print(f"✓ Delivery Date: {delivery_terms.delivery_date}")
-        print(f"✓ Incoterm: {delivery_terms.incoterm}")
-        print(f"✓ Partial Shipments: {'Allowed' if delivery_terms.partial_shipment_allowed else 'Not allowed'}")
+
+
+        logger.info(f"Delivery terms structured. Calculated delivery date: {delivery_terms.delivery_date}, Incoterm: {delivery_terms.incoterm}, Partial shipments: {'allowed' if delivery_terms.partial_shipment_allowed else 'not allowed'}.")
         
         # ========================================
         # PHASE 6: QUALITY FRAMEWORK
         # ========================================
-        print("\n[PHASE 6] Building quality assurance framework...")
+
+        logger.info("Building comprehensive quality assurance framework...")
         quality_framework = structure_quality_framework(context, compliance, risk_assessment)
         
-        print(f"✓ AQL Level: {quality_framework.aql_level}")
-        print(f"✓ Pre-production Sample: {'Required' if quality_framework.pre_production_sample_required else 'Not required'}")
-        print(f"✓ In-line Inspection: {'Required' if quality_framework.in_line_inspection_required else 'Not required'}")
-        print(f"✓ Pre-shipment Inspection: {'Required' if quality_framework.pre_shipment_inspection_required else 'Not required'}")
-        if quality_framework.third_party_inspector:
-            print(f"✓ Third-party Inspector: {quality_framework.third_party_inspector}")
+
+        logger.info(f"Quality assurance framework built with AQL Level: {quality_framework.aql_level}, Pre-production Sample: {'Required' if quality_framework.pre_production_sample_required else 'Not required'}, In-line Inspection: {'Required' if quality_framework.in_line_inspection_required else 'Not required'}, Pre-shipment Inspection: {'Required' if quality_framework.pre_shipment_inspection_required else 'Not required'}.")
         
         # ========================================
         # PHASE 7: GENERATE CONTRACT ID & METADATA
         # ========================================
-        print("\n[PHASE 7] Generating contract metadata...")
+        logger.info("Generating unique contract ID and metadata...")
         contract_id = f"CTXT_{datetime.now().strftime('%Y%m%d')}_{str(uuid.uuid4())[:8].upper()}"
         
         buyer_info = context['buyer_information']
@@ -1372,12 +1391,14 @@ def initiate_contract(state: AgentState):
             jurisdiction=f"{buyer_info.get('country', 'TBD')} or Neutral Arbitration"
         )
         
-        print(f"✓ Contract ID Generated: {contract_id}")
+
+        logger.info(f"Contract ID Generated: {contract_id}")
         
         # ========================================
         # PHASE 8: AI-POWERED TERMS STRUCTURING
         # ========================================
-        print("\n[PHASE 8] AI structuring of comprehensive contract terms...")
+
+        logger.info("AI structuring of comprehensive contract terms...")
         
         terms_formatted_prompt = enhanced_terms_prompt.invoke({
             "fabric_specifications": json.dumps(context['fabric_specifications'], indent=2),
@@ -1400,12 +1421,12 @@ def initiate_contract(state: AgentState):
         })
         
         structured_terms: ContractTerms = terms_model.invoke(terms_formatted_prompt)
-        print(f"✓ Contract terms structured successfully")
+        logger.success("✓ Contract terms structured by AI.")
         
         # ========================================
         # PHASE 9: AI-POWERED CONTRACT DRAFTING
         # ========================================
-        print("\n[PHASE 9] AI drafting complete contract document...")
+        logger.success("AI drafting of complete contract document...")
         
         contract_formatted_prompt = enhanced_contract_prompt.invoke({
             "contract_id": contract_id,
@@ -1436,12 +1457,12 @@ def initiate_contract(state: AgentState):
         drafted_contract.contract_metadata_summary = json.dumps(contract_metadata.model_dump())
         drafted_contract.generation_timestamp = datetime.now().isoformat()
         
-        print(f"✓ Contract document drafted ({len(drafted_contract.terms_and_conditions)} characters)")
+        logger.success("✓ Complete contract document drafted by AI.")
         
         # ========================================
         # PHASE 10: MULTI-DIMENSIONAL VALIDATION
         # ========================================
-        print("\n[PHASE 10] Performing multi-dimensional validation...")
+        logger.info("Performing multi-dimensional contract validation...")
         validation_results = enhanced_contract_validation(
             drafted_contract,
             structured_terms,
@@ -1450,17 +1471,25 @@ def initiate_contract(state: AgentState):
             context
         )
         
-        print(f"✓ Overall Validation Score: {validation_results['overall_score']:.1%}")
-        print(f"  - Legal Completeness: {validation_results['legal_completeness']:.1%}")
-        print(f"  - Financial Soundness: {validation_results['financial_soundness']:.1%}")
-        print(f"  - Risk Coverage: {validation_results['risk_coverage']:.1%}")
-        print(f"  - Compliance Adequacy: {validation_results['compliance_adequacy']:.1%}")
-        print(f"  - Operational Feasibility: {validation_results['operational_feasibility']:.1%}")
+        # print(f"✓ Overall Validation Score: {validation_results['overall_score']:.1%}")
+        # print(f"  - Legal Completeness: {validation_results['legal_completeness']:.1%}")
+        # print(f"  - Financial Soundness: {validation_results['financial_soundness']:.1%}")
+        # print(f"  - Risk Coverage: {validation_results['risk_coverage']:.1%}")
+        # print(f"  - Compliance Adequacy: {validation_results['compliance_adequacy']:.1%}")
+        # print(f"  - Operational Feasibility: {validation_results['operational_feasibility']:.1%}")
+
+        logger.success(f"✓ Overall Validation Score: {validation_results['overall_score']:.1%}")
+        logger.success(f"  - Legal Completeness: {validation_results['legal_completeness']:.1%}")
+        logger.success(f"  - Financial Soundness: {validation_results['financial_soundness']:.1%}")
+        logger.success(f"  - Risk Coverage: {validation_results['risk_coverage']:.1%}")
+        logger.success(f"  - Compliance Adequacy: {validation_results['compliance_adequacy']:.1%}")
+        logger.success(f"  - Operational Feasibility: {validation_results['operational_feasibility']:.1%}")
+
         
         # ========================================
         # PHASE 11: RECOMMENDATIONS & NEXT STEPS
         # ========================================
-        print("\n[PHASE 11] Generating recommendations...")
+        logger.info("Generating actionable recommendations based on validation...")
         recommendations = generate_comprehensive_recommendations(
             drafted_contract,
             context,
@@ -1471,12 +1500,13 @@ def initiate_contract(state: AgentState):
         
         drafted_contract.recommended_actions = recommendations
         
-        print(f"✓ Generated {len(recommendations)} action items")
+
+        logger.success(f"✓ Generated {len(recommendations)} action items")
         
         # ========================================
         # PHASE 12: PREPARE STATE UPDATES
         # ========================================
-        print("\n[PHASE 12] Preparing state updates...")
+        logger.info("Preparing state updates with drafted contract and details...")
         
         # Create comprehensive assistant message
         assistant_message = generate_contract_summary_message(
@@ -1514,20 +1544,20 @@ def initiate_contract(state: AgentState):
             "contract_generation_timestamp": datetime.now().isoformat()
         }
         
-        print("\n" + "="*80)
-        print("✅ CONTRACT DRAFTING COMPLETED SUCCESSFULLY")
-        print("="*80)
-        print(f"Contract ID: {contract_id}")
-        print(f"Overall Confidence: {drafted_contract.confidence_score:.1%}")
-        print(f"Validation Score: {validation_results['overall_score']:.1%}")
-        print(f"Next Step: {state_updates['next_step'].upper()}")
-        print("="*80 + "\n")
+
+
+        logger.success("CONTRACT DRAFTING COMPLETED SUCCESSFULLY")
+        logger.success(f"Contract ID: {contract_id}")
+        logger.success(f"Overall Confidence: {drafted_contract.confidence_score:.1%}")
+        logger.success(f"Validation Score: {validation_results['overall_score']:.1%}")
+        logger.success(f"Next Step: {state_updates['next_step'].upper()}")
+        
         
         return state_updates
         
     except Exception as e:
         error_message = f"❌ Error in contract drafting: {str(e)}"
-        print(error_message)
+        logger.error(error_message)
         import traceback
         traceback.print_exc()
         
@@ -1662,6 +1692,8 @@ def enhanced_contract_validation(
     
     validation_scores['issues'] = issues
     validation_scores['is_acceptable'] = overall_score >= 0.75
+
+    logger.info(f"Validation completed. Overall Score: {overall_score:.2%}, Issues Found: {len(issues)}")
     
     return validation_scores
 
@@ -1729,6 +1761,8 @@ def generate_comprehensive_recommendations(
     # Final recommendations
     recommendations.append("✓ Prepare contract execution ceremony/process")
     recommendations.append("✓ Plan post-execution contract monitoring and reporting framework")
+
+    logger.info(f"Generated {len(recommendations)} recommendations for next steps.")
     
     return recommendations[:12]  # Return top 12
 
@@ -1759,16 +1793,16 @@ def generate_contract_summary_message(
     total_value = context['pricing_terms']['total_value']
     
     message = f"""
-📋 **COMPREHENSIVE CONTRACT SUCCESSFULLY DRAFTED**
+**COMPREHENSIVE CONTRACT SUCCESSFULLY DRAFTED**
 
-{'='*70}
+{'-'*70}
 
 **CONTRACT IDENTIFICATION**
 • Contract ID: {contract_id}
 • Contract Type: Textile Procurement Agreement
 • Status: Draft - Ready for Legal Review
 
-{'='*70}
+{'-'*70}
 
 **PARTIES & SCOPE**
 • Buyer: {context['buyer_information']['company_name']}
@@ -1777,7 +1811,7 @@ def generate_contract_summary_message(
 • Quantity: {quantity:,} {unit}
 • Contract Value: {currency} {total_value:,.2f}
 
-{'='*70}
+{'-'*70}
 
 **RISK ASSESSMENT SUMMARY**
 • Risk Level: {risk_assessment.overall_risk_level.upper()}
@@ -1788,7 +1822,7 @@ def generate_contract_summary_message(
 **Risk Mitigation Measures Applied:**
 {chr(10).join(f'  ✓ {measure}' for measure in risk_assessment.mitigation_requirements[:3])}
 
-{'='*70}
+{'-'*70}
 
 **FINANCIAL TERMS STRUCTURE**
 • Payment Milestones: {len(financial_terms.payment_milestones)} structured payments
@@ -1798,7 +1832,7 @@ def generate_contract_summary_message(
 • Late Payment Interest: {financial_terms.late_payment_interest_rate}% per annum
 • Retention: {financial_terms.retention_amount_percentage or 0}% for quality assurance
 
-{'='*70}
+{'-'*70}
 
 **DELIVERY SCHEDULE**
 • Order Date: {delivery_terms.order_date}
@@ -1810,7 +1844,7 @@ def generate_contract_summary_message(
 • Partial Shipments: {'Permitted' if delivery_terms.partial_shipment_allowed else 'Not Permitted'}
 • Shipping Method: {delivery_terms.shipping_method}
 
-{'='*70}
+{'-'*70}
 
 **QUALITY ASSURANCE FRAMEWORK**
 • AQL Level: {quality_framework.aql_level}
@@ -1823,7 +1857,7 @@ def generate_contract_summary_message(
   - Major: {quality_framework.defect_tolerance['major_defects']}%
   - Minor: {quality_framework.defect_tolerance['minor_defects']}%
 
-{'='*70}
+{'-'*70}
 
 **CONTRACT QUALITY VALIDATION**
 • Overall Validation Score: {validation['overall_score']:.1%}
@@ -1833,11 +1867,11 @@ def generate_contract_summary_message(
   - Compliance Adequacy: {validation['compliance_adequacy']:.1%}
   - Operational Feasibility: {validation['operational_feasibility']:.1%}
 
-**Status:** {'✅ ACCEPTABLE - Ready for Review' if validation['is_acceptable'] else '⚠️ NEEDS ATTENTION'}
+**Status:** {'ACCEPTABLE - Ready for Review' if validation['is_acceptable'] else '⚠️ NEEDS ATTENTION'}
 
 {f"**Issues Identified:**{chr(10)}{chr(10).join(f'  ⚠️ {issue}' for issue in validation.get('issues', []))}" if validation.get('issues') else ""}
 
-{'='*70}
+{'-'*70}
 
 **NEGOTIATION SUMMARY**
 • Total Rounds: {context['negotiation_context']['total_rounds']}
@@ -1845,15 +1879,15 @@ def generate_contract_summary_message(
 • Relationship Quality: {context['negotiation_context']['relationship_quality'].title()}
 • Savings Achieved: {context['pricing_terms'].get('savings_achieved', 0):.1f}% from initial quote
 
-{'='*70}
+{'-'*70}
 
 **CRITICAL NEXT STEPS**
 
 {chr(10).join(f"{i+1}. {rec}" for i, rec in enumerate(recommendations[:8]))}
 
-{'='*70}
+{'-'*70}
 
-**⚖️ LEGAL NOTICE**
+**LEGAL NOTICE**
 This contract is a DRAFT and requires:
 • Comprehensive legal review by qualified counsel
 • Internal approval from authorized signatories
@@ -1862,219 +1896,24 @@ This contract is a DRAFT and requires:
 
 **DO NOT EXECUTE** this contract without proper legal review and approval.
 
-{'='*70}
+{''*70}
 
-**📄 CONTRACT COMPONENTS READY:**
-✓ Complete Preamble with Party Details
-✓ Comprehensive Terms and Conditions
-✓ Detailed Payment Schedule
-✓ Quality Assurance Procedures
-✓ Delivery Milestones
-✓ Risk Mitigation Clauses
-✓ Dispute Resolution Framework
-✓ Force Majeure Provisions
-✓ Signature Blocks
+**CONTRACT COMPONENTS READY:**
+Complete Preamble with Party Details
+Comprehensive Terms and Conditions
+Detailed Payment Schedule
+Quality Assurance Procedures
+Delivery Milestones
+Risk Mitigation Clauses
+Dispute Resolution Framework
+Force Majeure Provisions
+Signature Blocks
 
-{'='*70}
+{'-'*70}
 
-🎯 **RECOMMENDATION:** Proceed to legal review immediately to maintain momentum.
-⏰ **Timeline:** Allow 3-5 business days for legal review and revisions.
+**RECOMMENDATION:** Proceed to legal review immediately to maintain momentum.
+**Timeline:** Allow 3-5 business days for legal review and revisions.
 
 """
     
     return message.strip()
-
-
-# ============================================================================
-# HELPER FUNCTIONS
-# ============================================================================
-
-def determine_cultural_region(location: str) -> str:
-    """Determine cultural communication region based on supplier location"""
-    location_lower = location.lower()
-    
-    if any(country in location_lower for country in ['china', 'japan', 'korea', 'taiwan', 'singapore', 'hong kong']):
-        return 'east_asian'
-    elif any(country in location_lower for country in ['india', 'pakistan', 'bangladesh', 'sri lanka']):
-        return 'south_asian'  
-    elif any(country in location_lower for country in ['germany', 'italy', 'france', 'uk', 'netherlands', 'spain', 'portugal']):
-        return 'european'
-    elif any(country in location_lower for country in ['uae', 'turkey', 'egypt', 'saudi']):
-        return 'middle_eastern'
-    elif any(country in location_lower for country in ['mexico', 'brazil', 'argentina', 'colombia']):
-        return 'latin_american'
-    elif any(country in location_lower for country in ['usa', 'canada']):
-        return 'north_american'
-    else:
-        return 'international'
-
-
-# ============================================================================
-# TESTING & VALIDATION
-# ============================================================================
-
-def test_contract_initiator():
-    """
-    Test function to validate the improved contract initiator
-    """
-    print("\n" + "="*80)
-    print("🧪 TESTING IMPROVED CONTRACT INITIATOR")
-    print("="*80)
-    
-    # Create mock state with proper structure
-    mock_state = {
-        'top_suppliers': [{
-            'supplier_id': 'SUP001',
-            'name': 'EcoCanvas Mills Turkey',
-            'location': 'Istanbul, Turkey',
-            'email': 'sales@ecocanvas.tr',
-            'phone': '+90-212-555-0101',
-            'reputation_score': 8.9,
-            'price_per_unit': 4.80,
-            'lead_time_days': 22,
-            'certifications': ['GOTS', 'OEKO-TEX'],
-            'specialties': ['organic cotton', 'canvas']
-        }],
-        
-        'extracted_parameters': {
-            'fabric_details': {
-                'type': 'organic cotton canvas',
-                'quantity': 5000,
-                'unit': 'meters',
-                'quality_specs': ['organic', '120gsm'],
-                'certifications': ['GOTS', 'OEKO-TEX'],
-                'composition': '100% organic cotton',
-                'color': 'Natural',
-                'width': 150,
-                'finish': 'Pre-shrunk'
-            },
-            'logistics_details': {
-                'destination': 'New York, USA',
-                'timeline': '45 days',
-                'timeline_days': 45
-            },
-            'price_constraints': {
-                'max_price': 6.00,
-                'currency': 'USD',
-                'price_unit': 'per meter'
-            },
-            'urgency_level': 'medium',
-            'payment_terms': 'Net 30'
-        },
-        
-        'generated_quote': {
-            'quote_id': 'Q20250101001',
-            'unit_price': 4.80,
-            'total_amount': 24000.00,
-            'currency': 'USD',
-            'generation_date': '2025-01-15'
-        },
-        
-        'extracted_terms': {
-            'new_price': 4.50,
-            'new_lead_time': 40,
-            'new_quantity': 5000,
-            'concessions_offered': ['Reduced lead time by 5 days', 'Price reduced by $0.30/meter']
-        },
-        
-        'negotiation_history': [
-            {
-                'timestamp': '2025-01-15T10:00:00',
-                'round': 1,
-                'intent': 'counteroffer',
-                'sentiment': 'cooperative'
-            },
-            {
-                'timestamp': '2025-01-16T14:30:00',
-                'round': 2,
-                'intent': 'accept',
-                'sentiment': 'positive'
-            }
-        ],
-        
-        'negotiation_messages': [
-            {'role': 'assistant', 'content': 'Initial negotiation message'},
-            {'role': 'supplier', 'content': 'Supplier counteroffer'},
-            {'role': 'assistant', 'content': 'Final negotiation message'},
-            {'role': 'supplier', 'content': 'Supplier acceptance'}
-        ],
-        
-        'supplier_intent': {
-            'intent': 'accept',
-            'confidence': 0.95,
-            'sentiment': 'positive'
-        },
-        
-        'negotiation_analysis': {
-            'confidence_score': 0.88,
-            'opportunities': ['Strong relationship', 'Volume potential'],
-            'risk_factors': []
-        },
-        
-        'recipient_email': 'buyer@company.com',
-        'buyer_company_name': 'Global Textiles Inc.',
-        'analysis_confidence': 0.88
-    }
-    
-    print("\n✓ Mock state created")
-    print(f"  Supplier: {mock_state['top_suppliers'][0]['name']}")
-    print(f"  Fabric: {mock_state['extracted_parameters']['fabric_details']['type']}")
-    print(f"  Quantity: {mock_state['extracted_parameters']['fabric_details']['quantity']:,}")
-    print(f"  Negotiation Rounds: {len(mock_state['negotiation_history'])}")
-    
-    print("\n🚀 Executing contract initiator...")
-    
-    try:
-        result = initiate_contract(mock_state)
-        
-        print("\n✅ CONTRACT INITIATOR TEST COMPLETED")
-        print(f"\nContract ID: {result.get('contract_id')}")
-        print(f"Status: {result.get('status')}")
-        print(f"Next Step: {result.get('next_step')}")
-        print(f"Confidence: {result.get('contract_confidence', 0):.1%}")
-        print(f"Validation Score: {result.get('validation_results', {}).get('overall_score', 0):.1%}")
-        
-        print(f"\n✓ Risk Assessment: {result.get('risk_assessment', {}).get('overall_risk_level', 'N/A').upper()}")
-        print(f"✓ Financial Terms: {len(result.get('financial_terms_detail', {}).get('payment_milestones', []))} milestones")
-        print(f"✓ Quality Framework: {result.get('quality_framework', {}).get('aql_level', 'N/A')}")
-        print(f"✓ Recommendations: {len(result.get('drafted_contract', {}).get('recommended_actions', []))} items")
-        
-        if result.get('messages'):
-            print(f"\n📄 Contract Summary Generated ({len(result['messages'][0])} characters)")
-        
-        return True
-        
-    except Exception as e:
-        print(f"\n❌ TEST FAILED: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return False
-
-
-if __name__ == "__main__":
-    print("="*80)
-    print("IMPROVED CONTRACT INITIATOR NODE - MODULE LOADED")
-    print("="*80)
-    print("\n✅ All improvements implemented:")
-    print("  1. Comprehensive context extraction with proper model parsing")
-    print("  2. Risk-based contract customization")
-    print("  3. Detailed financial terms with milestone payments")
-    print("  4. Calculated delivery dates with buffers")
-    print("  5. Comprehensive quality assurance framework")
-    print("  6. Compliance and certification integration")
-    print("  7. Industry standards incorporation")
-    print("  8. Geographic and jurisdiction considerations")
-    print("  9. Negotiation history integration")
-    print("  10. Dynamic clause selection based on risk")
-    print("  11. Multi-dimensional validation")
-    print("  12. Comprehensive recommendations")
-    
-    print("\n🧪 Running test...")
-    test_contract_initiator()
-    
-    print("\n" + "="*80)
-    print("✅ MODULE READY FOR INTEGRATION")
-    print("="*80)
-    print("\nTo use in production:")
-    print("  from nodes.contract_initiator_node import initiate_contract")
-    print("  result = initiate_contract(agent_state)")

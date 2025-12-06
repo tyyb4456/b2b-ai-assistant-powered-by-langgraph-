@@ -268,18 +268,29 @@ def extract_negotiation_context(state: AgentState):
         'logistics_details': extracted_params.get('logistics_details', {}),
         'urgency_level': extracted_params.get('urgency_level', 'medium')
     }
+
+    supplier_data = state.get('top_suppliers', [])
+
+    # Check if user has selected a supplier, otherwise fall back to first supplier
+    selected_supplier = state.get('selected_supplier', None)
+
     
-    # Get supplier information
-    active_supplier = {}
-    top_suppliers = state.get('top_suppliers', [])
-    if top_suppliers:
-        active_supplier = top_suppliers[0]  # Assume first supplier is active in negotiation
+    if selected_supplier:
+        # Use the user-selected supplier
+        supplier_info = selected_supplier
+        logger.info("Using user-selected supplier for profile.")
+    elif supplier_data and len(supplier_data) > 0:
+        # Fall back to first supplier if no selection made
+        supplier_info = supplier_data[0]
+        logger.info("No user-selected supplier, using first supplier from search results.")
+    else:
+        supplier_info = None
 
     return {
         'negotiation_round': negotiation_round,
         'previous_terms': previous_terms,
         'original_request': original_request,
-        'active_supplier': active_supplier,
+        'supplier_info': supplier_info,
         'negotiation_history': negotiation_history
     }
 
@@ -316,7 +327,7 @@ def analyze_supplier_response(state: AgentState):
             }
         
         context = extract_negotiation_context(state)
-        supplier_info = context['active_supplier']
+        supplier_info = context['supplier_info']
 
         # Step 2: Classify supplier intent and sentiment
         intent_formatted_prompt = intent_prompt.invoke({
@@ -420,9 +431,9 @@ def analyze_supplier_response(state: AgentState):
         active_follow_up = get_active_follow_up_schedule(supplier_id)
         
         if active_follow_up:
-            print(f"\n📋 Active follow-up detected: {active_follow_up['schedule_id']}")
-            print(f"   Original delay reason: {active_follow_up['delay_reason']}")
-            print(f"   Follow-ups sent: {active_follow_up['follow_ups_sent']}")
+            logger.info(f"Active follow-up detected for supplier {supplier_id}: {active_follow_up['schedule_id']}")
+            logger.info(f"Original delay reason: {active_follow_up['delay_reason']}")
+            logger.info(f"Follow-ups sent: {active_follow_up['follow_ups_sent']}")
             
             # Update follow-up based on new response
             update_follow_up_on_response(
@@ -447,7 +458,7 @@ def analyze_supplier_response(state: AgentState):
     
     except Exception as e:
         error_message = f"Error analyzing supplier response: {str(e)}"
-        print(f"❌ {error_message}")
+        logger.error(error_message)
         import traceback
         traceback.print_exc()
         
@@ -604,22 +615,22 @@ def update_follow_up_on_response(schedule_id: str, response_type: str):
             for msg in pending_messages:
                 msg.status = 'cancelled'
             
-            print(f"✅ Follow-up schedule completed - supplier responded positively")
+            logger.info(f"Follow-up schedule completed - supplier responded positively")
         
         elif response_type == 'delay':
             # Still delaying - extend schedule
             schedule.next_follow_up_date = datetime.now() + timedelta(days=3)
-            print(f"⏰ Follow-up extended by 3 days")
+            logger.info(f"Follow-up extended by 3 days")
         
         elif response_type == 'reject':
             # Rejection - cancel schedule
             schedule.status = 'cancelled'
-            print(f"❌ Follow-up cancelled - supplier rejected")
+            logger.info(f"Follow-up schedule cancelled - supplier rejected")
         
         db.commit()
         
     except Exception as e:
-        print(f"Error updating follow-up: {e}")
+        logger.error(f"Error updating follow-up schedule: {str(e)}")
         db.rollback()
     finally:
         db.close()

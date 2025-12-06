@@ -16,7 +16,3 @@ api_router.include_router(conversation_endpoints.router)
 
 # Add this line to your router
 api_router.include_router(supplier_portal.router)
-
-# Future routers will be added here:
-# api_router.include_router(quotes.router)
-# api_router.include_router(suppliers.router)

@@ -56,13 +56,6 @@ export default function ConversationInput({
     handleSend(e.clientX - rect.left, e.clientY - rect.top);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Escape') {
-      setMessage('');
-      inputRef.current?.blur();
-    }
-  };
-
   return (
     <div className="relative w-full max-w-4xl mx-auto">
       {isWaitingForSupplier && (
@@ -92,44 +85,39 @@ export default function ConversationInput({
           )}
         </AnimatePresence>
 
-        <div className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            disabled={isSending}
-            className={`w-full px-5 pr-14 py-3.5 bg-white border-2 rounded-full transition-all duration-200 focus:outline-none text-neutral-900
-              ${isFocused ? 'border-primary-500 shadow-lg shadow-primary-100' : 'border-neutral-300 hover:border-neutral-400'}
-              ${isSending ? 'bg-neutral-50 cursor-not-allowed' : ''}
-            `}
-          />
+        <input
+          ref={inputRef}
+          type="text"
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          onKeyPress={handleKeyPress}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          disabled={isSending}
+          className={`w-full px-5 pr-14 py-3.5 bg-white border-2 rounded-full transition-all duration-200 focus:outline-none text-neutral-900
+            ${isFocused ? 'border-primary-500 shadow-lg shadow-primary-100' : 'border-neutral-300 hover:border-neutral-400'}
+            ${isSending ? 'bg-neutral-50 cursor-not-allowed' : ''}`}
+        />
 
-          <button
-            ref={sendButtonRef}
-            onClick={handleButtonClick}
-            disabled={!canSend && !canResume}
-            className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200
-              ${isSending ? 'bg-primary-400 cursor-not-allowed' : (canSend || canResume ? 'bg-primary-600 hover:bg-primary-700 active:scale-95 shadow-lg shadow-primary-200' : 'bg-neutral-300 cursor-not-allowed')}
-            `}
-          >
-            {isSending ? <Loader2 className="w-5 h-5 text-black animate-spin" /> : <ArrowRight className="w-5 h-5 text-black" />}
-            {ripples.map(r => (
-              <motion.span
-                key={r.id}
-                className="absolute inset-0 rounded-full bg-white opacity-30"
-                style={{ left: r.x - 20, top: r.y - 20 }}
-                initial={{ scale: 0, opacity: 0.5 }}
-                animate={{ scale: 2.5, opacity: 0 }}
-                transition={{ duration: 0.6, ease: 'easeOut' }}
-              />
-            ))}
-          </button>
-        </div>
+        <button
+          ref={sendButtonRef}
+          onClick={handleButtonClick}
+          disabled={!canSend && !canResume}
+          className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200
+            ${isSending ? 'bg-primary-400 cursor-not-allowed' : (canSend || canResume ? 'bg-primary-600 hover:bg-primary-700 active:scale-95 shadow-lg shadow-primary-200' : 'bg-neutral-300 cursor-not-allowed')}`}
+        >
+          {isSending ? <Loader2 className="w-5 h-5 text-black animate-spin" /> : <ArrowRight className="w-5 h-5 text-black" />}
+          {ripples.map(r => (
+            <motion.span
+              key={r.id}
+              className="absolute inset-0 rounded-full bg-white opacity-30"
+              style={{ left: r.x - 20, top: r.y - 20 }}
+              initial={{ scale: 0, opacity: 0.5 }}
+              animate={{ scale: 2.5, opacity: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            />
+          ))}
+        </button>
       </div>
 
       <div className="mt-2 px-2 flex items-center justify-between text-xs text-neutral-500">

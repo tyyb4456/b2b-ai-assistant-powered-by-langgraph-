@@ -16,6 +16,7 @@ export default function Conversation() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isWaitingForSupplier, setIsWaitingForSupplier] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState('');
+  const [assistantThought, setAssistantThought] = useState('');
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('connected');
   const [retryAttempt, setRetryAttempt] = useState(0);
@@ -23,20 +24,15 @@ export default function Conversation() {
 
   const cleanupRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const lastUserInputRef = useRef(''); // Track last user input to ignore echo
+  const lastUserInputRef = useRef('');
 
-  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streamingMessage]);
+  }, [messages, streamingMessage, assistantThought]);
 
-  // Load existing conversation
   useEffect(() => {
     if (threadId) loadExistingConversation(threadId);
-
-    return () => {
-      cleanupRef.current?.();
-    };
+    return () => cleanupRef.current?.();
   }, [threadId]);
 
   const loadExistingConversation = async (tid) => {
@@ -49,6 +45,7 @@ export default function Conversation() {
             id: msg.id || Date.now(),
             from: msg.role === 'user' ? 'user' : 'assistant',
             content: msg.content,
+            type: msg.type || 'assistant',
             timestamp: msg.timestamp || new Date().toISOString(),
             status: 'complete',
           }))
@@ -69,23 +66,18 @@ export default function Conversation() {
       id: Date.now(),
       from: 'user',
       content,
+      type: 'user',
       timestamp: new Date().toISOString(),
       status: 'complete',
     };
     setMessages((prev) => [...prev, userMessage]);
   };
 
-  const formatAssistantError = (content) => {
+  const formatAssistantContent = (content, type) => {
     if (!content) return null;
-
-    if (content.includes('RESOURCE_EXHAUSTED')) {
-      return `⚠️ Your AI request could not be processed: You’ve exceeded your usage quota. Please check your plan and billing details.`;
+    if (type === 'error' || content.includes('RESOURCE_EXHAUSTED')) {
+      return `⚠️ Your request could not be processed. Please check your plan and try again.`;
     }
-
-    if (content.toLowerCase().includes('error')) {
-      return `⚠️ Something went wrong while processing your request.`;
-    }
-
     return content;
   };
 
@@ -127,7 +119,7 @@ export default function Conversation() {
     setIsWaitingForSupplier(false);
     setConnectionStatus('connected');
 
-    const requestId = 'temp_request_id'; // replace with real one
+    const requestId = 'temp_request_id';
     cleanupRef.current = api.resumeConversationStream(
       currentThreadId,
       requestId,
@@ -145,97 +137,80 @@ export default function Conversation() {
         setConnectionStatus('reconnecting');
         setRetryAttempt(data.attempt || 0);
         break;
-
       case 'connected':
         setConnectionStatus('connected');
         setRetryAttempt(0);
         if (data.thread_id && !currentThreadId) setCurrentThreadId(data.thread_id);
         break;
-
       case 'message':
       case 'ai_chunk':
       case 'node_progress':
-        if (data.content) {
-          // Ignore echo
-          if (data.content.trim() === lastUserInputRef.current) break;
-
-          const displayContent = formatAssistantError(data.content);
-          setStreamingMessage((prev) => (prev ? prev + '\n\n' + displayContent : displayContent));
+        if (data.content && data.content.trim() !== lastUserInputRef.current) {
+          if (data.type === 'assistant_thought') {
+            setAssistantThought((prev) => (prev ? prev + '\n' + data.content : data.content));
+          } else {
+            const displayContent = formatAssistantContent(data.content, type);
+            setStreamingMessage((prev) => (prev ? prev + '\n' + displayContent : displayContent));
+          }
         }
         break;
-
       case 'ai_complete':
       case 'workflow_complete':
         if (streamingMessage) {
           setMessages((prev) => [
             ...prev,
-            {
-              id: Date.now(),
-              from: 'assistant',
-              content: streamingMessage,
-              timestamp: new Date().toISOString(),
-              status: 'complete',
-            },
+            { id: Date.now(), from: 'assistant', content: streamingMessage, type: 'assistant', timestamp: new Date().toISOString(), status: 'complete' },
           ]);
           setStreamingMessage('');
         }
+        if (assistantThought) {
+          setMessages((prev) => [
+            ...prev,
+            { id: Date.now() + 1, from: 'assistant', content: assistantThought, type: 'assistant_thought', timestamp: new Date().toISOString(), status: 'complete' },
+          ]);
+          setAssistantThought('');
+        }
         setIsStreaming(false);
         setIsWaitingForSupplier(false);
-        if (data.thread_id && !currentThreadId) setCurrentThreadId(data.thread_id);
         break;
-
       case 'supplier_wait':
       case 'paused':
         setIsWaitingForSupplier(true);
         break;
-
       case 'supplier_response':
         setIsWaitingForSupplier(false);
         if (data.content) {
           setMessages((prev) => [
             ...prev,
-            {
-              id: Date.now(),
-              from: 'supplier',
-              content: data.content,
-              timestamp: new Date().toISOString(),
-              status: 'complete',
-            },
+            { id: Date.now(), from: 'supplier', content: data.content, type: 'supplier', timestamp: new Date().toISOString(), status: 'complete' },
           ]);
         }
         break;
-
       case 'error':
         setError(data.error || 'An error occurred');
         setIsStreaming(false);
         setConnectionStatus('error');
         toast.error('Connection error: ' + (data.error || 'Unknown'));
         break;
-
-      case 'intent_classified':
-      case 'close':
-        console.log('Handled event type:', type);
-        break;
-
       default:
         console.log('Unknown event type:', type);
     }
   };
 
-  const handleStreamComplete = (data) => {
-    if (data.thread_id && !currentThreadId) setCurrentThreadId(data.thread_id);
+  const handleStreamComplete = () => {
     if (streamingMessage) {
       setMessages((prev) => [
         ...prev,
-        {
-          id: Date.now(),
-          from: 'assistant',
-          content: streamingMessage,
-          timestamp: new Date().toISOString(),
-          status: 'complete',
-        },
+        { id: Date.now(), from: 'assistant', content: streamingMessage, type: 'assistant', timestamp: new Date().toISOString(), status: 'complete' },
       ]);
       setStreamingMessage('');
+    }
+    if (assistantThought) {
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now() + 1, from: 'assistant', content: assistantThought, type: 'assistant_thought', timestamp: new Date().toISOString(), status: 'complete' },
+      ]);
+      setAssistantThought('');
     }
     setIsStreaming(false);
     setConnectionStatus('connected');
@@ -262,23 +237,17 @@ export default function Conversation() {
     setIsStreaming(false);
     setIsWaitingForSupplier(false);
     setStreamingMessage('');
+    setAssistantThought('');
     setError(null);
     setConnectionStatus('connected');
     navigate('/conversation');
   };
 
   const handleCopyConversation = () => {
-    const text = messages
-      .map((msg) => {
-        const sender =
-          msg.from === 'user'
-            ? 'You'
-            : msg.from === 'assistant'
-              ? 'AI Assistant'
-              : 'Supplier';
-        return `${sender}: ${msg.content}`;
-      })
-      .join('\n\n');
+    const text = messages.map((msg) => {
+      const sender = msg.from === 'user' ? 'You' : msg.from === 'assistant' ? 'AI Assistant' : 'Supplier';
+      return `${sender}: ${msg.content}`;
+    }).join('\n\n');
     navigator.clipboard.writeText(text);
     toast.success('Conversation copied!');
   };
@@ -301,27 +270,16 @@ export default function Conversation() {
           {currentThreadId && (
             <div className="flex items-center gap-2">
               {messages.length > 0 && (
-                <button
-                  onClick={handleCopyConversation}
-                  className="px-3 py-2 text-sm font-medium text-black hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2"
-                  title="Copy conversation"
-                >
+                <button onClick={handleCopyConversation} className="px-3 py-2 text-sm font-medium text-black hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2" title="Copy conversation">
                   <Copy size={16} />
                   Copy
                 </button>
               )}
-              <button
-                onClick={() => navigate(`/conversation/${currentThreadId}/details`)}
-                className="px-3 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2"
-                title="View conversation details"
-              >
+              <button onClick={() => navigate(`/conversation/${currentThreadId}/details`)} className="px-3 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2" title="View conversation details">
                 <Info size={16} />
                 Details
               </button>
-              <button
-                onClick={handleNewConversation}
-                className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg"
-              >
+              <button onClick={handleNewConversation} className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg">
                 New Conversation
               </button>
             </div>
@@ -333,7 +291,7 @@ export default function Conversation() {
         <ConversationMessages
           messages={messages}
           streamingMessage={streamingMessage}
-          isStreaming={isStreaming}
+          assistantThought={assistantThought}
           error={error}
           messagesEndRef={messagesEndRef}
           isLoading={isLoadingHistory}
@@ -341,17 +299,13 @@ export default function Conversation() {
       </div>
 
       <div className="border-t border-neutral-200 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="max-w-4xl mx-auto px-3 py-4">
           <ConversationInput
             onSubmit={handleSubmit}
             onResume={handleResumeConversation}
-            disabled={false}
+            disabled={isStreaming}
             isWaitingForSupplier={isWaitingForSupplier}
-            placeholder={
-              isWaitingForSupplier
-                ? 'Waiting for supplier response...'
-                : 'Type your message...'
-            }
+            placeholder={isWaitingForSupplier ? 'Waiting for supplier response...' : 'Type your message...'}
           />
         </div>
       </div>

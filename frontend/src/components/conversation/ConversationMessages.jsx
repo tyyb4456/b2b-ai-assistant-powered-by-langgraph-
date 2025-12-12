@@ -13,18 +13,15 @@ export default function ConversationMessages({
   const containerRef = useRef(null);
 
   useEffect(() => {
-    if (containerRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingMessage, assistantThought]);
 
   return (
-    <div ref={containerRef} className="h-full overflow-y-auto scroll-smooth">
+    <div ref={containerRef} className="h-full overflow-y-auto scroll-smooth bg-neutral-50">
       <div className="max-w-4xl mx-auto px-6 py-8">
-
         {/* EMPTY STATE */}
         {messages.length === 0 && !streamingMessage && !assistantThought && !error && !isLoading && (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+          <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
             <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center mb-4">
               <MessageSquareIcon className="w-8 h-8 text-primary-600" />
             </div>
@@ -58,39 +55,36 @@ export default function ConversationMessages({
           </div>
         )}
 
-        {/* MAIN MESSAGES */}
+        {/* MESSAGES */}
         <div className="space-y-6">
-
-          {/* USER + ASSISTANT MESSAGES */}
           {messages.map((msg) => (
             <ConversationMessage
               key={msg.id}
               message={msg}
-              isStreaming={false}
+              isStreaming={msg.status === 'streaming'}
             />
           ))}
 
-          {/* YELLOW BUBBLE — ASSISTANT THOUGHT PROCESS */}
-          {assistantThought && (
-            <div className="bg-yellow-100 border border-yellow-300 text-yellow-900 p-4 rounded-xl flex items-start gap-3 shadow-sm">
-              <Lightbulb className="w-5 h-5 mt-1 text-yellow-700" />
-              <div className="whitespace-pre-wrap text-sm">
-                {assistantThought}
-              </div>
-            </div>
-          )}
-
-          {/* NORMAL STREAMING FINAL OUTPUT (NO THOUGHT) */}
+          {/* CURRENT STREAMING MESSAGE */}
           {streamingMessage && (
             <ConversationMessage
               message={{
+                id: 'streaming',
                 from: 'assistant',
                 content: streamingMessage,
-                id: 'streaming',
+                type: 'assistant',
                 status: 'streaming',
               }}
               isStreaming={true}
             />
+          )}
+
+          {/* CURRENT ASSISTANT THOUGHT */}
+          {assistantThought && (
+            <div className="bg-yellow-100 border border-yellow-300 text-yellow-900 p-4 rounded-xl flex items-start gap-3 shadow-sm">
+              <Lightbulb className="w-5 h-5 mt-1 text-yellow-700" />
+              <div className="whitespace-pre-wrap text-sm">{assistantThought}</div>
+            </div>
           )}
 
           <div ref={messagesEndRef} />

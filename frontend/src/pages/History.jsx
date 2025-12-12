@@ -6,9 +6,8 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import { StatusBadge } from '../components/ui/Badge';
 import Spinner from '../components/ui/Spinner';
-import { 
-  Search, 
-  Filter,
+import {
+  Search,
   ArrowRight,
   Calendar,
   MessageSquare,
@@ -29,62 +28,49 @@ export default function History() {
     if (!conversations) return [];
 
     return conversations.filter(conv => {
-      // Search filter
-      const matchesSearch = 
-        searchQuery === '' ||
+      const matchesSearch = searchQuery === '' ||
         conv.preview?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         conv.thread_id.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Intent filter
-      const matchesIntent = 
-        filterIntent === 'all' || 
-        conv.intent === filterIntent;
-
-      // Status filter
-      const matchesStatus = 
-        filterStatus === 'all' || 
-        conv.status === filterStatus;
+      const matchesIntent = filterIntent === 'all' || conv.intent === filterIntent;
+      const matchesStatus = filterStatus === 'all' || conv.status === filterStatus;
 
       return matchesSearch && matchesIntent && matchesStatus;
     });
   }, [conversations, searchQuery, filterIntent, filterStatus]);
 
-  // Get unique intents and statuses for filters
   const availableIntents = useMemo(() => {
     if (!conversations) return [];
-    const intents = [...new Set(conversations.map(c => c.intent).filter(Boolean))];
-    return intents;
+    return [...new Set(conversations.map(c => c.intent).filter(Boolean))];
   }, [conversations]);
 
   const availableStatuses = useMemo(() => {
     if (!conversations) return [];
-    const statuses = [...new Set(conversations.map(c => c.status).filter(Boolean))];
-    return statuses;
+    return [...new Set(conversations.map(c => c.status).filter(Boolean))];
   }, [conversations]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 py-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-neutral-900">Conversation History</h1>
-        <p className="text-neutral-600 mt-1">View and manage all your conversations</p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <div>
+          <h1 className="text-3xl font-bold text-neutral-900">Conversation History</h1>
+          <p className="text-neutral-600 mt-1">View and manage all your conversations</p>
+        </div>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search & Filters */}
       <Card>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <Input
-                placeholder="Search conversations..."
-                leftIcon={<Search size={18} />}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
+            <Input
+              placeholder="Search conversations..."
+              leftIcon={<Search size={18} />}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1"
+            />
 
-            {/* Intent Filter */}
             <select
               value={filterIntent}
               onChange={(e) => setFilterIntent(e.target.value)}
@@ -98,7 +84,6 @@ export default function History() {
               ))}
             </select>
 
-            {/* Status Filter */}
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -113,7 +98,6 @@ export default function History() {
             </select>
           </div>
 
-          {/* Results Count */}
           {!isLoading && conversations && (
             <p className="text-sm text-neutral-600 mt-4">
               Showing {filteredConversations.length} of {conversations.length} conversations
@@ -122,66 +106,71 @@ export default function History() {
         </CardContent>
       </Card>
 
-      {/* Conversations List */}
-      {isLoading && (
-        <div className="py-12">
-          <Spinner text="Loading conversations..." />
-        </div>
-      )}
+      {/* Content */}
+      <div className="space-y-4">
+        {isLoading && (
+          <div className="py-12 flex justify-center">
+            <Spinner text="Loading conversations..." />
+          </div>
+        )}
 
-      {error && (
-        <Card>
-          <CardContent>
-            <div className="text-center py-8">
-              <p className="text-error-600">Failed to load conversations</p>
-              <p className="text-sm text-neutral-500 mt-1">{error.message}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        {error && (
+          <Card>
+            <CardContent>
+              <div className="text-center py-8">
+                <p className="text-error-600">Failed to load conversations</p>
+                <p className="text-sm text-neutral-500 mt-1">{error.message}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-      {!isLoading && !error && filteredConversations.length === 0 && (
-        <Card>
-          <CardContent>
-            <div className="text-center py-12">
-              <MessageSquare className="mx-auto text-neutral-400 mb-4" size={48} />
-              <p className="text-neutral-600 mb-2">No conversations found</p>
-              {searchQuery || filterIntent !== 'all' || filterStatus !== 'all' ? (
-                <p className="text-sm text-neutral-500">Try adjusting your filters</p>
-              ) : (
-                <Button onClick={() => navigate('/new')} className="mt-4">
-                  Start a Conversation
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        {!isLoading && !error && filteredConversations.length === 0 && (
+          <Card>
+            <CardContent>
+              <div className="text-center py-12">
+                <MessageSquare className="mx-auto text-neutral-400 mb-4" size={48} />
+                <p className="text-neutral-600 mb-2">No conversations found</p>
+                {(searchQuery || filterIntent !== 'all' || filterStatus !== 'all') ? (
+                  <p className="text-sm text-neutral-500">Try adjusting your filters</p>
+                ) : (
+                  <Button onClick={() => navigate('/new')} className="mt-8">
+                    Start a Conversation
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
-      {!isLoading && !error && filteredConversations.length > 0 && (
-        <div className="space-y-3">
-          {filteredConversations.map(conversation => (
-            <ConversationRow
-              key={conversation.thread_id}
-              conversation={conversation}
-              onClick={() => navigate(`/conversation/${conversation.thread_id}`)}
-            />
-          ))}
-        </div>
-      )}
+        {!isLoading && !error && filteredConversations.length > 0 && (
+          <div className="grid gap-3 md:grid-cols-1 lg:grid-cols-2">
+            {filteredConversations.map(conv => (
+              <ConversationRow
+                key={conv.thread_id}
+                conversation={conv}
+                onClick={() => navigate(`/conversation/${conv.thread_id}`)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 // Conversation Row Component
 function ConversationRow({ conversation, onClick }) {
+  const navigate = useNavigate();
   const intentConfig = INTENT_CONFIG[conversation.intent] || { label: conversation.intent, icon: '📝' };
 
   return (
     <Card hoverable>
       <CardContent>
-        <div onClick={() => navigate(`/conversation/${conversation.thread_id}`)}
-        className="flex items-center gap-4 cursor-pointer">
+        <div
+          onClick={onClick}
+          className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 p-2 rounded transition"
+        >
           {/* Icon */}
           <div className="w-12 h-12 rounded-lg bg-primary-100 flex items-center justify-center text-2xl shrink-0">
             {intentConfig.icon}
@@ -206,9 +195,9 @@ function ConversationRow({ conversation, onClick }) {
           </div>
 
           {/* Arrow */}
-          <ArrowRight 
-            size={20} 
-            className="text-neutral-400 group-hover:text-primary-600 transition-colors shrink-0" 
+          <ArrowRight
+            size={20}
+            className="text-neutral-400 shrink-0"
           />
         </div>
       </CardContent>

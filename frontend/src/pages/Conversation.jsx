@@ -16,6 +16,7 @@ export default function Conversation() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [isWaitingForSupplier, setIsWaitingForSupplier] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState('');
+  const [assistantThought, setAssistantThought] = useState('');
   const [error, setError] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('connected');
   const [retryAttempt, setRetryAttempt] = useState(0);
@@ -23,20 +24,15 @@ export default function Conversation() {
 
   const cleanupRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const lastUserInputRef = useRef(''); // Track last user input to ignore echo
+  const lastUserInputRef = useRef('');
 
-  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streamingMessage]);
+  }, [messages, streamingMessage, assistantThought]);
 
-  // Load existing conversation
   useEffect(() => {
     if (threadId) loadExistingConversation(threadId);
-
-    return () => {
-      cleanupRef.current?.();
-    };
+    return () => cleanupRef.current?.();
   }, [threadId]);
 
   const loadExistingConversation = async (tid) => {
@@ -49,6 +45,7 @@ export default function Conversation() {
             id: msg.id || Date.now(),
             from: msg.role === 'user' ? 'user' : 'assistant',
             content: msg.content,
+            type: msg.type || 'assistant',
             timestamp: msg.timestamp || new Date().toISOString(),
             status: 'complete',
           }))
@@ -69,24 +66,11 @@ export default function Conversation() {
       id: Date.now(),
       from: 'user',
       content,
+      type: 'user',
       timestamp: new Date().toISOString(),
       status: 'complete',
     };
     setMessages((prev) => [...prev, userMessage]);
-  };
-
-  const formatAssistantError = (content) => {
-    if (!content) return null;
-
-    if (content.includes('RESOURCE_EXHAUSTED')) {
-      return `⚠️ Your AI request could not be processed: You’ve exceeded your usage quota. Please check your plan and billing details.`;
-    }
-
-    if (content.toLowerCase().includes('error')) {
-      return `⚠️ Something went wrong while processing your request.`;
-    }
-
-    return content;
   };
 
   const handleStartConversation = (userInput) => {
@@ -95,6 +79,7 @@ export default function Conversation() {
     setIsStreaming(true);
     setError(null);
     setConnectionStatus('connected');
+    setStreamingMessage('');
 
     cleanupRef.current = api.startConversationStream(
       { userInput, channel: 'web' },
@@ -111,6 +96,7 @@ export default function Conversation() {
     setError(null);
     setIsWaitingForSupplier(false);
     setConnectionStatus('connected');
+    setStreamingMessage('');
 
     cleanupRef.current = api.continueConversationStream(
       currentThreadId,
@@ -126,8 +112,9 @@ export default function Conversation() {
     setError(null);
     setIsWaitingForSupplier(false);
     setConnectionStatus('connected');
+    setStreamingMessage('');
 
-    const requestId = 'temp_request_id'; // replace with real one
+    const requestId = 'temp_request_id';
     cleanupRef.current = api.resumeConversationStream(
       currentThreadId,
       requestId,
@@ -137,6 +124,7 @@ export default function Conversation() {
     );
   };
 
+  // Stream event handler
   const handleStreamEvent = (event) => {
     const { type, data = {} } = event;
 
@@ -155,33 +143,26 @@ export default function Conversation() {
       case 'message':
       case 'ai_chunk':
       case 'node_progress':
-        if (data.content) {
-          // Ignore echo
-          if (data.content.trim() === lastUserInputRef.current) break;
+        if (data.content && data.content.trim() !== lastUserInputRef.current) {
+          const displayContent = data.type === 'assistant_thought'
+            ? null
+            : data.content;
 
-          const displayContent = formatAssistantError(data.content);
-          setStreamingMessage((prev) => (prev ? prev + '\n\n' + displayContent : displayContent));
+          // Only update streamingMessage live
+          if (displayContent) setStreamingMessage((prev) => (prev ? prev + data.content : data.content));
+
+          // Update assistant thought separately
+          if (data.type === 'assistant_thought') {
+            setAssistantThought((prev) => (prev ? prev + '\n' + data.content : data.content));
+          }
         }
         break;
 
       case 'ai_complete':
       case 'workflow_complete':
-        if (streamingMessage) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now(),
-              from: 'assistant',
-              content: streamingMessage,
-              timestamp: new Date().toISOString(),
-              status: 'complete',
-            },
-          ]);
-          setStreamingMessage('');
-        }
+        appendAIMessage();
         setIsStreaming(false);
         setIsWaitingForSupplier(false);
-        if (data.thread_id && !currentThreadId) setCurrentThreadId(data.thread_id);
         break;
 
       case 'supplier_wait':
@@ -198,6 +179,7 @@ export default function Conversation() {
               id: Date.now(),
               from: 'supplier',
               content: data.content,
+              type: 'supplier',
               timestamp: new Date().toISOString(),
               status: 'complete',
             },
@@ -212,18 +194,12 @@ export default function Conversation() {
         toast.error('Connection error: ' + (data.error || 'Unknown'));
         break;
 
-      case 'intent_classified':
-      case 'close':
-        console.log('Handled event type:', type);
-        break;
-
       default:
         console.log('Unknown event type:', type);
     }
   };
 
-  const handleStreamComplete = (data) => {
-    if (data.thread_id && !currentThreadId) setCurrentThreadId(data.thread_id);
+  const appendAIMessage = () => {
     if (streamingMessage) {
       setMessages((prev) => [
         ...prev,
@@ -231,12 +207,32 @@ export default function Conversation() {
           id: Date.now(),
           from: 'assistant',
           content: streamingMessage,
+          type: 'assistant',
           timestamp: new Date().toISOString(),
           status: 'complete',
         },
       ]);
       setStreamingMessage('');
     }
+
+    if (assistantThought) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          from: 'assistant',
+          content: assistantThought,
+          type: 'assistant_thought',
+          timestamp: new Date().toISOString(),
+          status: 'complete',
+        },
+      ]);
+      setAssistantThought('');
+    }
+  };
+
+  const handleStreamComplete = () => {
+    appendAIMessage();
     setIsStreaming(false);
     setConnectionStatus('connected');
   };
@@ -262,6 +258,7 @@ export default function Conversation() {
     setIsStreaming(false);
     setIsWaitingForSupplier(false);
     setStreamingMessage('');
+    setAssistantThought('');
     setError(null);
     setConnectionStatus('connected');
     navigate('/conversation');
@@ -284,16 +281,16 @@ export default function Conversation() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-neutral-50">
+    <div className="flex flex-col h-[calc(100vh-2rem)] bg-neutral-50">
       <ConnectionStatus status={connectionStatus} retryAttempt={retryAttempt} />
 
-      <div className="px-6 py-6 border-b border-neutral-200 bg-white">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+      <div className="px-6 py-3 border-b border-neutral-400 bg-white">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-black">
+            <h1 className="text-2xl font-bold text-black">
               {currentThreadId ? 'Conversation' : 'Start a conversation'}
             </h1>
-            <p className="text-neutral-600 mt-1">
+            <p className="text-neutral-500 mt-1">
               Get supplier info, request a quote, and negotiate — all from this page.
             </p>
           </div>
@@ -311,7 +308,9 @@ export default function Conversation() {
                 </button>
               )}
               <button
-                onClick={() => navigate(`/conversation/${currentThreadId}/details`)}
+                onClick={() =>
+                  navigate(`/conversation/${currentThreadId}/details`)
+                }
                 className="px-3 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2"
                 title="View conversation details"
               >
@@ -333,7 +332,7 @@ export default function Conversation() {
         <ConversationMessages
           messages={messages}
           streamingMessage={streamingMessage}
-          isStreaming={isStreaming}
+          assistantThought={assistantThought}
           error={error}
           messagesEndRef={messagesEndRef}
           isLoading={isLoadingHistory}
@@ -341,11 +340,11 @@ export default function Conversation() {
       </div>
 
       <div className="border-t border-neutral-200 bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="max-w-4xl mx-auto px-3 py-4">
           <ConversationInput
             onSubmit={handleSubmit}
             onResume={handleResumeConversation}
-            disabled={false}
+            disabled={isStreaming}
             isWaitingForSupplier={isWaitingForSupplier}
             placeholder={
               isWaitingForSupplier

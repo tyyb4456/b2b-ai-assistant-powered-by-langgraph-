@@ -1,101 +1,123 @@
-import { useRef, useEffect } from 'react';
-import { MessageSquareIcon, AlertCircle, Lightbulb } from 'lucide-react';
-import ConversationMessage from './ConversationMessage';
+import { useRef, useEffect, useState } from 'react';
+import { Lightbulb, CheckCircle } from 'lucide-react';
 
 export default function ConversationMessages({
-  messages,
+  messages = [],
   streamingMessage,
   assistantThought,
   error,
   messagesEndRef,
-  isLoading
+  isLoading,
+  onAction,
 }) {
   const containerRef = useRef(null);
+  const [expandedCards, setExpandedCards] = useState({});
+  const toggleCard = (id) => setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
 
+  // Auto-scroll
   useEffect(() => {
-    if (containerRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, streamingMessage, assistantThought]);
 
+  // Merge messages
+  const allMessages = [...messages];
+  if (streamingMessage) {
+    allMessages.push({
+      id: 'streaming',
+      from: 'assistant',
+      content: streamingMessage,
+      type: 'assistant',
+      status: 'streaming',
+      timestamp: new Date().toISOString(),
+    });
+  }
+  if (assistantThought) {
+    allMessages.push({
+      id: 'thought',
+      from: 'assistant',
+      content: assistantThought,
+      type: 'assistant_thought',
+      status: 'complete',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   return (
-    <div ref={containerRef} className="h-full overflow-y-auto scroll-smooth">
-      <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="flex-1 overflow-y-auto pr-2 space-y-4 mt-5">
+      {allMessages.length === 0 && !isLoading && !error && (
+        <p className="text-gray-400 text-center mt-4">Start the conversation below.</p>
+      )}
 
-        {/* EMPTY STATE */}
-        {messages.length === 0 && !streamingMessage && !assistantThought && !error && !isLoading && (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-            <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center mb-4">
-              <MessageSquareIcon className="w-8 h-8 text-primary-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-neutral-900 mb-2">
-              Start a conversation
-            </h3>
-            <p className="text-neutral-600 max-w-md">
-              Messages will appear here once you begin.
-            </p>
+      {allMessages.map((msg) => {
+        const isUser = msg.from === 'user';
+        const isAI = msg.from === 'assistant';
+        const isSupplier = msg.from === 'supplier';
+        const isThought = msg.type === 'assistant_thought';
+
+        // Avatar
+        const avatar = (
+          <div className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8 bg-gray-100 border p-1 flex items-center justify-center">
+            {isUser ? (
+              <svg width="20" height="20" viewBox="0 0 16 16" fill="black">
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="black">
+                <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+              </svg>
+            )}
           </div>
-        )}
+        );
 
-        {/* LOADING HISTORY */}
-        {isLoading && (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-              <p className="text-neutral-600">Loading conversation...</p>
+        // Message bubble classes
+        const bubbleClass = `p-4 rounded-xl max-w-[75%] whitespace-pre-wrap ${isUser ? 'bg-blue-50 ml-auto' : 'bg-gray-100'}`;
+
+        return (
+          <div key={msg.id} className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} text-gray-700 text-sm`}>
+            {avatar}
+            <div className={bubbleClass}>
+              {isThought ? (
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-4 h-4 mt-1 text-yellow-700" />
+                  {msg.content}
+                </div>
+              ) : msg.suppliers || msg.quote_id ? (
+                <div className="space-y-1">
+                  <div className="font-semibold flex items-center gap-1">
+                    <CheckCircle className="w-4 h-4 text-green-600" /> AI Suggested Quote
+                  </div>
+                  {expandedCards[msg.id] && msg.suppliers && (
+                    <div className="space-y-1">
+                      {msg.suppliers.map((s, idx) => (
+                        <div key={idx} className="p-2 bg-gray-50 border rounded flex justify-between items-center text-sm">
+                          <div>
+                            <p className="font-medium">{s.name}</p>
+                            <p>Price: ${s.price_per_unit} / {s.unit}</p>
+                          </div>
+                          <button
+                            className="text-xs text-primary-600 hover:underline"
+                            onClick={() => onAction?.('send_to_supplier', msg.id, s)}
+                          >
+                            Send
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {msg.quote_id && <div className="p-2 bg-gray-50 border rounded text-sm">Quote ID: <span className="font-medium">{msg.quote_id}</span></div>}
+                  <div className="flex gap-2 mt-2">
+                    <button className="px-2 py-1 bg-green-100 text-green-800 rounded text-sm hover:bg-green-200" onClick={() => onAction?.('approve', msg.id)}>Approve</button>
+                    <button className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-sm hover:bg-yellow-200" onClick={() => onAction?.('clarify', msg.id)}>Ask Clarification</button>
+                  </div>
+                </div>
+              ) : (
+                msg.content
+              )}
             </div>
           </div>
-        )}
-
-        {/* ERROR */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
-            <div>
-              <p className="text-sm font-semibold text-red-900 mb-1">Error</p>
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {/* MAIN MESSAGES */}
-        <div className="space-y-6">
-
-          {/* USER + ASSISTANT MESSAGES */}
-          {messages.map((msg) => (
-            <ConversationMessage
-              key={msg.id}
-              message={msg}
-              isStreaming={false}
-            />
-          ))}
-
-          {/* YELLOW BUBBLE — ASSISTANT THOUGHT PROCESS */}
-          {assistantThought && (
-            <div className="bg-yellow-100 border border-yellow-300 text-yellow-900 p-4 rounded-xl flex items-start gap-3 shadow-sm">
-              <Lightbulb className="w-5 h-5 mt-1 text-yellow-700" />
-              <div className="whitespace-pre-wrap text-sm">
-                {assistantThought}
-              </div>
-            </div>
-          )}
-
-          {/* NORMAL STREAMING FINAL OUTPUT (NO THOUGHT) */}
-          {streamingMessage && (
-            <ConversationMessage
-              message={{
-                from: 'assistant',
-                content: streamingMessage,
-                id: 'streaming',
-                status: 'streaming',
-              }}
-              isStreaming={true}
-            />
-          )}
-
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
+        );
+      })}
+      <div ref={messagesEndRef} />
     </div>
   );
 }

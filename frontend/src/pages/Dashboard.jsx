@@ -4,10 +4,10 @@ import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '../co
 import Button from '../components/ui/Button';
 import { StatusBadge } from '../components/ui/Badge';
 import Spinner from '../components/ui/Spinner';
-import { 
-  MessageSquare, 
-  FileText, 
-  DollarSign, 
+import {
+  MessageSquare,
+  FileText,
+  DollarSign,
   TrendingUp,
   Plus,
   ArrowRight,
@@ -20,7 +20,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { data: conversations, isLoading, error } = useConversations({ limit: 10 });
 
-  // Calculate stats
   const stats = {
     totalConversations: conversations?.length || 0,
     quotesGenerated: conversations?.filter(c => c.status === 'quote_generated')?.length || 0,
@@ -29,66 +28,47 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="space-y-10">
+      {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">Dashboard</h1>
-          <p className="text-neutral-600 mt-1">Overview of your procurement activities</p>
+          <h1 className="text-3xl font-semibold text-neutral-900 tracking-tight">Dashboard</h1>
+          <p className="text-neutral-600 mt-1 text-sm">Overview of your procurement activities</p>
         </div>
+
         <Button
           leftIcon={<Plus size={18} />}
-          onClick={() => navigate('/conversation')} // Changed from '/new'
+          onClick={() => navigate('/conversation')}
+          className="shadow-sm hover:shadow-md transition-all"
         >
           New Conversation
         </Button>
-
-        {/* <Button onClick={() => navigate('/conversation')}>
-          Start Your First Conversation
-        </Button> */}
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Total Conversations"
-          value={stats.totalConversations}
-          icon={<MessageSquare className="text-primary-600" size={24} />}
-          color="primary"
-        />
-        <StatCard
-          title="Quotes Generated"
-          value={stats.quotesGenerated}
-          icon={<FileText className="text-success-600" size={24} />}
-          color="success"
-        />
-        <StatCard
-          title="In Progress"
-          value={stats.inProgress}
-          icon={<Clock className="text-warning-600" size={24} />}
-          color="warning"
-        />
-        <StatCard
-          title="Negotiations"
-          value={stats.negotiations}
-          icon={<TrendingUp className="text-secondary-600" size={24} />}
-          color="secondary"
-        />
+        <StatCard title="Total Conversations" value={stats.totalConversations} icon={MessageSquare} />
+        <StatCard title="Quotes Generated" value={stats.quotesGenerated} icon={FileText} />
+        <StatCard title="In Progress" value={stats.inProgress} icon={Clock} />
+        <StatCard title="Negotiations" value={stats.negotiations} icon={TrendingUp} />
       </div>
 
       {/* Recent Conversations */}
-      <Card>
+      <Card className="rounded-2xl border border-neutral-200 shadow-sm hover:shadow-md transition-all">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Recent Conversations</CardTitle>
-              <CardDescription>Your latest procurement requests</CardDescription>
+              <CardTitle className="font-semibold text-neutral-900">Recent Conversations</CardTitle>
+              <CardDescription className="text-neutral-500">
+                Your latest procurement requests
+              </CardDescription>
             </div>
             <Button
               variant="ghost"
               size="sm"
               rightIcon={<ArrowRight size={16} />}
               onClick={() => navigate('/history')}
+              className="text-neutral-600 hover:text-neutral-900"
             >
               View All
             </Button>
@@ -104,7 +84,7 @@ export default function Dashboard() {
 
           {error && (
             <div className="py-8 text-center">
-              <p className="text-error-600">Failed to load conversations</p>
+              <p className="text-neutral-700 font-medium">Failed to load conversations</p>
               <p className="text-sm text-neutral-500 mt-1">{error.message}</p>
             </div>
           )}
@@ -136,56 +116,53 @@ export default function Dashboard() {
   );
 }
 
-// Stat Card Component
-function StatCard({ title, value, icon, color }) {
-  const colorClasses = {
-    primary: 'bg-primary-50',
-    success: 'bg-success-50',
-    warning: 'bg-warning-50',
-    secondary: 'bg-secondary-50',
-  };
-
+function StatCard({ title, value, icon: Icon }) {
   return (
-    <Card className="relative overflow-hidden">
-      <div className="flex items-start justify-between">
+    <Card className="rounded-2xl border border-neutral-200 shadow-sm hover:shadow-md transition-all">
+      <div className="flex items-start justify-between p-5">
         <div>
           <p className="text-sm text-neutral-600 font-medium">{title}</p>
-          <p className="text-3xl font-bold text-neutral-900 mt-2">{value}</p>
+          <p className="text-3xl font-semibold text-neutral-900 mt-2">{value}</p>
         </div>
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
-          {icon}
+        <div className="p-2 rounded-xl border border-neutral-300 bg-neutral-50">
+          <Icon className="text-neutral-700" size={22} />
         </div>
       </div>
     </Card>
   );
 }
 
-// Conversation Card Component
 function ConversationCard({ conversation, onClick }) {
-  const intentConfig = INTENT_CONFIG[conversation.intent] || { label: conversation.intent, icon: '📝' };
+  const intentConfig = INTENT_CONFIG[conversation.intent] || {
+    label: conversation.intent,
+    icon: '📝'
+  };
 
   return (
     <div
       onClick={onClick}
-      className="p-4 border border-neutral-200 rounded-lg hover:border-primary-300 hover:bg-primary-50/30 transition-all cursor-pointer group"
+      className="p-4 border border-neutral-200 rounded-xl hover:border-neutral-400 hover:bg-neutral-50 transition-all cursor-pointer group shadow-sm hover:shadow-md"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">{intentConfig.icon}</span>
+            <span className="text-base">{intentConfig.icon}</span>
             <span className="text-sm font-medium text-neutral-700">{intentConfig.label}</span>
             <StatusBadge status={conversation.status} />
           </div>
+
           <p className="text-neutral-900 font-medium mb-1">
-            {truncate(conversation.preview, 80)}
+            {truncate(conversation.preview, 90)}
           </p>
+
           <p className="text-sm text-neutral-500">
             {formatRelativeTime(conversation.created_at)}
           </p>
         </div>
-        <ArrowRight 
-          size={20} 
-          className="text-neutral-400 group-hover:text-primary-600 transition-colors shrink-0 mt-1" 
+
+        <ArrowRight
+          size={18}
+          className="text-neutral-400 group-hover:text-neutral-700 transition-colors shrink-0 mt-1"
         />
       </div>
     </div>

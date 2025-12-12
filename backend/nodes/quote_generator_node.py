@@ -2,7 +2,7 @@ from typing import Dict, Any, List, Optional, Tuple
 from langchain.chat_models import init_chat_model
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime, timedelta
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP, InvalidOperation
 from functools import lru_cache
 import uuid
 import logging
@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 model = init_chat_model("gemini-2.5-flash", model_provider="google_genai")
-
 structured_model = model.with_structured_output(GeneratedQuote)
+
 
 # Configuration constants
 class QuoteConfig:
@@ -29,6 +29,13 @@ class QuoteConfig:
     DEFAULT_CURRENCY = "USD"
     MIN_QUANTITY_FOR_DISCOUNT = 50000
     LARGE_ORDER_THRESHOLD = 50000
+    
+    # Default values for missing data
+    DEFAULT_UNIT_PRICE = 5.0
+    DEFAULT_LEAD_TIME = 30
+    DEFAULT_REPUTATION_SCORE = 5.0
+    DEFAULT_QUANTITY = 1000
+    DEFAULT_DESTINATION = "Unknown"
     
     # Weight factors for supplier scoring
     SCORING_WEIGHTS = {
@@ -79,6 +86,72 @@ class QuoteConfig:
     }
 
 
+def safe_get_value(obj, key, default=None):
+    """
+    Safely get value from dict or object attribute
+    
+    Args:
+        obj: Dictionary or object
+        key: Key or attribute name
+        default: Default value if not found
+    
+    Returns:
+        Value or default
+    """
+    if obj is None:
+        return default
+    
+    try:
+        if isinstance(obj, dict):
+            return obj.get(key, default)
+        elif hasattr(obj, key):
+            return getattr(obj, key, default)
+        else:
+            return default
+    except Exception:
+        return default
+
+
+def safe_float(value, default=0.0):
+    """
+    Safely convert to float
+    
+    Args:
+        value: Value to convert
+        default: Default if conversion fails
+    
+    Returns:
+        Float value or default
+    """
+    if value is None:
+        return default
+    
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return default
+
+
+def safe_int(value, default=0):
+    """
+    Safely convert to int
+    
+    Args:
+        value: Value to convert
+        default: Default if conversion fails
+    
+    Returns:
+        Int value or default
+    """
+    if value is None:
+        return default
+    
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+
 def validate_input_state(state: AgentState) -> Tuple[bool, Optional[str]]:
     """
     Validate that the state has all required fields for quote generation
@@ -89,28 +162,41 @@ def validate_input_state(state: AgentState) -> Tuple[bool, Optional[str]]:
     Returns:
         Tuple of (is_valid, error_message)
     """
-    required_fields = {
-        'extracted_parameters': 'Missing extracted parameters',
-        'top_suppliers': 'No suppliers available'
-    }
-    
-    for field, error_msg in required_fields.items():
-        if not state.get(field):
-            logger.warning(f"Validation failed: {error_msg}")
-            return False, error_msg
-    
-    # Validate top_suppliers is not empty
-    if not state.get('top_suppliers'):
-        return False, "Supplier list is empty"
-    
-    # Validate extracted_parameters has required sub-fields
-    params = state.get('extracted_parameters', {})
-    if not params.get('fabric_details'):
-        return False, "Missing fabric details in parameters"
-    
-    logger.info("Input state validation passed")
-    
-    return True, None
+    try:
+        # Check state is not None
+        if state is None:
+            return False, "State is None"
+        
+        # Check extracted_parameters
+        extracted_params = state.get('extracted_parameters')
+        if not extracted_params:
+            logger.warning("Missing extracted parameters")
+            return False, "Missing extracted parameters"
+        
+        # Check top_suppliers
+        top_suppliers = state.get('top_suppliers')
+        if not top_suppliers:
+            logger.warning("No suppliers available")
+            return False, "No suppliers available"
+        
+        if not isinstance(top_suppliers, list) or len(top_suppliers) == 0:
+            logger.warning("Supplier list is empty")
+            return False, "Supplier list is empty"
+        
+        # Check fabric_details exists (can be empty dict)
+        params_dict = extracted_params if isinstance(extracted_params, dict) else {}
+        fabric_details = safe_get_value(params_dict, 'fabric_details')
+        
+        if fabric_details is None:
+            logger.warning("Missing fabric details in parameters")
+            return False, "Missing fabric details in parameters"
+        
+        logger.info("Input state validation passed")
+        return True, None
+        
+    except Exception as e:
+        logger.error(f"Error during validation: {str(e)}")
+        return False, f"Validation error: {str(e)}"
 
 
 def calculate_logistics_costs(
@@ -120,7 +206,7 @@ def calculate_logistics_costs(
     fabric_type: str
 ) -> LogisticsCost:
     """
-    Calculate comprehensive logistics costs for a supplier with improved accuracy
+    Calculate comprehensive logistics costs for a supplier with safety checks
     
     Args:
         supplier: Supplier dictionary with location and other details
@@ -130,15 +216,27 @@ def calculate_logistics_costs(
     
     Returns:
         LogisticsCost: Detailed breakdown of logistics expenses
-    
-    Raises:
-        ValueError: If quantity is invalid
     """
-    if quantity <= 0:
-        raise ValueError(f"Invalid quantity: {quantity}. Must be positive.")
-    
     try:
-        supplier_country = supplier.get('location', 'Unknown')
+        # Safety check: validate inputs
+        if supplier is None:
+            logger.warning("Supplier is None, using default logistics costs")
+            return get_default_logistics_cost()
+        
+        if quantity is None or quantity <= 0:
+            logger.warning(f"Invalid quantity: {quantity}, using default")
+            quantity = QuoteConfig.DEFAULT_QUANTITY
+        
+        quantity = safe_float(quantity, QuoteConfig.DEFAULT_QUANTITY)
+        
+        if fabric_type is None or fabric_type == "":
+            fabric_type = "default"
+        
+        if destination is None or destination == "":
+            destination = QuoteConfig.DEFAULT_DESTINATION
+        
+        # Get supplier location safely
+        supplier_country = safe_get_value(supplier, 'location', 'Unknown')
         
         # Get fabric weight range and use average
         fabric_key = next(
@@ -160,8 +258,18 @@ def calculate_logistics_costs(
         volume_discount = calculate_volume_discount(total_weight_kg)
         shipping_cost = base_shipping * (1 - volume_discount)
         
+        # Safety check: ensure shipping cost is positive
+        if shipping_cost < 0:
+            shipping_cost = 0.0
+        
         # Calculate insurance (5% of material + shipping value)
-        material_value = supplier.get('price_per_unit', 5.0) * quantity
+        unit_price = safe_float(safe_get_value(supplier, 'price_per_unit'), QuoteConfig.DEFAULT_UNIT_PRICE)
+        material_value = unit_price * quantity
+        
+        # Safety check: ensure material value is positive
+        if material_value < 0:
+            material_value = 0.0
+        
         insurance_base = material_value + shipping_cost
         insurance_cost = insurance_base * 0.05
         
@@ -174,6 +282,13 @@ def calculate_logistics_costs(
         
         # Total logistics cost
         total_logistics = shipping_cost + insurance_cost + customs_duties + handling_fees
+        
+        # Final safety check: ensure all values are positive
+        shipping_cost = max(0.0, shipping_cost)
+        insurance_cost = max(0.0, insurance_cost)
+        customs_duties = max(0.0, customs_duties)
+        handling_fees = max(0.0, handling_fees)
+        total_logistics = max(0.0, total_logistics)
         
         logger.info(f"Logistics calculated: Shipping=${shipping_cost:.2f}, "
                    f"Insurance=${insurance_cost:.2f}, Customs=${customs_duties:.2f}, "
@@ -190,19 +305,24 @@ def calculate_logistics_costs(
     except Exception as e:
         logger.error(f"Error calculating logistics costs: {str(e)}")
         # Return default conservative estimate
-        return LogisticsCost(
-            shipping_cost=1000.0,
-            insurance_cost=100.0,
-            customs_duties=500.0,
-            handling_fees=200.0,
-            total_logistics=1800.0
-        )
+        return get_default_logistics_cost()
+
+
+def get_default_logistics_cost() -> LogisticsCost:
+    """Return default logistics cost when calculation fails"""
+    return LogisticsCost(
+        shipping_cost=1000.0,
+        insurance_cost=100.0,
+        customs_duties=500.0,
+        handling_fees=200.0,
+        total_logistics=1800.0
+    )
 
 
 @lru_cache(maxsize=100)
 def get_shipping_rate(route_key: Optional[Tuple[str, str]], origin: str, destination: Optional[str]) -> float:
     """
-    Get shipping rate with caching for performance
+    Get shipping rate with caching and safety checks
     
     Args:
         route_key: Tuple of (origin, destination) or None
@@ -212,27 +332,36 @@ def get_shipping_rate(route_key: Optional[Tuple[str, str]], origin: str, destina
     Returns:
         float: Shipping rate per kg
     """
-    if not destination:
+    try:
+        # Safety check: validate inputs
+        if origin is None or origin == "" or origin == "Unknown":
+            return QuoteConfig.SHIPPING_RATES[('default_international',)]
+        
+        if not destination or destination == "" or destination == "Unknown":
+            return QuoteConfig.SHIPPING_RATES[('default_international',)]
+        
+        if route_key and route_key in QuoteConfig.SHIPPING_RATES:
+            return QuoteConfig.SHIPPING_RATES[route_key]
+        
+        # Check if both are in Asia (regional rate)
+        asian_countries = ['China', 'India', 'Pakistan', 'Bangladesh', 'Vietnam', 'Thailand', 'Indonesia']
+        if origin in asian_countries and destination in asian_countries:
+            logger.debug(f"Using regional shipping rate for {origin} to {destination}.")
+            return QuoteConfig.SHIPPING_RATES[('default_regional',)]
+        
+        logger.debug(f"No specific shipping rate found for {origin} to {destination}, using default international rate.")
+        
+        # International rate
         return QuoteConfig.SHIPPING_RATES[('default_international',)]
-    
-    if route_key and route_key in QuoteConfig.SHIPPING_RATES:
-        return QuoteConfig.SHIPPING_RATES[route_key]
-    
-    # Check if both are in Asia (regional rate)
-    asian_countries = ['China', 'India', 'Pakistan', 'Bangladesh', 'Vietnam', 'Thailand', 'Indonesia']
-    if origin in asian_countries and destination in asian_countries:
-        logger.debug(f"Using regional shipping rate for {origin} to {destination}.")
-        return QuoteConfig.SHIPPING_RATES[('default_regional',)]
-    
-    logger.debug(f"No specific shipping rate found for {origin} to {destination}, using default international rate.")
-    
-    # International rate
-    return QuoteConfig.SHIPPING_RATES[('default_international',)]
+        
+    except Exception as e:
+        logger.error(f"Error getting shipping rate: {str(e)}")
+        return QuoteConfig.SHIPPING_RATES[('default_international',)]
 
 
 def get_customs_rate(fabric_type: str) -> float:
     """
-    Determine customs duty rate based on fabric type
+    Determine customs duty rate based on fabric type with safety checks
     
     Args:
         fabric_type: Type/description of fabric
@@ -240,23 +369,31 @@ def get_customs_rate(fabric_type: str) -> float:
     Returns:
         float: Customs duty rate (as decimal, e.g., 0.12 for 12%)
     """
-    fabric_lower = fabric_type.lower()
-    
-    if 'organic' in fabric_lower or 'eco' in fabric_lower:
-        return QuoteConfig.CUSTOMS_RATES['organic']
-    elif 'polyester' in fabric_lower or 'nylon' in fabric_lower or 'synthetic' in fabric_lower:
-        return QuoteConfig.CUSTOMS_RATES['synthetic']
-    elif 'cotton' in fabric_lower or 'silk' in fabric_lower or 'wool' in fabric_lower:
-        return QuoteConfig.CUSTOMS_RATES['natural']
-    elif 'blend' in fabric_lower or 'mix' in fabric_lower:
-        return QuoteConfig.CUSTOMS_RATES['blended']
-    
-    return QuoteConfig.CUSTOMS_RATES['default']
+    try:
+        if fabric_type is None or fabric_type == "":
+            return QuoteConfig.CUSTOMS_RATES['default']
+        
+        fabric_lower = fabric_type.lower()
+        
+        if 'organic' in fabric_lower or 'eco' in fabric_lower:
+            return QuoteConfig.CUSTOMS_RATES['organic']
+        elif 'polyester' in fabric_lower or 'nylon' in fabric_lower or 'synthetic' in fabric_lower:
+            return QuoteConfig.CUSTOMS_RATES['synthetic']
+        elif 'cotton' in fabric_lower or 'silk' in fabric_lower or 'wool' in fabric_lower:
+            return QuoteConfig.CUSTOMS_RATES['natural']
+        elif 'blend' in fabric_lower or 'mix' in fabric_lower:
+            return QuoteConfig.CUSTOMS_RATES['blended']
+        
+        return QuoteConfig.CUSTOMS_RATES['default']
+        
+    except Exception as e:
+        logger.error(f"Error getting customs rate: {str(e)}")
+        return QuoteConfig.CUSTOMS_RATES['default']
 
 
 def calculate_volume_discount(weight_kg: float) -> float:
     """
-    Calculate volume discount based on shipment weight
+    Calculate volume discount based on shipment weight with safety checks
     
     Args:
         weight_kg: Total weight in kilograms
@@ -264,21 +401,31 @@ def calculate_volume_discount(weight_kg: float) -> float:
     Returns:
         float: Discount rate (e.g., 0.05 for 5% discount)
     """
-    if weight_kg > 10000:
-        return 0.10  # 10% discount for very large shipments
-    elif weight_kg > 5000:
-        return 0.07  # 7% discount
-    elif weight_kg > 2000:
-        return 0.05  # 5% discount
-    elif weight_kg > 1000:
-        return 0.03  # 3% discount
-    
-    return 0.0  # No discount for smaller shipments
+    try:
+        weight_kg = safe_float(weight_kg, 0.0)
+        
+        if weight_kg <= 0:
+            return 0.0
+        
+        if weight_kg > 10000:
+            return 0.10  # 10% discount for very large shipments
+        elif weight_kg > 5000:
+            return 0.07  # 7% discount
+        elif weight_kg > 2000:
+            return 0.05  # 5% discount
+        elif weight_kg > 1000:
+            return 0.03  # 3% discount
+        
+        return 0.0  # No discount for smaller shipments
+        
+    except Exception as e:
+        logger.error(f"Error calculating volume discount: {str(e)}")
+        return 0.0
 
 
 def calculate_handling_fees(quantity: float, weight_kg: float) -> float:
     """
-    Calculate handling fees based on order size and weight
+    Calculate handling fees based on order size and weight with safety checks
     
     Args:
         quantity: Order quantity
@@ -287,30 +434,38 @@ def calculate_handling_fees(quantity: float, weight_kg: float) -> float:
     Returns:
         float: Handling fee amount
     """
-    # Base fee on quantity tiers
-    if quantity > 100000:
-        base_fee = 800
-    elif quantity > 50000:
-        base_fee = 500
-    elif quantity > 20000:
-        base_fee = 300
-    elif quantity > 5000:
-        base_fee = 150
-    else:
-        base_fee = 75
-    
-    # Add weight-based fee for very heavy shipments
-    if weight_kg > 5000:
-        base_fee += 200
-    elif weight_kg > 2000:
-        base_fee += 100
-    
-    return float(base_fee)
+    try:
+        quantity = safe_float(quantity, 0.0)
+        weight_kg = safe_float(weight_kg, 0.0)
+        
+        # Base fee on quantity tiers
+        if quantity > 100000:
+            base_fee = 800
+        elif quantity > 50000:
+            base_fee = 500
+        elif quantity > 20000:
+            base_fee = 300
+        elif quantity > 5000:
+            base_fee = 150
+        else:
+            base_fee = 75
+        
+        # Add weight-based fee for very heavy shipments
+        if weight_kg > 5000:
+            base_fee += 200
+        elif weight_kg > 2000:
+            base_fee += 100
+        
+        return float(base_fee)
+        
+    except Exception as e:
+        logger.error(f"Error calculating handling fees: {str(e)}")
+        return 75.0  # Default minimum fee
 
 
 def round_decimal(value: float, places: int = 2) -> float:
     """
-    Round a float to specified decimal places
+    Round a float to specified decimal places with safety checks
     
     Args:
         value: Value to round
@@ -319,9 +474,19 @@ def round_decimal(value: float, places: int = 2) -> float:
     Returns:
         float: Rounded value
     """
-    decimal_value = Decimal(str(value))
-    rounded = decimal_value.quantize(Decimal(10) ** -places, rounding=ROUND_HALF_UP)
-    return float(rounded)
+    try:
+        if value is None:
+            return 0.0
+        
+        value = safe_float(value, 0.0)
+        
+        decimal_value = Decimal(str(value))
+        rounded = decimal_value.quantize(Decimal(10) ** -places, rounding=ROUND_HALF_UP)
+        return float(rounded)
+        
+    except (InvalidOperation, ValueError, TypeError) as e:
+        logger.warning(f"Error rounding decimal {value}: {str(e)}, returning original")
+        return safe_float(value, 0.0)
 
 
 def calculate_supplier_score(
@@ -330,7 +495,7 @@ def calculate_supplier_score(
     all_suppliers: List[Dict]
 ) -> float:
     """
-    Calculate comprehensive supplier score using multiple weighted factors
+    Calculate comprehensive supplier score using multiple weighted factors with safety checks
     
     Args:
         supplier: Individual supplier data
@@ -341,29 +506,66 @@ def calculate_supplier_score(
         float: Overall score (0-100)
     """
     try:
+        # Safety check: validate inputs
+        if supplier is None:
+            logger.warning("Supplier is None, returning default score")
+            return 50.0
+        
+        if not isinstance(all_suppliers, list) or len(all_suppliers) == 0:
+            logger.warning("No suppliers for comparison, using default score")
+            return 50.0
+        
         weights = QuoteConfig.SCORING_WEIGHTS
         
         # Use overall_score if available, otherwise calculate
-        if 'overall_score' in supplier and supplier['overall_score']:
-            return supplier['overall_score']
+        existing_score = safe_get_value(supplier, 'overall_score')
+        if existing_score is not None and existing_score > 0:
+            return safe_float(existing_score, 50.0)
         
         # 1. Price Score (30%)
-        prices = [s.get('price_per_unit', 0) for s in all_suppliers if s.get('price_per_unit', 0) > 0]
-        avg_market_price = sum(prices) / len(prices) if prices else supplier.get('price_per_unit', 5.0)
-        supplier_price = supplier.get('price_per_unit', avg_market_price)
+        prices = []
+        for s in all_suppliers:
+            price = safe_float(safe_get_value(s, 'price_per_unit'), 0)
+            if price > 0:
+                prices.append(price)
         
-        if avg_market_price > 0:
+        if prices:
+            avg_market_price = sum(prices) / len(prices)
+        else:
+            avg_market_price = QuoteConfig.DEFAULT_UNIT_PRICE
+        
+        supplier_price = safe_float(
+            safe_get_value(supplier, 'price_per_unit'),
+            avg_market_price
+        )
+        
+        if avg_market_price > 0 and supplier_price > 0:
             price_ratio = supplier_price / avg_market_price
             price_score = max(0, min(100, 100 - ((price_ratio - 1) * 100)))
         else:
             price_score = 50.0
         
         # 2. Reliability Score (25%)
-        reliability_score = supplier.get('reputation_score', 5.0) * 10
+        reputation = safe_float(
+            safe_get_value(supplier, 'reputation_score'),
+            QuoteConfig.DEFAULT_REPUTATION_SCORE
+        )
+        reliability_score = reputation * 10
+        reliability_score = max(0, min(100, reliability_score))
         
         # 3. Lead Time Score (20%)
-        target_lead_time = extracted_params.get('logistics_details', {}).get('timeline_days', 30)
-        supplier_lead_time = supplier.get('lead_time_days', 30)
+        params_dict = extracted_params if isinstance(extracted_params, dict) else {}
+        logistics_dict = safe_get_value(params_dict, 'logistics_details', {})
+        
+        target_lead_time = safe_int(
+            safe_get_value(logistics_dict, 'timeline_days'),
+            QuoteConfig.DEFAULT_LEAD_TIME
+        )
+        
+        supplier_lead_time = safe_int(
+            safe_get_value(supplier, 'lead_time_days'),
+            QuoteConfig.DEFAULT_LEAD_TIME
+        )
         
         if target_lead_time and target_lead_time > 0:
             lead_time_ratio = supplier_lead_time / target_lead_time
@@ -372,8 +574,19 @@ def calculate_supplier_score(
             lead_time_score = 50.0
         
         # 4. Certification Score (15%)
-        required_certs = set(extracted_params.get('fabric_details', {}).get('certifications', []))
-        supplier_certs = set(supplier.get('certifications', []))
+        fabric_dict = safe_get_value(params_dict, 'fabric_details', {})
+        required_certs_list = safe_get_value(fabric_dict, 'certifications', [])
+        
+        if not isinstance(required_certs_list, list):
+            required_certs_list = []
+        
+        required_certs = set(required_certs_list)
+        
+        supplier_certs_list = safe_get_value(supplier, 'certifications', [])
+        if not isinstance(supplier_certs_list, list):
+            supplier_certs_list = []
+        
+        supplier_certs = set(supplier_certs_list)
         
         if required_certs:
             matched_certs = len(required_certs & supplier_certs)
@@ -393,6 +606,9 @@ def calculate_supplier_score(
             location_score * weights['location']
         )
         
+        # Ensure score is within bounds
+        overall_score = max(0.0, min(100.0, overall_score))
+        
         return round_decimal(overall_score)
         
     except Exception as e:
@@ -406,7 +622,7 @@ def analyze_supplier_advantages_risks(
     extracted_params: Dict
 ) -> Tuple[List[str], List[str]]:
     """
-    Analyze supplier to identify key advantages and potential risks
+    Analyze supplier to identify key advantages and potential risks with safety checks
     
     Args:
         supplier: Supplier data
@@ -419,64 +635,112 @@ def analyze_supplier_advantages_risks(
     advantages = []
     risks = []
     
-    # Get comparison metrics
-    prices = [s.get('price_per_unit', 0) for s in all_suppliers if s.get('price_per_unit', 0) > 0]
-    min_price = min(prices) if prices else 0
-    avg_price = sum(prices) / len(prices) if prices else 0
-    
-    lead_times = [s.get('lead_time_days', 30) for s in all_suppliers]
-    min_lead_time = min(lead_times) if lead_times else 30
-    avg_lead_time = sum(lead_times) / len(lead_times) if lead_times else 30
-    
-    # Analyze advantages
-    if supplier.get('reputation_score', 5) >= 8:
-        advantages.append("✓ Excellent reliability track record (8+/10)")
-    elif supplier.get('reputation_score', 5) >= 7:
-        advantages.append("✓ Good reliability score")
-    
-    supplier_lead_time = supplier.get('lead_time_days', 30)
-    if supplier_lead_time <= min_lead_time * 1.1:
-        advantages.append(f"✓ Fast delivery capability ({supplier_lead_time} days)")
-    elif supplier_lead_time <= avg_lead_time:
-        advantages.append("✓ Competitive lead time")
-    
-    supplier_price = supplier.get('price_per_unit', avg_price)
-    if avg_price > 0 and supplier_price <= min_price * 1.05:
-        advantages.append(f"✓ Most competitive pricing (${supplier_price:.2f}/unit)")
-    elif avg_price > 0 and supplier_price <= avg_price:
-        advantages.append("✓ Below market average pricing")
-    
-    # Check certifications
-    supplier_certs = supplier.get('certifications', [])
-    if 'GOTS' in supplier_certs or 'organic' in str(supplier_certs).lower():
-        advantages.append("✓ Organic/GOTS certification available")
-    if 'OEKO-TEX' in supplier_certs:
-        advantages.append("✓ OEKO-TEX certified")
-    if len(supplier_certs) >= 3:
-        advantages.append(f"✓ Multiple certifications ({len(supplier_certs)})")
-    
-    # Analyze risks
-    if supplier.get('reputation_score', 5) < 7:
-        risks.append("⚠ Lower reliability score - recommend closer monitoring")
-    
-    if supplier_lead_time > avg_lead_time * 1.3:
-        risks.append(f"⚠ Extended lead time ({supplier_lead_time} days) may impact timeline")
-    
-    min_order = supplier.get('minimum_order_qty', 0)
-    requested_qty = extracted_params.get('fabric_details', {}).get('quantity', 0)
-    if min_order > requested_qty:
-        risks.append(f"⚠ MOQ ({min_order:,}) exceeds requested quantity")
-    
-    if avg_price > 0 and supplier_price > avg_price * 1.2:
-        risks.append("⚠ Pricing above market average")
-    
-    # Default messages if none found
-    if not advantages:
-        advantages.append("Competitive option for consideration")
-    if not risks:
-        risks.append("Standard supplier risks apply - due diligence recommended")
-    
-    return advantages, risks
+    try:
+        # Safety checks
+        if supplier is None:
+            return (["Unable to analyze - supplier data missing"], 
+                   ["Missing supplier information"])
+        
+        if not isinstance(all_suppliers, list) or len(all_suppliers) == 0:
+            all_suppliers = [supplier]
+        
+        # Get comparison metrics safely
+        prices = []
+        for s in all_suppliers:
+            price = safe_float(safe_get_value(s, 'price_per_unit'), 0)
+            if price > 0:
+                prices.append(price)
+        
+        min_price = min(prices) if prices else 0
+        avg_price = sum(prices) / len(prices) if prices else QuoteConfig.DEFAULT_UNIT_PRICE
+        
+        lead_times = []
+        for s in all_suppliers:
+            lead_time = safe_int(safe_get_value(s, 'lead_time_days'), 0)
+            if lead_time > 0:
+                lead_times.append(lead_time)
+        
+        min_lead_time = min(lead_times) if lead_times else QuoteConfig.DEFAULT_LEAD_TIME
+        avg_lead_time = sum(lead_times) / len(lead_times) if lead_times else QuoteConfig.DEFAULT_LEAD_TIME
+        
+        # Analyze advantages
+        reputation = safe_float(
+            safe_get_value(supplier, 'reputation_score'),
+            QuoteConfig.DEFAULT_REPUTATION_SCORE
+        )
+        
+        if reputation >= 8:
+            advantages.append("✓ Excellent reliability track record (8+/10)")
+        elif reputation >= 7:
+            advantages.append("✓ Good reliability score")
+        
+        supplier_lead_time = safe_int(
+            safe_get_value(supplier, 'lead_time_days'),
+            QuoteConfig.DEFAULT_LEAD_TIME
+        )
+        
+        if supplier_lead_time > 0 and min_lead_time > 0:
+            if supplier_lead_time <= min_lead_time * 1.1:
+                advantages.append(f"✓ Fast delivery capability ({supplier_lead_time} days)")
+            elif supplier_lead_time <= avg_lead_time:
+                advantages.append("✓ Competitive lead time")
+        
+        supplier_price = safe_float(
+            safe_get_value(supplier, 'price_per_unit'),
+            avg_price
+        )
+        
+        if avg_price > 0 and supplier_price > 0:
+            if supplier_price <= min_price * 1.05:
+                advantages.append(f"✓ Most competitive pricing (${supplier_price:.2f}/unit)")
+            elif supplier_price <= avg_price:
+                advantages.append("✓ Below market average pricing")
+        
+        # Check certifications safely
+        supplier_certs_list = safe_get_value(supplier, 'certifications', [])
+        if not isinstance(supplier_certs_list, list):
+            supplier_certs_list = []
+        
+        supplier_certs = set(supplier_certs_list)
+        
+        if 'GOTS' in supplier_certs or any('organic' in str(c).lower() for c in supplier_certs):
+            advantages.append("✓ Organic/GOTS certification available")
+        if 'OEKO-TEX' in supplier_certs:
+            advantages.append("✓ OEKO-TEX certified")
+        if len(supplier_certs) >= 3:
+            advantages.append(f"✓ Multiple certifications ({len(supplier_certs)})")
+        
+        # Analyze risks
+        if reputation < 7:
+            risks.append("⚠ Lower reliability score - recommend closer monitoring")
+        
+        if avg_lead_time > 0 and supplier_lead_time > avg_lead_time * 1.3:
+            risks.append(f"⚠ Extended lead time ({supplier_lead_time} days) may impact timeline")
+        
+        min_order = safe_int(safe_get_value(supplier, 'minimum_order_qty'), 0)
+        
+        params_dict = extracted_params if isinstance(extracted_params, dict) else {}
+        fabric_dict = safe_get_value(params_dict, 'fabric_details', {})
+        requested_qty = safe_int(safe_get_value(fabric_dict, 'quantity'), 0)
+        
+        if min_order > 0 and requested_qty > 0 and min_order > requested_qty:
+            risks.append(f"⚠ MOQ ({min_order:,}) exceeds requested quantity")
+        
+        if avg_price > 0 and supplier_price > avg_price * 1.2:
+            risks.append("⚠ Pricing above market average")
+        
+        # Default messages if none found
+        if not advantages:
+            advantages.append("Competitive option for consideration")
+        if not risks:
+            risks.append("Standard supplier risks apply - due diligence recommended")
+        
+        return advantages, risks
+        
+    except Exception as e:
+        logger.error(f"Error analyzing supplier advantages/risks: {str(e)}")
+        return (["Unable to fully analyze advantages"], 
+                ["Unable to fully analyze risks - manual review recommended"])
 
 
 def create_quote_generation_prompt() -> ChatPromptTemplate:
@@ -542,25 +806,50 @@ def prepare_supplier_options_text(
     logistics_costs: Dict[str, LogisticsCost]
 ) -> str:
     """
-    Format supplier data for prompt inclusion with enhanced details
+    Format supplier data for prompt inclusion with enhanced details and safety checks
     """
-    options_text = []
-    
-    for i, supplier in enumerate(suppliers[:QuoteConfig.MAX_SUPPLIER_OPTIONS], 1):
-        supplier_id = supplier.get('supplier_id', f'supplier_{i}')
-        logistics = logistics_costs.get(supplier_id, LogisticsCost(
-            shipping_cost=0, insurance_cost=0, customs_duties=0, handling_fees=0, total_logistics=0
-        ))
+    try:
+        if not suppliers or not isinstance(suppliers, list):
+            return "No supplier options available"
         
-        unit_price = supplier.get('price_per_unit', 5.0)
-        quantity = supplier.get('quantity', 1000)
-        material_cost = unit_price * quantity
-        total_cost = material_cost + logistics.total_logistics
+        options_text = []
         
-        option_text = f"""
-**Option {i}: {supplier.get('name', 'Unknown Supplier')}**
+        for i, supplier in enumerate(suppliers[:QuoteConfig.MAX_SUPPLIER_OPTIONS], 1):
+            if supplier is None:
+                continue
+            
+            supplier_id = safe_get_value(supplier, 'supplier_id', f'supplier_{i}')
+            logistics = logistics_costs.get(supplier_id, get_default_logistics_cost())
+            
+            unit_price = safe_float(safe_get_value(supplier, 'price_per_unit'), QuoteConfig.DEFAULT_UNIT_PRICE)
+            quantity = safe_float(safe_get_value(supplier, 'quantity'), QuoteConfig.DEFAULT_QUANTITY)
+            material_cost = unit_price * quantity
+            total_cost = material_cost + logistics.total_logistics
+            
+            supplier_name = safe_get_value(supplier, 'name', 'Unknown Supplier')
+            location = safe_get_value(supplier, 'location', 'Unknown')
+            lead_time = safe_int(safe_get_value(supplier, 'lead_time_days'), QuoteConfig.DEFAULT_LEAD_TIME)
+            reputation = safe_float(safe_get_value(supplier, 'reputation_score'), QuoteConfig.DEFAULT_REPUTATION_SCORE)
+            overall_score = safe_float(safe_get_value(supplier, 'overall_score'), 50.0)
+            
+            specialties_list = safe_get_value(supplier, 'specialties', [])
+            if not isinstance(specialties_list, list):
+                specialties_list = ['N/A']
+            specialties = ', '.join(specialties_list) if specialties_list else 'N/A'
+
+           #  FIXED CERTIFICATIONS BLOCK
+            certs_list = safe_get_value(supplier, 'certifications', [])
+            if not isinstance(certs_list, list):
+                certs_list = ['None']
+            certifications = ', '.join(certs_list) if certs_list else 'None'
+
+            moq = safe_int(safe_get_value(supplier, 'minimum_order_qty'), 0)
+            moq_str = f"{moq:,}" if moq > 0 else "N/A"
+
+            option_text = f"""
+**Option {i}: {supplier_name}**
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Location: {supplier.get('location', 'Unknown')}
+Location: {location}
 Unit Price: ${unit_price:.2f}
 Material Cost: ${material_cost:,.2f}
 
@@ -573,17 +862,22 @@ Logistics Breakdown:
 
 **Total Landed Cost: ${total_cost:,.2f}**
 
-Lead Time: {supplier.get('lead_time_days', 'N/A')} days
-Reputation Score: {supplier.get('reputation_score', 'N/A')}/10
-Overall Score: {supplier.get('overall_score', 'N/A')}/100
+Lead Time: {lead_time} days
+Reputation Score: {reputation:.1f}/10
+Overall Score: {overall_score:.1f}/100
 
-Specialties: {', '.join(supplier.get('specialties', ['N/A']))}
-Certifications: {', '.join(supplier.get('certifications', ['None']))}
-MOQ: {supplier.get('minimum_order_qty', 'N/A')} units
+Specialties: {specialties}
+Certifications: {certifications}
+MOQ: {moq_str} units
 """
-        options_text.append(option_text)
-    
-    return "\n".join(options_text)
+            options_text.append(option_text)
+
+        return "\n".join(options_text) if options_text else "No supplier options available"
+
+    except Exception as e:
+        logger.error(f"Error preparing supplier options text: {str(e)}")
+        return "Unable to format supplier options"
+
 
 
 def generate_terms_and_conditions() -> str:
@@ -733,6 +1027,10 @@ def generate_quote(state: AgentState) -> dict:
             
             # Calculate costs
             unit_price = supplier.get('price_per_unit', 5.0)
+            if unit_price is None:
+                unit_price = 5.0
+            if quantity is None:
+                quantity = 1
             material_cost = unit_price * quantity
             total_landed_cost = material_cost + logistics.total_logistics
             

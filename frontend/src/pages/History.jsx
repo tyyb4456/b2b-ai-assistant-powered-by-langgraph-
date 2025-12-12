@@ -134,7 +134,7 @@ export default function History() {
                 {(searchQuery || filterIntent !== 'all' || filterStatus !== 'all') ? (
                   <p className="text-sm text-neutral-500">Try adjusting your filters</p>
                 ) : (
-                  <Button onClick={() => navigate('/new')} className="mt-4">
+                  <Button onClick={() => navigate('/new')} className="mt-8">
                     Start a Conversation
                   </Button>
                 )}

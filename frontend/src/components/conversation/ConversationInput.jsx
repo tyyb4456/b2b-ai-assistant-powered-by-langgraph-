@@ -48,6 +48,8 @@ export default function ConversationInput({
       const rect = sendButtonRef.current?.getBoundingClientRect();
       if (rect) handleSend(rect.width / 2, rect.height / 2);
       else handleSend();
+    } else if (e.key === 'Escape') {
+      setMessage('');
     }
   };
 
@@ -72,7 +74,7 @@ export default function ConversationInput({
 
       <div className="relative">
         <AnimatePresence>
-          {!message && !isFocused && (
+          {!message && !isFocused && !isWaitingForSupplier && (
             <motion.div
               className="absolute inset-0 flex items-center pl-5 pr-14 pointer-events-none text-neutral-400"
               initial={{ opacity: 0, y: -10 }}
@@ -90,16 +92,17 @@ export default function ConversationInput({
           type="text"
           value={message}
           onChange={e => setMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          disabled={isSending}
+          disabled={isSending || isWaitingForSupplier || disabled}
           className={`w-full px-5 pr-14 py-3.5 bg-white border-2 rounded-full transition-all duration-200 focus:outline-none text-neutral-900
             ${isFocused ? 'border-primary-500 shadow-lg shadow-primary-100' : 'border-neutral-300 hover:border-neutral-400'}
             ${isSending ? 'bg-neutral-50 cursor-not-allowed' : ''}`}
         />
 
         <button
+          type="button"
           ref={sendButtonRef}
           onClick={handleButtonClick}
           disabled={!canSend && !canResume}

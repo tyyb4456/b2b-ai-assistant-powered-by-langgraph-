@@ -5,14 +5,12 @@ import Card, { CardHeader, CardTitle, CardDescription, CardContent } from '../co
 import Button from '../components/ui/Button';
 import { StatusBadge } from '../components/ui/Badge';
 import Spinner from '../components/ui/Spinner';
-import { 
+import {
   Handshake,
   ArrowRight,
-  TrendingUp,
   Clock,
   CheckCircle,
   XCircle,
-  MessageSquare,
 } from 'lucide-react';
 import { formatRelativeTime, truncate } from '../utils/formatters';
 
@@ -20,13 +18,11 @@ export default function Negotiations() {
   const navigate = useNavigate();
   const { data: allConversations, isLoading, error } = useConversations({ limit: 100 });
 
-  // Filter only negotiation conversations
   const negotiations = useMemo(() => {
     if (!allConversations) return [];
     return allConversations.filter(conv => conv.intent === 'negotiate');
   }, [allConversations]);
 
-  // Group by status
   const groupedNegotiations = useMemo(() => {
     return {
       active: negotiations.filter(n => n.status === 'paused' || n.status === 'message_sent'),
@@ -36,40 +32,41 @@ export default function Negotiations() {
   }, [negotiations]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
+
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-neutral-900">Negotiations</h1>
-        <p className="text-neutral-600 mt-1">Track and manage your ongoing negotiations</p>
-      </div>
+      <header className="space-y-1">
+        <h1 className="text-3xl font-semibold text-neutral-900 tracking-tight">Negotiations</h1>
+        <p className="text-neutral-600 text-sm">Review and manage supplier negotiations effortlessly</p>
+      </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatCard
           title="Total"
           value={negotiations.length}
-          icon={<Handshake size={24} className="text-primary-600" />}
+          icon={<Handshake size={22} />}
         />
         <StatCard
           title="Active"
           value={groupedNegotiations.active.length}
-          icon={<Clock size={24} className="text-warning-600" />}
+          icon={<Clock size={22} />}
         />
         <StatCard
           title="Completed"
           value={groupedNegotiations.completed.length}
-          icon={<CheckCircle size={24} className="text-success-600" />}
+          icon={<CheckCircle size={22} />}
         />
         <StatCard
           title="Failed"
           value={groupedNegotiations.failed.length}
-          icon={<XCircle size={24} className="text-error-600" />}
+          icon={<XCircle size={22} />}
         />
-      </div>
+      </section>
 
       {/* Loading */}
       {isLoading && (
-        <div className="py-12">
+        <div className="py-16">
           <Spinner text="Loading negotiations..." />
         </div>
       )}
@@ -79,7 +76,7 @@ export default function Negotiations() {
         <Card>
           <CardContent>
             <div className="text-center py-8">
-              <p className="text-error-600">Failed to load negotiations</p>
+              <p className="text-error-600 font-medium">Failed to load negotiations</p>
               <p className="text-sm text-neutral-500 mt-1">{error.message}</p>
             </div>
           </CardContent>
@@ -90,80 +87,80 @@ export default function Negotiations() {
       {!isLoading && !error && negotiations.length === 0 && (
         <Card>
           <CardContent>
-            <div className="text-center py-12">
-              <Handshake className="mx-auto text-neutral-400 mb-4" size={48} />
-              <p className="text-neutral-600 mb-2">No negotiations yet</p>
-              <p className="text-sm text-neutral-500 mb-4">
-                Start negotiating with suppliers to get better deals
+            <div className="text-center py-16 space-y-4">
+              <div className="w-14 h-14 mx-auto rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-500">
+                <Handshake size={32} />
+              </div>
+              <p className="text-neutral-700 font-medium">No negotiations yet</p>
+              <p className="text-sm text-neutral-500">
+                Start negotiating with suppliers to secure better deals.
               </p>
-              <Button onClick={() => navigate('/new')}>
-                Start a Negotiation
+              <Button onClick={() => navigate('/conversation')} className="mt-2">
+                Start Negotiation
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Active Negotiations */}
-      {!isLoading && !error && groupedNegotiations.active.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Negotiations</CardTitle>
-            <CardDescription>
-              {groupedNegotiations.active.length} negotiation(s) in progress
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {groupedNegotiations.active.map(negotiation => (
-                <NegotiationCard
-                  key={negotiation.thread_id}
-                  negotiation={negotiation}
-                  onClick={() => navigate(`/conversation/${negotiation.thread_id}`)}
-                />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Active */}
+      {groupedNegotiations.active.length > 0 && (
+        <NegotiationSection
+          title="Active Negotiations"
+          subtitle={`${groupedNegotiations.active.length} ongoing`}
+          list={groupedNegotiations.active}
+          navigate={navigate}
+        />
       )}
 
-      {/* Completed Negotiations */}
-      {!isLoading && !error && groupedNegotiations.completed.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Completed Negotiations</CardTitle>
-            <CardDescription>
-              {groupedNegotiations.completed.length} successful negotiation(s)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {groupedNegotiations.completed.map(negotiation => (
-                <NegotiationCard
-                  key={negotiation.thread_id}
-                  negotiation={negotiation}
-                  onClick={() => navigate(`/conversation/${negotiation.thread_id}`)}
-                />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Completed */}
+      {groupedNegotiations.completed.length > 0 && (
+        <NegotiationSection
+          title="Completed Negotiations"
+          subtitle={`${groupedNegotiations.completed.length} completed`}
+          list={groupedNegotiations.completed}
+          navigate={navigate}
+        />
       )}
     </div>
   );
 }
 
-// Stat Card
+
+/** Reusable Section Wrapper */
+function NegotiationSection({ title, subtitle, list, navigate }) {
+  return (
+    <Card className="shadow-sm border border-neutral-200/70">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{subtitle}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {list.map(item => (
+            <NegotiationCard
+              key={item.thread_id}
+              negotiation={item}
+              onClick={() => navigate(`/conversation/${item.thread_id}`)}
+            />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Stat Card */
 function StatCard({ title, value, icon }) {
   return (
-    <Card>
+    <Card className="shadow-sm border border-neutral-200">
       <CardContent>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-neutral-600 font-medium">{title}</p>
-            <p className="text-3xl font-bold text-neutral-900 mt-2">{value}</p>
+            <p className="text-neutral-600 text-sm">{title}</p>
+            <p className="text-3xl font-semibold text-neutral-900 mt-1">{value}</p>
           </div>
-          <div className="p-3 rounded-lg bg-neutral-100">
+          <div className="p-3 rounded-xl bg-neutral-100 text-neutral-600">
             {icon}
           </div>
         </div>
@@ -172,40 +169,36 @@ function StatCard({ title, value, icon }) {
   );
 }
 
-// Negotiation Card
+/** Negotiation Card */
 function NegotiationCard({ negotiation, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="p-4 border border-neutral-200 rounded-lg hover:border-primary-300 hover:bg-primary-50/30 transition-all cursor-pointer group"
+      className="
+        p-4 rounded-xl border border-neutral-200 hover:border-neutral-400 
+        hover:bg-neutral-50 transition-all cursor-pointer group flex items-start gap-4
+      "
     >
-      <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-lg bg-secondary-100 flex items-center justify-center text-2xl shrink-0">
-          🤝
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <StatusBadge status={negotiation.status} />
-            {negotiation.status === 'paused' && (
-              <span className="text-xs text-warning-600 font-medium">
-                Waiting for supplier response
-              </span>
-            )}
-          </div>
-          <p className="text-neutral-900 font-medium mb-1">
-            {truncate(negotiation.preview, 100)}
-          </p>
-          <p className="text-sm text-neutral-500">
-            {formatRelativeTime(negotiation.created_at)}
-          </p>
-        </div>
-
-        <ArrowRight 
-          size={20} 
-          className="text-neutral-400 group-hover:text-primary-600 transition-colors shrink-0 mt-2" 
-        />
+      <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center text-neutral-600">
+        🤝
       </div>
+
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-1">
+          <StatusBadge status={negotiation.status} />
+        </div>
+
+        <p className="text-neutral-900 font-medium mb-1">
+          {truncate(negotiation.preview, 90)}
+        </p>
+
+        <p className="text-sm text-neutral-500">{formatRelativeTime(negotiation.created_at)}</p>
+      </div>
+
+      <ArrowRight
+        size={18}
+        className="text-neutral-400 group-hover:text-neutral-700 transition-colors mt-2"
+      />
     </div>
   );
 }

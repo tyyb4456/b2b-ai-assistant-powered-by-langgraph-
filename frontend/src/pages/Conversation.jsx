@@ -73,20 +73,13 @@ export default function Conversation() {
     setMessages((prev) => [...prev, userMessage]);
   };
 
-  const formatAssistantContent = (content, type) => {
-    if (!content) return null;
-    if (type === 'error' || content.includes('RESOURCE_EXHAUSTED')) {
-      return `⚠️ Your request could not be processed. Please check your plan and try again.`;
-    }
-    return content;
-  };
-
   const handleStartConversation = (userInput) => {
     lastUserInputRef.current = userInput;
     addUserMessage(userInput);
     setIsStreaming(true);
     setError(null);
     setConnectionStatus('connected');
+    setStreamingMessage('');
 
     cleanupRef.current = api.startConversationStream(
       { userInput, channel: 'web' },
@@ -103,6 +96,7 @@ export default function Conversation() {
     setError(null);
     setIsWaitingForSupplier(false);
     setConnectionStatus('connected');
+    setStreamingMessage('');
 
     cleanupRef.current = api.continueConversationStream(
       currentThreadId,
@@ -118,6 +112,7 @@ export default function Conversation() {
     setError(null);
     setIsWaitingForSupplier(false);
     setConnectionStatus('connected');
+    setStreamingMessage('');
 
     const requestId = 'temp_request_id';
     cleanupRef.current = api.resumeConversationStream(
@@ -129,6 +124,7 @@ export default function Conversation() {
     );
   };
 
+  // Stream event handler
   const handleStreamEvent = (event) => {
     const { type, data = {} } = event;
 
@@ -137,81 +133,106 @@ export default function Conversation() {
         setConnectionStatus('reconnecting');
         setRetryAttempt(data.attempt || 0);
         break;
+
       case 'connected':
         setConnectionStatus('connected');
         setRetryAttempt(0);
         if (data.thread_id && !currentThreadId) setCurrentThreadId(data.thread_id);
         break;
+
       case 'message':
       case 'ai_chunk':
       case 'node_progress':
         if (data.content && data.content.trim() !== lastUserInputRef.current) {
+          const displayContent = data.type === 'assistant_thought'
+            ? null
+            : data.content;
+
+          // Only update streamingMessage live
+          if (displayContent) setStreamingMessage((prev) => (prev ? prev + data.content : data.content));
+
+          // Update assistant thought separately
           if (data.type === 'assistant_thought') {
             setAssistantThought((prev) => (prev ? prev + '\n' + data.content : data.content));
-          } else {
-            const displayContent = formatAssistantContent(data.content, type);
-            setStreamingMessage((prev) => (prev ? prev + '\n' + displayContent : displayContent));
           }
         }
         break;
+
       case 'ai_complete':
       case 'workflow_complete':
-        if (streamingMessage) {
-          setMessages((prev) => [
-            ...prev,
-            { id: Date.now(), from: 'assistant', content: streamingMessage, type: 'assistant', timestamp: new Date().toISOString(), status: 'complete' },
-          ]);
-          setStreamingMessage('');
-        }
-        if (assistantThought) {
-          setMessages((prev) => [
-            ...prev,
-            { id: Date.now() + 1, from: 'assistant', content: assistantThought, type: 'assistant_thought', timestamp: new Date().toISOString(), status: 'complete' },
-          ]);
-          setAssistantThought('');
-        }
+        appendAIMessage();
         setIsStreaming(false);
         setIsWaitingForSupplier(false);
         break;
+
       case 'supplier_wait':
       case 'paused':
         setIsWaitingForSupplier(true);
         break;
+
       case 'supplier_response':
         setIsWaitingForSupplier(false);
         if (data.content) {
           setMessages((prev) => [
             ...prev,
-            { id: Date.now(), from: 'supplier', content: data.content, type: 'supplier', timestamp: new Date().toISOString(), status: 'complete' },
+            {
+              id: Date.now(),
+              from: 'supplier',
+              content: data.content,
+              type: 'supplier',
+              timestamp: new Date().toISOString(),
+              status: 'complete',
+            },
           ]);
         }
         break;
+
       case 'error':
         setError(data.error || 'An error occurred');
         setIsStreaming(false);
         setConnectionStatus('error');
         toast.error('Connection error: ' + (data.error || 'Unknown'));
         break;
+
       default:
         console.log('Unknown event type:', type);
     }
   };
 
-  const handleStreamComplete = () => {
+  const appendAIMessage = () => {
     if (streamingMessage) {
       setMessages((prev) => [
         ...prev,
-        { id: Date.now(), from: 'assistant', content: streamingMessage, type: 'assistant', timestamp: new Date().toISOString(), status: 'complete' },
+        {
+          id: Date.now(),
+          from: 'assistant',
+          content: streamingMessage,
+          type: 'assistant',
+          timestamp: new Date().toISOString(),
+          status: 'complete',
+        },
       ]);
       setStreamingMessage('');
     }
+
     if (assistantThought) {
       setMessages((prev) => [
         ...prev,
-        { id: Date.now() + 1, from: 'assistant', content: assistantThought, type: 'assistant_thought', timestamp: new Date().toISOString(), status: 'complete' },
+        {
+          id: Date.now() + 1,
+          from: 'assistant',
+          content: assistantThought,
+          type: 'assistant_thought',
+          timestamp: new Date().toISOString(),
+          status: 'complete',
+        },
       ]);
       setAssistantThought('');
     }
+  };
+
+  const handleStreamComplete = () => {
+    appendAIMessage();
     setIsStreaming(false);
     setConnectionStatus('connected');
   };
@@ -244,25 +265,32 @@ export default function Conversation() {
   };
 
   const handleCopyConversation = () => {
-    const text = messages.map((msg) => {
-      const sender = msg.from === 'user' ? 'You' : msg.from === 'assistant' ? 'AI Assistant' : 'Supplier';
-      return `${sender}: ${msg.content}`;
-    }).join('\n\n');
+    const text = messages
+      .map((msg) => {
+        const sender =
+          msg.from === 'user'
+            ? 'You'
+            : msg.from === 'assistant'
+              ? 'AI Assistant'
+              : 'Supplier';
+        return `${sender}: ${msg.content}`;
+      })
+      .join('\n\n');
     navigator.clipboard.writeText(text);
     toast.success('Conversation copied!');
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-neutral-50">
+    <div className="flex flex-col h-[calc(100vh-2rem)] bg-neutral-50">
       <ConnectionStatus status={connectionStatus} retryAttempt={retryAttempt} />
 
-      <div className="px-6 py-6 border-b border-neutral-200 bg-white">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+      <div className="px-6 py-3 border-b border-neutral-400 bg-white">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-black">
+            <h1 className="text-2xl font-bold text-black">
               {currentThreadId ? 'Conversation' : 'Start a conversation'}
             </h1>
-            <p className="text-neutral-600 mt-1">
+            <p className="text-neutral-500 mt-1">
               Get supplier info, request a quote, and negotiate — all from this page.
             </p>
           </div>
@@ -270,16 +298,29 @@ export default function Conversation() {
           {currentThreadId && (
             <div className="flex items-center gap-2">
               {messages.length > 0 && (
-                <button onClick={handleCopyConversation} className="px-3 py-2 text-sm font-medium text-black hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2" title="Copy conversation">
+                <button
+                  onClick={handleCopyConversation}
+                  className="px-3 py-2 text-sm font-medium text-black hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2"
+                  title="Copy conversation"
+                >
                   <Copy size={16} />
                   Copy
                 </button>
               )}
-              <button onClick={() => navigate(`/conversation/${currentThreadId}/details`)} className="px-3 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2" title="View conversation details">
+              <button
+                onClick={() =>
+                  navigate(`/conversation/${currentThreadId}/details`)
+                }
+                className="px-3 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg flex items-center gap-2"
+                title="View conversation details"
+              >
                 <Info size={16} />
                 Details
               </button>
-              <button onClick={handleNewConversation} className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg">
+              <button
+                onClick={handleNewConversation}
+                className="px-4 py-2 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg"
+              >
                 New Conversation
               </button>
             </div>
@@ -305,7 +346,11 @@ export default function Conversation() {
             onResume={handleResumeConversation}
             disabled={isStreaming}
             isWaitingForSupplier={isWaitingForSupplier}
-            placeholder={isWaitingForSupplier ? 'Waiting for supplier response...' : 'Type your message...'}
+            placeholder={
+              isWaitingForSupplier
+                ? 'Waiting for supplier response...'
+                : 'Type your message...'
+            }
           />
         </div>
       </div>

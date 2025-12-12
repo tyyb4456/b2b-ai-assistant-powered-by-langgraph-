@@ -153,8 +153,6 @@ def search_suppliers_direct_sql(state : AgentState):
     Uses AI model for intelligent filtering, market insights, and alternatives
     """
     try:
-        # Change this:
-        extracted_params = state['extracted_parameters']
 
         # To this (with safety check):
         extracted_params = state.get('extracted_parameters', {})

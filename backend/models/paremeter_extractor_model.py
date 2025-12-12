@@ -54,13 +54,10 @@ class ExtractedRequest(BaseModel):
             "   - Delivery timeline (if available)\n"
             "   - Budget constraints (if available)\n"
             "   - Special requirements (certifications, quality specs, etc.)\n"
-            "3. If information is missing, smoothly transition with: 'To give you the best results, I need a few more details:'\n"
-            "4. End with next steps: 'Once I have this info, I'll [find suppliers/generate quotes/etc.]'\n\n"
             "**Tone:** Professional but friendly, clear and organized, action-oriented.\n"
             "**Avoid:** Technical jargon, saying 'you requested', robotic language.\n"
             "**Example:** 'Perfect! Here's what I've gathered: You're looking for 10,000 meters of organic cotton fabric "
             "(GSM 180) with GOTS certification, delivery to Pakistan within 45 days, and a budget of $4-5 per meter. "
-            "To give you the best options, could you confirm: [questions]. Once I have this, I'll source the top suppliers for you!'"
         )
     )
     

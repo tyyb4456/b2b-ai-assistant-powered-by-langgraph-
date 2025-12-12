@@ -339,8 +339,8 @@ export default function Conversation() {
         />
       </div>
 
-      <div className="border-t border-neutral-200 bg-white">
-        <div className="max-w-4xl mx-auto px-3 py-4">
+      <div className="border-t  border-neutral-300 bg-white">
+        <div className="max-w-8xl mb-0 px-0 py-2 justify-between">
           <ConversationInput
             onSubmit={handleSubmit}
             onResume={handleResumeConversation}

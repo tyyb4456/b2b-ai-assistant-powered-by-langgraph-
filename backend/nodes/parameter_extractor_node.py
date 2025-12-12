@@ -66,10 +66,10 @@ def extract_parameters(state: AgentState) -> dict:
         # Get structured extraction from LLM
         extraction_result: ExtractedRequest = structured_model.invoke(messages)
 
-        assistant_message = f"Extracted parameters with {extraction_result.urgency_level} urgency. and the brief extraction notes are: {extraction_result.detailed_extraction} and missing info are: {', '.join(extraction_result.missing_info) if extraction_result.missing_info else 'None'}"
-
+        assistant_message = extraction_result.detailed_extraction
+        
         if extraction_result.clarification_questions:
-            assistant_message += f" Clarification questions: {', '.join(extraction_result.clarification_questions)}"
+            # assistant_message += f" Clarification questions: {', '.join(extraction_result.clarification_questions)}"
             logger.info(f"Clarification questions generated: {extraction_result.clarification_questions}")
             logger.warning("Missing critical information, clarification needed.")
 

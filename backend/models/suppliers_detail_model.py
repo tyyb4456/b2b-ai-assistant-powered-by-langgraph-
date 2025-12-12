@@ -118,10 +118,23 @@ class SupplierSearchResult(BaseModel):
     total_suppliers_found: int = Field(..., description="Total number of suppliers found")
     filtered_suppliers: int = Field(..., description="Number after filtering")
     top_recommendations: List[Supplier] = Field(..., description="Top ranked suppliers (max 10)")
-    search_strategy: str = Field(..., description="Strategy used for this search")
-    market_insights: str = Field(..., description="Brief market analysis and recommendations")
+    
+    search_strategy: str = Field(
+        ..., 
+        description="Brief user-friendly explanation of search and filtering approach"
+    )
+    
+    market_insights: str = Field(
+        ..., 
+        description="Main assistant message summarizing results, market conditions, and next steps"
+    )
+    
     confidence: float = Field(..., description="Confidence in recommendations", ge=0.0, le=1.0)
-    alternative_suggestions: Optional[List[str]] = Field(default_factory=list, description="Alternative options if results are limited")
+    
+    alternative_suggestions: Optional[List[str]] = Field(
+        default_factory=list, 
+        description="Alternative options if results are limited"
+    )
     
     # Additional metadata
     search_timestamp: Optional[datetime] = Field(default_factory=datetime.utcnow)
@@ -149,18 +162,58 @@ class SupplierAnalysis(BaseModel):
     top_supplier_ids: List[str] = Field(
         description="Top 5-10 supplier IDs ranked by overall fit"
     )
+    
     market_insights: str = Field(
-        description="Detailed market analysis including pricing trends, availability, and recommendations"
+        description=(
+            "A friendly, conversational message directly to the user summarizing supplier search results. Format:\n\n"
+            "**Structure:**\n"
+            "1. Start with results summary: 'Great news! I found [X] suppliers who match your requirements.'\n"
+            "2. Provide market context:\n"
+            "   - Pricing trends: 'Current market prices range from $X-Y per meter'\n"
+            "   - Availability: 'Strong availability' / 'Limited options due to [reason]'\n"
+            "   - Lead times: 'Typical delivery is X-Y days'\n"
+            "3. Highlight top recommendations:\n"
+            "   - 'The top matches include suppliers from [regions] with [key strengths]'\n"
+            "   - Mention standout features: certifications, reliability scores, competitive pricing\n"
+            "4. Note any trade-offs or considerations:\n"
+            "   - 'If you're flexible on [parameter], you could get better [benefit]'\n"
+            "5. End with next steps: 'I'll now prepare detailed quotes from these suppliers.'\n\n"
+            "**Tone:** Informative, optimistic (when results are good), honest (if challenges exist), action-oriented.\n"
+            "**Avoid:** Technical jargon, supplier IDs in the message, overly formal language.\n"
+            "**Example:** 'Great news! I found 8 suppliers who can provide organic cotton fabric within your specs. "
+            "Current market pricing is running $4.20-$5.50/meter for GOTS-certified material. The top matches include "
+            "established suppliers from Turkey and India with 8.5+ reliability scores and 25-30 day lead times. "
+            "I'll now prepare detailed quotes comparing pricing, delivery terms, and certifications.'"
+        )
     )
+    
     alternative_suggestions: List[str] = Field(
-        description="Alternative fabric types or suppliers to consider"
+        description=(
+            "List of alternative approaches if results are limited. Examples:\n"
+            "- 'Consider polyester blends as a cost-effective alternative'\n"
+            "- 'Increasing quantity to 15,000m could unlock better pricing'\n"
+            "- 'Extending timeline by 2 weeks opens up 5 more high-quality suppliers'\n"
+            "Keep suggestions actionable and business-focused."
+        )
     )
+    
     search_strategy: str = Field(
-        description="Description of the filtering strategy used"
+        description=(
+            "A brief, user-friendly explanation of how suppliers were found and filtered. Format:\n"
+            "'I searched for suppliers specializing in [fabric type] with [key requirements], "
+            "then filtered based on [criteria] to ensure the best matches for your needs.'\n"
+            "Keep it simple - 1-2 sentences max. This provides transparency without overwhelming detail."
+        )
     )
+    
     filtering_rationale: str = Field(
-        description="Explanation of why certain suppliers were filtered out"
+        description=(
+            "Technical explanation of filtering logic (internal use only - not shown to user). "
+            "Example: 'Filtered out 12 suppliers: 5 due to MOQ mismatch, 4 lacking required certifications, "
+            "3 with reliability scores below 6.0'"
+        )
     )
+
 
 
 class SupplierCreateRequest(BaseModel):

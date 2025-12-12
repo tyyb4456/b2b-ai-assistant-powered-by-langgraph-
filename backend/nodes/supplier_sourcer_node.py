@@ -118,7 +118,7 @@ Return supplier_ids in your lists, not full objects."""
 
         print(f"   Filtering Rationale: {ai_result.filtering_rationale[:100]}...")
         logger.info(f"AI filtering succeeded: Total Suppliers: {len(suppliers)}, {len(filtered_suppliers)} suppliers filtered, {len(top_recommendations)} top recommendations, rationale: {ai_result.filtering_rationale[:100]}...")
-        
+
         return {
             'filtered_suppliers': filtered_suppliers,
             'top_recommendations': top_recommendations,
@@ -289,6 +289,8 @@ def search_suppliers_direct_sql(state : AgentState):
             market_insights = ai_analysis['market_insights']
             alternative_suggestions = ai_analysis['alternative_suggestions']
             search_strategy = ai_analysis['search_strategy']
+            filtering_rationale = ai_analysis['filtering_rationale']
+
             
         else:
             # No suppliers found
@@ -312,7 +314,12 @@ def search_suppliers_direct_sql(state : AgentState):
             search_parameters=extracted_params
         )
 
-        assistant_message = f"Found {total_found} suppliers, filtered to {len(filtered_suppliers)} based on criteria."
+        assistant_message = market_insights
+
+        # Optionally append alternative suggestions if results are limited
+        if supplier_search_result.filtered_suppliers < 5 and supplier_search_result.alternative_suggestions:
+            assistant_message += "\n\n💡 **Alternative Options:**\n"
+            assistant_message += "\n".join(f"• {suggestion}" for suggestion in supplier_search_result.alternative_suggestions)
 
         top_suppliers = [supplier.model_dump() for supplier in supplier_search_result.top_recommendations]  # Pydantic v2
 

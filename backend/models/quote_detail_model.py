@@ -27,12 +27,44 @@ class SupplierQuoteOption(BaseModel):
 
 class QuoteAnalysis(BaseModel):
     """Strategic analysis and recommendations"""
-    market_assessment: str = Field(..., description="Overall market conditions and pricing trends")
+    
+    market_assessment: str = Field(
+        ..., 
+        description=(
+            "User-facing message explaining market conditions. Include: "
+            "current pricing trends ($X-Y range), supply availability (strong/limited), "
+            "typical lead times, and overall options quality. "
+            "Example: 'Market pricing for organic cotton is $4.20-5.50/meter. "
+            "Availability is strong with 6 qualified suppliers. You have excellent options.'"
+        )
+    )
     recommended_supplier: str = Field(..., description="Primary recommended supplier name")
-    recommendation_reasoning: str = Field(..., description="Detailed reasoning for the recommendation")
-    risk_factors: List[str] = Field(..., description="Key risks to be aware of")
-    negotiation_opportunities: List[str] = Field(..., description="Suggested negotiation points")
-    alternative_strategies: List[str] = Field(..., description="Alternative approaches if needed")
+    
+    recommendation_reasoning: str = Field(
+        ..., 
+        description=(
+            "Clear explanation of why the recommended supplier is best. Include: "
+            "their key strength (cost/speed/quality), supporting evidence (reliability score, certifications), "
+            "honest comparison to alternatives, and confidence statement. "
+            "Example: 'Premium Textile offers best value at $52,400 with 28-day delivery and 8.7/10 reliability. "
+            "While Indian Fabrics is $2k cheaper, Premium's track record makes them lower-risk.'"
+        )
+    )
+    
+    risk_factors: List[str] = Field(
+        ..., 
+        description="User-facing risks: '⚠️ [Risk]: [Impact]'. Keep specific and actionable."
+    )
+    
+    negotiation_opportunities: List[str] = Field(
+        ..., 
+        description="Actionable negotiation points: '💡 [Opportunity]: [How to use it]'. Be concrete."
+    )
+    
+    alternative_strategies: List[str] = Field(
+        ..., 
+        description="Alternative approaches: '🔄 [Strategy]: [Trade-off]'. Each shows different priority."
+    )
 
 class GeneratedQuote(BaseModel):
     """Complete quote document structure"""

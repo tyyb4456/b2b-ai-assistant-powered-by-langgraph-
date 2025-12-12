@@ -22,8 +22,17 @@ class IntentClassification(BaseModel):
     )
     reasoning: str = Field(
         ...,
-        description="Brief explanation of why this intent was chosen"
+        description=(
+            "A friendly, conversational explanation directly to the user explaining "
+            "how their message was understood. Start with phrases like:\n"
+            "- 'Got it! I understand you want to...'\n"
+            "- 'I see you're looking for...'\n"
+            "- 'Based on your message, it looks like you need...'\n"
+            "Keep it natural, clear, and action-oriented. Avoid phrases like "
+            "'The user requested' - speak directly TO the user, not about them."
+        )
     )
+
 
 
 def create_classification_prompt():
@@ -106,7 +115,8 @@ def classify_intent(state: AgentState):
         classification: IntentClassification = structured_model.invoke(formatted_prompt)
 
         # Create assistant response message
-        assistant_message = f"Intent classified as: {classification.intent} (confidence: {classification.confidence:.2f})"
+
+        assistant_message = classification.reasoning
 
         logger.info(f"Classified intent: {classification.intent} with confidence {classification.confidence}")
 

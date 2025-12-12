@@ -809,29 +809,37 @@ def generate_quote(state: AgentState) -> dict:
         
         # Step 11: Create assistant response message
         best_supplier = supplier_options[0] if supplier_options else None
-        
         if best_supplier:
             savings_text = ""
             if quote_result.estimated_savings:
-                savings_text = f"\n💰 Potential Savings: Up to {quote_result.estimated_savings}% by choosing optimal supplier"
+                savings_text = f"\n\n💰 **Potential Savings:** Up to {quote_result.estimated_savings}% by choosing optimal supplier"
             
+            # Create comprehensive assistant message
             assistant_message = f"""✅ **Quote Generated Successfully!**
 
 **Quote ID:** `{quote_result.quote_id}`
 
-**Recommended Option:**
-- Supplier: **{best_supplier.supplier_name}** ({best_supplier.supplier_location})
-- Total Landed Cost: **${best_supplier.total_landed_cost:,.2f}**
-- Lead Time: {best_supplier.lead_time_days} days
-- Reliability Score: {best_supplier.reliability_score}/10
-- Overall Score: {best_supplier.overall_score:.1f}/100{savings_text}
+{quote_result.strategic_analysis.market_assessment}
 
-**Key Insight:**
-{quote_result.strategic_analysis.recommendation_reasoning[:200]}...
+🎯 **My Recommendation:**
 
-📊 Complete quote with {len(supplier_options)} supplier options is ready for review."""
+**{best_supplier.supplier_name}** from {best_supplier.supplier_location}
+
+💰 Total Landed Cost: **${best_supplier.total_landed_cost:,.2f}** (${best_supplier.unit_price:.2f}/unit)
+⏱️ Lead Time: {best_supplier.lead_time_days} days
+⭐ Reliability: {best_supplier.reliability_score}/10
+🏆 Overall Score: {best_supplier.overall_score:.1f}/100
+
+**Why this supplier?**
+{quote_result.strategic_analysis.recommendation_reasoning}
+
+💡 **Negotiation Opportunities:**
+{chr(10).join(f"• {opp}" for opp in quote_result.strategic_analysis.negotiation_opportunities[:3])}{savings_text}
+
+📊 Complete quote with {len(supplier_options)} detailed supplier options is ready for review.
+        """
         else:
-            assistant_message = "⚠️ Quote generated but no suppliers fully meet all requirements. Please review options."
+            assistant_message = "⚠️ Quote generated but no suppliers fully meet all requirements. Please review options and alternative strategies."
         
         logger.info(f"Quote {quote_result.quote_id} generated successfully")
         

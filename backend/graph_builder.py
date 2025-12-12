@@ -14,6 +14,7 @@ from nodes.parameter_extractor_node import extract_parameters
 from nodes.quote_generator_node import generate_quote
 from nodes.supplier_sourcer_node import search_suppliers_direct_sql  
 from nodes.quote_sender_node import send_quote_email
+from nodes.state_summarizer_node import summarize_state
 from nodes.negotiation_starter_node import start_negotiation
 from nodes.negotiation_message_drafter_node import draft_negotiation_message
 from nodes.message_validator_node import validate_and_enhance_message
@@ -38,8 +39,8 @@ class Config:
         Your competitor quoted 10% lower, can you match?
     ''')  
     DEFAULT_GET_QUOTE_INPUT = os.getenv("DEFAULT_GET_QUOTE_INPUT", '''
-        ,
-        What's your price for 10k yI need a quote for 5,000 meters of organic cotton canvasards of denim fabric?,
+        I need a quote for 5,000 meters of organic cotton canvas,
+        What's your price for 10k yards of denim fabric?,
         Cost for cotton poplin 120gsm, GOTS certified?,
         Price check: polyester blend, 50/50, 150gsm, quantity 20,000m
     ''')
@@ -86,6 +87,7 @@ graph_builder.add_node('extract_parameters', extract_parameters)
 graph_builder.add_node('search_suppliers_direct_sql', search_suppliers_direct_sql)
 graph_builder.add_node('generate_quote', generate_quote)
 graph_builder.add_node("send_quote_email", send_quote_email)
+graph_builder.add_node('summarize_state', summarize_state)
 
 graph_builder.add_node('start_negotiation', start_negotiation)
 graph_builder.add_node('draft_negotiation_message', draft_negotiation_message)
@@ -110,7 +112,8 @@ graph_builder.add_conditional_edges(
 
 graph_builder.add_edge('extract_parameters', 'search_suppliers_direct_sql')
 graph_builder.add_edge('search_suppliers_direct_sql', 'generate_quote')
-graph_builder.add_edge('generate_quote', END)
+graph_builder.add_edge('generate_quote', 'summarize_state')
+graph_builder.add_edge('summarize_state', END)
 # graph_builder.add_edge("send_quote_email", END)
 
 graph_builder.add_edge('start_negotiation', 'draft_negotiation_message')

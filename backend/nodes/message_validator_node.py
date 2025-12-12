@@ -279,7 +279,7 @@ Generate an enhanced version that eliminates confusion while keeping the core me
 
 
 # Initialize models and prompts
-model = init_chat_model("google_genai:gemini-2.0-flash")
+model = init_chat_model("google_genai:gemini-2.5-flash")
 validation_model = model.with_structured_output(MessageValidationResult)
 enhancement_model = model.with_structured_output(EnhancedMessage)
 

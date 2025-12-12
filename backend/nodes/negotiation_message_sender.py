@@ -15,7 +15,7 @@ def _run_email_agent_sync(recipient_email: str, drafted_message: str) -> tuple:
     Run the email agent synchronously.
     This is called via asyncio.to_thread to avoid blocking the async event loop.
     """
-    model = init_chat_model("google_genai:gemini-2.5-flash_lite")
+    model = init_chat_model("google_genai:gemini-2.5-flash")
 
     composio = Composio(provider=LangchainProvider())
 

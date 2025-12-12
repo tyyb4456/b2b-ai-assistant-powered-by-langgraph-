@@ -253,6 +253,7 @@ class GraphManager:
             # 3. Re-execute from START
             async for event in self._graph.astream(updates, config):
                 logger.debug(f"Continue event: {list(event.keys())}")
+                logger.info(f"Continue event: {list(event.keys())}")
                 yield event
             
             logger.success(f"Workflow continued successfully for thread: {thread_id}")
